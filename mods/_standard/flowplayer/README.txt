@@ -1,5 +1,258 @@
 Version history:
 
+3.2.16
+------
+- #15 fixes for #627, handle the display init on startup.
+- #615 dispatch begin if in paused mode too early.
+- #629 if start has been dispatched already prevent dispatching many begin events.
+- #20 for the free player swap the logo with the stage video mask to display underneath not on top.
+- #42 pass in stream clips through and close the stream before returning to the parent clip.
+- #52 when replaying flag start has dispatched on the current clip.
+- #44 fixes for #627 check if the stagevideo dimensions and positioning has changed to update the stage video mask with.
+- unbinding and binding stage video events caused issues with instream playlists therefore has to be kept binded.
+  unbinded stage video events during seeking to prevent the mask repositioning.
+- #53 update url filter to accomodate for pretty urls with semi colons.
+- #50 if we have metadata already set it is being updated during seeks and switching, dispatch metadata change events instead.
+
+3.2.15
+------
+- #614 when the clip ends if the next clip in the provider has a different provider close the provider stream.
+- #627 only detach / attach the display on start events which causes issues in buffering events after a seek in stagevideo.
+- #627 re-enable stagevideo state change listeners if stagevideo is available or detach the fullscreen events on first call.
+- #9 when replaying from stopping, connection does not receive callbacks anymore.
+
+
+
+
+3.2.13
+------
+- Updated to automatically load the latest controls and audio plugins
+- #612 add some logging for the stagevideo render state to determine what mode the hardware acceleration is in for various systems.
+- #628 opera browsers do not return filesize correctly for latest flash players so require to use load completion instead which may help with gzipped files also.
+
+3.2.12
+------
+- new flowplayer.js version 3.2.11,
+   fixes removing the player in fullscreen mode leaves Android locked in landscape orientation (#511)
+- #586 add a bitrate label with a new namespace attribute fp:bitratelabel.
+- #583 fixes for handling the fullscreenOnly property better
+- #494 with relative filenames with a root path strip the baseurl of paths first.
+
+3.2.11
+------
+- new flowplayer.js, now requires Flash 10.1 as the minimum flash version
+- #526 allow click through event for flash installation message when using div containers.
+- #508 disabling the stagevideo screen mask, canvas is visible without it, this was causing issues with the display list.
+- #443 adding accessibility option to the playbuttonoverlay.
+
+
+3.2.10
+------
+- Fixed #514, scrubbing was broken
+- new flowplayer.js version 3.2.9, fixes #510
+
+3.2.9
+-----
+- Fixed #490, controlbar background, buffer bar and progress bar colors were all reset to white
+- #503 Update viewport when stage is added to obtain the coordnates correctly. Update viewport when in and out of fullscreen.
+- #508 stage video mask was being added to the top layer and hiding all children.
+
+3.2.8
+-----
+- Added new property clip.backBufferLength, to be used with FMS 3.5
+- Adds support for StageVideo. To enable it set clip.accelerated to true.
+- Tries to reload two times if the stream is not initially found. Also does 3 connection attempts if the connection fails with RTMP.
+- Support for FMS slow motion
+- Support for thumbnails in RSS files
+- Added onPlayStatus clip event handler on NetStreamClient.
+- Added new clip events for stream switching onSwitchFailed and onSwitchComplete
+- made it possible to replay a clip using play(<current_clip's_index>)
+
+Fixes:
+- fixed to dispatch onStart also when replaying the previous clip, now the JS controlbar again works when replaying
+- cuepoints were fired multiple times when there is a playlist with several clips. Issue #150.
+- fixed XML parsing error when metadata's keys contains dashes
+- backgroundImage css property can now be set to "none" to be removed
+- fixed the facts that clips in a playlist were cut off by a fraction in the end
+- fullScreenOnly now works in conjunction with displayTime
+- JS plugins now handles grouped syntax like flowplayer("a.player" /*...*/ )
+- JS function setClip can now be used to add listeners on the new Clip
+- different players with the same configuration stored in a variable can now use JS plugins
+- using linkUrl now works when calling JS function setClip
+- zIndex for plugins works fine now, issue #302
+- onLastSecond was fired twice, issue #300
+- fixed license key verification on subdomains, issue #318
+- fixed XSS vulnerability with linkUrls. Thank you Szymon Gruszecki for discovering and reporting this to us. Issue #329.
+- fixed switch stream api support in paused state. #279.
+- added switching state properties. #339
+- fixed the stopBuffering() API method to close the NetConnection and to clear the screen
+- Issue #355 setup targeting for Flash 10.0 and 10.1 to provide support for Flash 10.0 without Stagevideo requirements.
+- fixed #364, NetConnection unnecessary closed/reconnected when the netConnection does not change from clip to clip
+- xss fix for flashembed #357
+- Issue #384 added links support in context menus with configuration { url: "domain.com", target: "_blank"} which will work in embedded players.
+- #378, javascript method loadPluginWithConfig is unavailable and non existant. Documentation updated required to remove this and updates for loadPlugin like so
+this.loadPlugin("content","../flowplayer.content.swf", { html: "test", top: 30  }); or
+this.loadPlugin("content","../flowplayer.content.swf", { html: "test"  }, function() {
+                        this.css({ top: 30 });
+                    });
+- #191 send the resume event, and no stop event first before reconnecting due to a connection timeout so the player comes out of a paused state correctly.
+- #363 pause stream after metadata not beforehand or else no metadata is sent for rtmp clips .
+- #363 silent seek and force to seek to a keyframe or else video frame will not display initially when paused.
+- #375 clearing the event listeners when adding new video displays prevents new events being added when the playlist is replaced.
+- #391 add message argument to connection failure callback required by some connection providers.
+- #363 add overridable pause to frame for different seek functionality between http and rtmp.
+- #392 possible fix for extensions with no filetypes like rtmp flv clips, require positive index check.
+- #395 apply buffer animation status to VOD streams only.
+- #375 possible fix when replacing the playlist in onBeforeFinish, move replay button to onFinish.
+- #390 correct seek back to a valid time on invalid seeking while seeking in the buffer.
+- #404 implement netstreamplayoptions for http streams, resets the stream or start loading a new stream.
+- fixed an issue in parsing JSON config that contains several comments separated by whitespace
+- new clip property 'stopLiveOnPause'
+- #415 regression issue with #395, stop the buffering animation correctly.
+- #414 problem appears again for very short clips with invalid seek times, make it step back 1 second from the invalid seek time to seek the buffer correctly.
+- #416 enable seekableOnBegin to enable the scrubbar correctly when autobuffering.
+- #423 add the . to clip type extension checks or else files with known extension postfixes within them will be chosen instead.
+- #426 when a plugin width is set to a percentage, x/y is required to be floored or else it will affect the animation engine. specifically for the autohide function.
+- #430 adding event listeners for netconnection to obtain certain events.
+- #430 clear buffering status on connection failure.
+- #430 clear buffering status on stream failure.
+- #412 check for empty baseurl or else player url is appended and affects the url parsing.
+- #439 check for all rtmp streaming protocols when checking for rtmp urls.
+- #442 fix for code error in the javascript api.
+- #461 when we have a clip base url set, we need the complete clip url sent to play2 for http streams.
+- #470 check for a playlist when replacing the playlist with an rss feed.
+- #494 regression issued caused by #412, enable base url correctly.
+- #30 regression caused by character replacements, removing for now and let end user deal with them.
+
+3.2.7
+-----
+- Loads the new controlbar plugin version 3.2.5.
+Fixes:
+- Fixed 'orig' scaling in fullscreen: http://flowplayer.org/forum/2/10274#post-52646
+
+3.2.6
+-----
+- linkUrl should now work better with popup blockers: http://code.google.com/p/flowplayer-core/issues/detail?id=31
+- new linkWindow value "_popup" opens the linked page in a popup browser window
+- added new onClipResized event
+- Added new onUnload event, can be only listened in Flash and not triggered to JS
+- API: Added new url property to plugin objects
+Fixes:
+- it was not possible to call play() in an onFinish listener
+- fix to preserve the infoObject for custom netStream and netConnection clients in cases where the infoObject is a
+  primitive object without properties
+- does not show the error dialog in the debugger player when showErrors: false
+- fixed to correctly handle xx.ca subdomains when validating the license key
+- a custom logo is now sized correctly according to the configured size
+- does not show the buffer animation any more when the player receives the onBufferEmpty message from the netStream.
+  The animation was unnecessarily shown in some situations.
+- fixed #155. added new urlEncoding property to Clip for url ncoding ut8 urls
+
+3.2.5
+-----
+- added new scaling option 'crop' that resizes to fill all available space, cropping on top/bottom or left/right
+- improvements to RSS file parsing
+- Now displays a hand cursor when a linkUrl is used in clips
+
+3.2.4
+-----
+- new flowplayer.js version, with Apple iDevice fixes
+
+3.2.3
+-----
+- a new 'type' clip property exposed to JS
+- changed the clip type property to better work as a read-write property. Now accepts 'video', 'audio',
+  'image' and 'api' as configuration values.
+- moved parallel rtmp connection mechanism from the RTMP plugin to Core so other plugins can use it (ie: securestreaming)
+Fixes:
+- fixed #112, wrong URL computation when using clip with relative URL on a page with a / after a # in its url
+- fixed #111, wrong behavior of pre/post roll images with duration 0
+- fixed multiple license keys logic
+Fixes:
+- correct verification of license keys in *.ca domains
+- fix to make playback to always reach end of video
+- fixed resuming of live streams
+
+3.2.2
+-----
+Fixes:
+- Now recognizes following kind of urls as audio clips: 'mp3:audiostreamname' (ulrs with mp3 prefix and no extension)
+- Now ignores the duration from metadata if we already got one. Fix required for pseudostreaming
+- Fix to reuse buffered data when replaying a clip
+
+3.2.1
+---------
+- Support for RTMP redirects (tested with Wowza loadbalancing)
+- Fixed video size when no size info available in clip metadata
+
+Fixes:
+- Fix to correctly detect if the player SWF name contains a version number and if it does also use the version number
+when it automatically loads the controls plugin.
+
+3.2.0
+-----
+- canvas, controlbar and the content plugin backgound color and border color can be now given with rgb() and rgba() CSS style syntax
+- Added onMouseOver() and onMouseOut() listener registration methods to the Flowplayer API
+- enhancements to RSS playlist. Converted parsing to E4X, yahoo media and flowplayer namespace support. 
+- added feature to obtain bitrate and dimension information to a new clip custom property "bitrates" for future support for bitrate choosing. 
+- added getter for playerSwfName config
+- if clip.url has the string "mp3:" in it, the clip.type will report 'audio'
+- added setKeyboardShortcutsEnabled(), addKeyListener(), removeKeyListener() to FlowplayerBase
+Fixes:
+- onSeek() was not fired when seeking while paused and when using RTMP. An extra onStart was fired too.
+- fireErrorExternal() was not working properly with an error PlayerEvent
+- countPlugins() was throwing an error when a plugin was not found
+- external swf files were not scaled properly
+- the logo was unnecessary shown when going fullscreen if logo.displayTime was being used
+- added a loadPluginWithConfig method to FlowplayerBase, accessible from javascript. Fixed double onload callback call.
+- now handles cuepoint parameters injected using the Adobe Media Encoder
+- showPlugin was not working when config.play was null
+- handles 3-part duration values included in FLV metadata, like "500.123.123"
+- player wasn't always reaching end of video
+- fixed broken buffering: false
+- fixed event dispatching when embedding flowplayer without flowplayer.js (=without playlist config field)
+- fixed safari crashes when unloading player
+- fixed scrubber behaviour with a playlist containing 2 images (or swf) in a row
+- fixed errors in logs when using an RSS playlist
+- fixed OverlayPlayButton that was showing even if it shouldn't on some cases
+- fixed wrong behavior when onBeforeFinish was returning false within playlists
+- /!\ Don't use the fadeIn / fadeOut controlbar's API while using autoHide.
+- fixed play state button with images
+- fixed splash image flickering
+
+3.1.5
+-----
+Fixes:
+- The player went to a locked state when resuming playback after a period that was long enought to send the
+netConnection to an invalid state. Now when resuming playback on an invalid connection the clip starts again from
+the beginning. This is only when using RTMP connections and does not affect progressive download playback.
+- Custom netConnect and netStream events did not pass the info object to JS listeners
+
+3.1.4
+-----
+Fixes:
+- player did not initialize if the controlbar plugin was disabled and if the play button overlay was disabled with play: null
+- works properly without cachebusting on IE
+- RSS playlist parsing now respects the isDefault attribute used in mRSS media group items
+- Fixed passing of connection arguments
+
+3.1.3
+-----
+- enhancements to RSS playlist parsing: Now skips all media:content that have unsupported types. Now the type attribute
+of the media:content element is mandatory and has to be present in the RSS file
+- Possibility to pass a RSS file name with playFeed("playlist.rss") and setPlaylist("playlist.rss") calls.
+- changes to the ConnectionProvider and URLResolver APIs
+- Now automatically uses a plugin that is called 'rtmp' for all clips that have the rtmp-protocol in their URLs.
+- Added possibility to specify all clip properties in an RSS playlist
+
+Fixes:
+- the result of URL resolvers in now cached, and the resolvers will not be used again when a clip is replayed
+- some style properties like 'backgroundGradient' had no effect in config
+- video goes tiny on Firefox: http://flowplayer.org/forum/8/23226
+- RSS playlists: The 'type' attribute value 'audio/mp3' in the media:content element caused an error.
+- Dispatches onMetadata() if an URL resolver changes the clip URL (changes to a different file)
+- error codes and error message were not properly passed to onEvent JS listeners
+
 3.1.2
 -----
 - The domain of the logo url must the same domain from where the player SWF is loaded from.
