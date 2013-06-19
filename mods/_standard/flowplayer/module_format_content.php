@@ -47,6 +47,16 @@ if (isset($_SESSION['flash']) && $_SESSION['flash'] == "yes") {
                                 src: '".AT_BASE_HREF."mods/_standard/flowplayer/flowplayer-3.2.16.swf',
                                 SeamlessTabbing: false
                                 }, {
+                                onKeyPress: function(code) {
+                                    switch(code) {
+                                        case 70: this.toggleFullscreen();           //F key
+                                        break;
+                                        case 36: this.stop();this.play();           //Home key
+                                        break;
+                                        case 67: this.getPlugin('content').toggle();//C key
+                                        break;
+                                    }
+                                },
                                 plugins: {
                                 controls: {
                                 autoHide: false,
@@ -67,6 +77,20 @@ if (isset($_SESSION['flash']) && $_SESSION['flash'] == "yes") {
                                 }
                                 });
                               </script>\n".
+                              "<h2 class='box' style='width:200px;'>
+                              <span>Shortcuts</span>
+                              <a href='#' class='flowplayer_shortcuts_link' title='Show Keyboard Shortcuts' onclick = 'show_flowplayer_shortcuts(this);return false;'></a>
+                              <div class='box' style='display:none;'>
+                                <ul class='social_side_menu'>
+                                    <li>Play/Pause: Spacebar Key</li>
+                                    <li>Restart: Home Key</li>
+                                    <li>Volume Up: Up Key</li>
+                                    <li>Volume Down: Down Key</li>
+                                    <li>Captions Toggle: C key</li>
+                                    <li>Fullscreen: F key</li>
+                                </ul>
+                              </div>
+                              </h2>\n".
 	                   "</div>\n";
 } else {
 	$media_replace[] = "<div>\n".
@@ -85,6 +109,16 @@ if (isset($_SESSION['flash']) && $_SESSION['flash'] == "yes") {
                                 src: '".AT_BASE_HREF."mods/_standard/flowplayer/flowplayer-3.2.16.swf',
                                 SeamlessTabbing: false
                                 }, {
+                                onKeyPress: function(code) {
+                                    switch(code) {
+                                        case 70: this.toggleFullscreen();           //F key
+                                        break;
+                                        case 36: this.stop();this.play();           //Home key
+                                        break;
+                                        case 67: this.getPlugin('content').toggle();//C key
+                                        break;
+                                    }
+                                },
                                 plugins: {
                                 controls: {
                                 autoHide: false,
@@ -105,6 +139,20 @@ if (isset($_SESSION['flash']) && $_SESSION['flash'] == "yes") {
                                 }
                                 });
                               </script>\n".
+                              "<h2 class='box' style='width:200px;'>
+                              <span>Shortcuts</span>
+                              <a href='#' class='flowplayer_shortcuts_link' title='Show Keyboard Shortcuts' onclick = 'show_flowplayer_shortcuts(this);return false;'></a>
+                              <div class='box' style='display:none;'>
+                                <ul class='social_side_menu'>
+                                    <li>Play/Pause: Spacebar Key</li>
+                                    <li>Restart: Home Key</li>
+                                    <li>Volume Up: Up Key</li>
+                                    <li>Volume Down: Down Key</li>
+                                    <li>Captions Toggle: C key</li>
+                                    <li>Fullscreen: F key</li>
+                                </ul>
+                              </div>
+                              </h2>\n".
 	                   "</div>\n";
 } else {
 	$media_replace[] = "<div>\n".
@@ -161,7 +209,39 @@ for ($i=0;$i<count($media_replace);$i++){
 		$_input = str_replace($media[0],$media_input,$_input);
 	}
 }
+global $rtl;
 
+$tree_collapse_icon = AT_BASE_HREF.find_image($rtl.'tree/tree_collapse.gif', '');
+$tree_expand_icon = AT_BASE_HREF.find_image($rtl.'tree/tree_expand.gif', '');
+
+$_input.='
+    <script type="text/javascript">
+    ATutor.course.collapse_icon = "'. AT_print($tree_collapse_icon, 'url.tree').'";
+    ATutor.course.expand_icon = "'.AT_print($tree_expand_icon,  'url.tree').'";
+        
+    $(".flowplayer_shortcuts_link").html("<img src="+ATutor.course.expand_icon+" alt=\'Show Keyboard Shortcuts\' title=\'Show Keyboard Shortcuts\' class=\'shortcut_icon\' >");
+    function show_flowplayer_shortcuts(id) {
+    if($(id).find("img").attr("src") == ATutor.course.expand_icon) {
+        $(id).find("img").attr({
+            "src": ATutor.course.collapse_icon,
+            "alt": "Hide Keyboard Shortcuts",
+            "title": "Hide Keyboard Shortcuts"
+            })
+        $(id).attr("title", "Hide Keyboard Shortcuts");
+    }
+    else {
+        $(id).find("img").attr({
+            "src": ATutor.course.expand_icon,
+            "alt": "Show Keyboard Shortcuts",
+            "title": "Show Keyboard Shortcuts"
+            })
+        $(id).attr("title", "Show Keyboard Shortcuts");
+    }
+    ch = $(id).siblings(".box");
+    ch.slideToggle();
+    };
+    </script>
+';
 // Include the javascript only if:
 // 1. $flowplayerholder_class is used but not defined
 // 2. exclude from export common cartridge or content package
