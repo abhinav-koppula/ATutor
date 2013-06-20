@@ -1301,6 +1301,7 @@ INSERT INTO `language_text` VALUES ('en', '_template','fix_content_ordering','Fi
 INSERT INTO `language_text` VALUES ('en', '_template','fix_content_ordering_text','Occasionally, content pages can get disordered due to miscalculation. This is an ongoing issue that will be resolved in an upcoming version of ATutor but until then, we have made a patch available that can be used to fix the issue. If you are experiencing this problem, please use the button below.','2005-03-10 11:19:41','');
 INSERT INTO `language_text` VALUES ('en', '_template','flag_text','<small>%s indicates files have been handed in.</small>','2011-05-30 10:07:17','');
 INSERT INTO `language_text` VALUES ('en', '_template','flowplayer','Flowplayer','2010-03-18 11:46:30','');
+INSERT INTO `language_text` VALUES ('en', '_template','fluidplayer','Fluidplayer','2013-06-19 11:46:30','');
 INSERT INTO `language_text` VALUES ('en', '_template','focus','Focus','2008-10-06 13:41:36','');
 INSERT INTO `language_text` VALUES ('en', '_template','folder','Folder','2003-05-20 10:05:51','file manager, zip utility');
 INSERT INTO `language_text` VALUES ('en', '_template','font_face','Font Face','2008-09-09 09:01:13','');
