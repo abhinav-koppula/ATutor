@@ -38,6 +38,11 @@ $_custom_head .='
 $_custom_head .='
         <!-- Fluid and jQuery Dependencies -->
         <script type="text/javascript" src="'.$AT_BASE_HREF.'mods/_standard/fluidplayer/lib/infusion/MyInfusion.js"></script>
+        <script language="javascript" type="text/javascript">
+	//<!--
+	jQuery.noConflict();
+	//-->
+	</script>
         <!-- Utils -->
         <script type="text/javascript" src="'.$AT_BASE_HREF.'mods/_standard/fluidplayer/lib/jquery-ui/js/jquery.ui.button.js"></script>
         <script type="text/javascript" src="'.$AT_BASE_HREF.'mods/_standard/fluidplayer/lib/captionator/js/captionator.js"></script>

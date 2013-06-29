@@ -32,7 +32,7 @@ $media_replace[] = "<div>\n".
                    "    <div class='##DIVCLASS## fl-videoPlayer' style='height:##HEIGHT##px;'></div>\n".
                    "    <script type='text/javascript'>
                         $(document).ready(function() {
-                            fluid.videoPlayer('.##DIVCLASS##',  {
+                            fluid_1_5.videoPlayer('.##DIVCLASS##',  {
                             videoTitle: 'Mammals',
                             video: {
                                 sources: [
@@ -53,7 +53,7 @@ $media_replace[] = "<div>\n".
                                 } 
                             } 
                             });
-                             fluid.demands('fluid.videoPlayer.controllers', 'fluid.videoPlayer', { 
+                             fluid_1_5.demands('fluid_1_5.videoPlayer.controllers', 'fluid_1_5.videoPlayer', { 
                                 options: { 
                                     templates: { 
                                         controllers: { 
@@ -73,7 +73,7 @@ $media_replace[] = "<div>\n".
                    "    <div class='##DIVCLASS## fl-videoPlayer' style='height:##HEIGHT##px;'></div>\n".
                    "    <script type='text/javascript'>
                         $(document).ready(function() {
-                            fluid.videoPlayer('.##DIVCLASS##',  {
+                            fluid_1_5.videoPlayer('.##DIVCLASS##',  {
                             videoTitle: 'Mammals',
                             video: {
                                 sources: [
@@ -94,7 +94,7 @@ $media_replace[] = "<div>\n".
                                 } 
                             } 
                             });
-                             fluid.demands('fluid.videoPlayer.controllers', 'fluid.videoPlayer', { 
+                             fluid_1_5.demands('fluid.videoPlayer.controllers', 'fluid.videoPlayer', { 
                                 options: { 
                                     templates: { 
                                         controllers: { 
