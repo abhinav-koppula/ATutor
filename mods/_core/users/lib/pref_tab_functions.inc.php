@@ -104,7 +104,8 @@ global $addslashes;
 	if (isset($_POST['form_focus'])) $temp_prefs['PREF_FORM_FOCUS'] = intval($_POST['form_focus']);
 	if (isset($_POST['content_editor'])) $temp_prefs['PREF_CONTENT_EDITOR'] = intval($_POST['content_editor']);
 	if (isset($_POST['show_guide']))$temp_prefs['PREF_SHOW_GUIDE'] = intval($_POST['show_guide']);
-
+        if (isset($_POST['media_player'])) $temp_prefs['PREF_MEDIA_PLAYER'] = intval($_POST['media_player']);
+        
 	// display settings (tab 1)
 	if (isset($_POST['fontface'])) $temp_prefs['PREF_FONT_FACE'] = $addslashes($_POST['fontface']);
 	if (isset($_POST['font_times'])) $temp_prefs['PREF_FONT_TIMES'] = $addslashes($_POST['font_times']);

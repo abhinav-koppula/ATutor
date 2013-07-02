@@ -874,8 +874,14 @@ function apply_customized_format($input) {
             $module_content_format_file = AT_INCLUDE_PATH . '../mods/'.$dir_name.'/module_format_content.php';
             if (file_exists($module_content_format_file))
             {
-                if($dir_name != '_standard/flowplayer')
-                include($module_content_format_file);
+                if(($dir_name == '_standard/flowplayer') || ($dir_name == '_standard/fluidplayer')) {
+                    if(($dir_name == '_standard/flowplayer') && ($_SESSION['prefs']['PREF_MEDIA_PLAYER']==0))
+                        include($module_content_format_file);
+                    else if(($dir_name == '_standard/fluidplayer') && ($_SESSION['prefs']['PREF_MEDIA_PLAYER']==1))
+                        include($module_content_format_file);
+                }
+                else
+                    include($module_content_format_file);
             }
         }
     }

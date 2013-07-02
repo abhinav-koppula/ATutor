@@ -1639,6 +1639,8 @@ INSERT INTO `language_text` VALUES ('en', '_template','max_file_size','Max File 
 INSERT INTO `language_text` VALUES ('en', '_template','max_file_size_system','Maximum system allows','2003-10-14 14:32:52','php\'s max file size');
 INSERT INTO `language_text` VALUES ('en', '_template','mb','<acronym title=\"Megabyte\">MB</acronym>','2007-07-26 14:05:45','short for MB (megabytes)');
 INSERT INTO `language_text` VALUES ('en', '_template','media','Media','2007-06-15 14:41:08','');
+
+INSERT INTO `language_text` VALUES ('en', '_template','media_player','Media Player','2013-06-22 13:12:41','user prefs');
 INSERT INTO `language_text` VALUES ('en', '_template','members','Members','2003-05-20 13:00:39','instructor course statistics/details');
 INSERT INTO `language_text` VALUES ('en', '_template','member_id','Member ID','2003-05-20 13:01:18','admin user manager column heading');
 INSERT INTO `language_text` VALUES ('en', '_template','member_stats','Student Specific Usage','2005-03-03 15:25:57','');

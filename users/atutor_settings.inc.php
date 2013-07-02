@@ -202,3 +202,22 @@ function print_theme_selectbox($theme_list, $selected_theme, $type) {
 		<input type="radio" name="content_editor" id="ce_1" value="1" <?php echo $num1; ?>/><label for="ce_1"><?php echo _AT('html'); ?></label>
 		<input type="radio" name="content_editor" id="ce_2" value="2" <?php echo $num2; ?>/><label for="ce_2"><?php echo _AT('html') . ' - '. _AT('visual_editor'); ?></label>
 	</div>
+        
+        <div class="row">
+		<?php
+			if (isset($_POST['media_player']))
+				$selected_media_player = $_POST['media_player'];
+			else
+				$selected_media_player = $_SESSION['prefs']['PREF_MEDIA_PLAYER'];
+				
+			$num0 = $num1 = '';
+			if ($selected_media_player == 0) {
+				$num0 = ' checked="checked"';
+			} else {
+				$num1 = ' checked="checked"';
+			}
+		?>
+		<?php echo _AT('media_player'); ?><br />
+		<input type="radio" name="media_player" id="mp_0" value="0" <?php echo $num0; ?>/><label for="mp_0"><?php echo _AT('flowplayer');?></label>
+		<input type="radio" name="media_player" id="mp_1" value="1" <?php echo $num1; ?>/><label for="mp_1"><?php echo _AT('fluidplayer'); ?></label>
+	</div>
