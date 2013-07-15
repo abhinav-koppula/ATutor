@@ -119,6 +119,8 @@ global $addslashes;
 	if (isset($_POST['alt_to_text_append_or_replace'])) $temp_prefs['PREF_ALT_TO_TEXT_APPEND_OR_REPLACE'] = $addslashes($_POST['alt_to_text_append_or_replace']);
 	if (isset($_POST['alt_text_prefer_lang'])) $temp_prefs['PREF_ALT_TEXT_PREFER_LANG'] = $addslashes($_POST['alt_text_prefer_lang']);
 	if (isset($_POST['use_alternative_to_audio'])) $temp_prefs['PREF_USE_ALTERNATIVE_TO_AUDIO'] = intval($_POST['use_alternative_to_audio']);
+        if (isset($_POST['use_captions'])) $temp_prefs['PREF_USE_CAPTIONS'] = intval($_POST['use_captions']);
+        if (isset($_POST['use_transcripts'])) $temp_prefs['PREF_USE_TRANSCRIPTS'] = intval($_POST['use_transcripts']);
 	if (isset($_POST['preferred_alt_to_audio'])) $temp_prefs['PREF_ALT_TO_AUDIO'] = $addslashes($_POST['preferred_alt_to_audio']);
 	if (isset($_POST['alt_to_audio_append_or_replace'])) $temp_prefs['PREF_ALT_TO_AUDIO_APPEND_OR_REPLACE'] = $addslashes($_POST['alt_to_audio_append_or_replace']);
 	if (isset($_POST['alt_audio_prefer_lang'])) $temp_prefs['PREF_ALT_AUDIO_PREFER_LANG'] = $addslashes($_POST['alt_audio_prefer_lang']);

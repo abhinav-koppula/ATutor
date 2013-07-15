@@ -2518,12 +2518,14 @@ INSERT INTO `language_text` VALUES ('en', '_template','use_alt_to_text','Use Alt
 INSERT INTO `language_text` VALUES ('en', '_template','use_alt_to_visual','Use Alternative To Visual','2008-09-09 08:56:34','');
 INSERT INTO `language_text` VALUES ('en', '_template','use_as_alternative','Use As Alternative','2010-03-09 16:15:53','adapted content');
 INSERT INTO `language_text` VALUES ('en', '_template','use_captcha','Allow the use of CAPTCHA','2009-06-03 15:33:17','');
+INSERT INTO `language_text` VALUES ('en', '_template','use_captions','Use Captions by default','2013-07-12 15:33:17','');
 INSERT INTO `language_text` VALUES ('en', '_template','use_customized_head','Turn on custom Scripts/CSS','2010-05-03 10:44:56','');
 INSERT INTO `language_text` VALUES ('en', '_template','use_enrol_button','Use the button below to enroll in this course.','2003-05-22 16:03:37','enrol screen instruction');
 INSERT INTO `language_text` VALUES ('en', '_template','use_higher_grade','Use higher grade','2008-09-25 16:01:17','gradebook');
 INSERT INTO `language_text` VALUES ('en', '_template','use_lower_grade','Use lower grade','2008-09-25 16:01:17','gradebook');
 INSERT INTO `language_text` VALUES ('en', '_template','use_parent_theme','Use parent category\'s theme.','2004-08-04 11:34:41','');
 INSERT INTO `language_text` VALUES ('en', '_template','use_system_time','Use the system\'s time','2006-11-01 13:06:01','');
+INSERT INTO `language_text` VALUES ('en', '_template','use_transcripts','Use Transcripts by default','2013-07-12 15:33:17','');
 INSERT INTO `language_text` VALUES ('en', '_template','use_url_as_alternative','Use a remote URL as an alternative','2010-06-18 13:28:40','');
 INSERT INTO `language_text` VALUES ('en', '_template','use_visual_editor','<small style=\"text-decoration:underline;\">(Editor)</small>','2004-12-08 12:15:36','form editor in create test question');
 INSERT INTO `language_text` VALUES ('en', '_template','version','Version','2003-05-22 16:04:54','copyright notice in footer');

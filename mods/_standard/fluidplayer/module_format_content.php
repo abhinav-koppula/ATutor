@@ -20,6 +20,7 @@ $caption_init_flowplayer = "
             backgroundGradient: 'low',
             borderRadius: 4,
             border: 0,
+            ##DISPLAY_CAPTIONS##,
             style: {
                 'body': {
                 fontSize: '14',
@@ -68,6 +69,14 @@ $media_replace[] = "<div>\n".
                                 ]
                                 ##CAPTION_CODE##
                                 ##TRANSCRIPTS_CODE##
+                            },
+                            model: {
+                                currentTracks: {
+                                    captions: [0],
+                                    transcripts: [0]
+                                }
+                                ##DISPLAY_CAPTIONS##
+                                ##DISPLAY_TRANSCRIPTS##
                             },
                             templates: { 
                                 videoPlayer: { 
@@ -123,6 +132,14 @@ $media_replace[] = "<div>\n".
                                 ]
                                 ##CAPTION_CODE##
                                 ##TRANSCRIPTS_CODE##
+                            },
+                            model: {
+                                currentTracks: {
+                                    captions: [0],
+                                    transcripts: [0]
+                                }
+                                ##DISPLAY_CAPTIONS##
+                                ##DISPLAY_TRANSCRIPTS##
                             },
                             templates: { 
                                 videoPlayer: { 
@@ -246,27 +263,44 @@ for ($i=0;$i<count($media_replace);$i++){
                 {
                     $media_input = str_replace("##CAPTION_CODE##", $caption_init, $media_input);
                     $media_input = str_replace("##CAPTIONS##", $matches[1], $media_input);
+                    
+                    if($_SESSION['prefs']['PREF_USE_CAPTIONS'] == 1)
+                        $media_input = str_replace("##DISPLAY_CAPTIONS##", ',displayCaptions: true', $media_input);
+                    else if($_SESSION['prefs']['PREF_USE_CAPTIONS'] == 0)
+                        $media_input = str_replace("##DISPLAY_CAPTIONS##", '', $media_input);
                 }
                 else if((!empty($media[1])) && (preg_match("/captions=([.\w\d]+[^\s\"]+\.srt)/", $media[1], $matches)))
                 {
                     $media_input = str_replace("##CAPTION_CODE##", $caption_init_flowplayer, $media_input);
                     $media_input = str_replace("##CAPTIONS##", 'captionUrl:"'.$matches[1].'"', $media_input);
+                    
+                    if($_SESSION['prefs']['PREF_USE_CAPTIONS'] == 1)
+                        $media_input = str_replace("##DISPLAY_CAPTIONS##", 'display:"block"', $media_input);
+                    else if($_SESSION['prefs']['PREF_USE_CAPTIONS'] == 0)
+                        $media_input = str_replace("##DISPLAY_CAPTIONS##", 'display:"none"', $media_input);
                 }
                 else
                 {
                     $media_input = str_replace("##CAPTION_CODE##", '', $media_input);
                     $media_input = str_replace("##CAPTIONS##", '', $media_input);
+                    $media_input = str_replace("##DISPLAY_CAPTIONS##", '', $media_input);
                 }
                 
                 if((!empty($media[2])) && (preg_match("/transcripts=([.\w\d]+[^\s\"]+\.json)/", $media[2], $matches)))
                 {
                     $media_input = str_replace("##TRANSCRIPTS_CODE##", $transcripts_init, $media_input);
                     $media_input = str_replace("##TRANSCRIPTS##", $matches[1], $media_input);
+                    
+                    if($_SESSION['prefs']['PREF_USE_TRANSCRIPTS'] == 1)
+                        $media_input = str_replace("##DISPLAY_TRANSCRIPTS##", ',displayTranscripts: true', $media_input);
+                    else if($_SESSION['prefs']['PREF_USE_TRANSCRIPTS'] == 0)
+                        $media_input = str_replace("##DISPLAY_TRANSCRIPTS##", '', $media_input);
                 }
                 else
                 {
                     $media_input = str_replace("##TRANSCRIPTS_CODE##", '', $media_input);
                     $media_input = str_replace("##TRANSCRIPTS##", '', $media_input);
+                    $media_input = str_replace("##DISPLAY_TRANSCRIPTS##", '', $media_input);
                 }
                 
                 $media_input = str_replace("##DIVCLASS##", $player_id, $media_input);

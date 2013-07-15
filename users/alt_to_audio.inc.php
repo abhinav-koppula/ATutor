@@ -37,6 +37,40 @@
     </div>
 
     <div class="row">
+        <label for="use_captions"><?php echo _AT('use_captions'); ?></label><br />
+            <?php
+            if (isset($_POST['use_captions']))
+                $selected_captions = $_POST['use_captions'];
+            else
+		$selected_captions = $_SESSION['prefs']['PREF_USE_CAPTIONS'];
+            $yes = $no = '';
+            if ($selected_captions == 1) {
+				$yes = ' checked="checked"';
+			} else {
+				$no = ' checked="checked"';
+            }
+            ?>
+            <input type="radio" name ="use_captions" id="captions_yes" value="1" <?php echo $yes; ?> /><label for="captions_yes"><?php echo _AT('yes');  ?></label> 
+            <input type="radio" name ="use_captions" id="captions_no" value="0" <?php echo $no; ?> /><label for="captions_no"><?php echo _AT('no');  ?></label><br/>
+            
+            <label for="use_transcripts"><?php echo _AT('use_transcripts'); ?></label><br />
+            <?php
+            if (isset($_POST['use_transcripts']))
+                $selected_transcripts = $_POST['use_transcripts'];
+            else
+		$selected_transcripts = $_SESSION['prefs']['PREF_USE_TRANSCRIPTS'];
+            $yes = $no = '';
+            if ($selected_transcripts == 1) {
+				$yes = ' checked="checked"';
+			} else {
+				$no = ' checked="checked"';
+            }
+            ?>
+            <input type="radio" name ="use_transcripts" id="transcripts_yes" value="1" <?php echo $yes; ?> /><label for="transcripts_yes"><?php echo _AT('yes');  ?></label> 
+            <input type="radio" name ="use_transcripts" id="transcripts_no" value="0" <?php echo $no; ?> /><label for="transcripts_no"><?php echo _AT('no');  ?></label>
+    </div>
+
+    <div class="row">
         <?php echo _AT('append_or_replace'); ?><br />
         <?php
             $append = $replace = '';
