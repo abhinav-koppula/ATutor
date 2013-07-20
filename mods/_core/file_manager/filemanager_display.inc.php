@@ -639,11 +639,30 @@ function insertFile(fileName, pathTo, ext, ed_pref) {
 		var html = '<img src="' + pathTo+fileName + '" border="0" alt="' + info + '" />';
 
 		insertLink(html, ed_pref);
-	} else if (ext == "mpg" || ext == "avi" || ext == "wmv" || ext == "mov" || ext == "swf" || ext == "mp3" || ext == "wav" || ext == "ogg" || ext == "mid" ||ext == "flv"|| ext == "mp4") {
+	} else if (ext == "mpg" || ext == "avi" || ext == "wmv" || ext == "mov" || ext == "swf" || ext == "mp3" || ext == "wav" || ext == "ogg" || ext == "mid" ||ext == "flv"|| ext == "mp4" || ext == "webm") {
+                <?php if(isset($_GET['miface']) && $_GET['miface']>0) {?>
+                    var html = pathTo + fileName;
+                <?php } else {?>
 		var html = '[media]'+ pathTo + fileName + '[/media]';
-
+                <?php } ?>
 		insertLink(html, ed_pref);
-	} else {
+	} else if (ext == "srt" || ext == "vtt" || ext == "xml") {
+                <?php if(isset($_GET['miface']) && $_GET['miface']>0) {?>
+                    var html = pathTo + fileName;
+                <?php } else {?>
+                    var html = '[media captions='+ pathTo + fileName + '][/media]';
+                <?php } ?>
+                insertLink(html, ed_pref);
+        }
+        else if (ext == "json") {
+                <?php if(isset($_GET['miface']) && $_GET['miface']>0) {?>
+                    var html = pathTo + fileName;
+                <?php } else {?>
+                    var html = '[media transcripts='+ pathTo + fileName + '][/media]';
+                <?php } ?>
+                insertLink(html, ed_pref);
+        }
+        else {
 		var info = "<?php echo _AT('put_link'); ?>";
 		var html = '<a href="' + pathTo+fileName + '">' + info + '</a>';
 		
@@ -668,7 +687,12 @@ function insertLink(html, ed_pref)
 			if (window.opener && window.opener.tinyMCE)
 				window.opener.tinyMCE.execCommand('mceInsertContent', false, html);
 	} else {
-		insertAtCursor(window.opener.document.form.body_text, html);
+                <?php if(isset($_GET['miface']) && $_GET['miface']>0) {?>
+                    window.opener.document.getElementById('media_interface_'+ <?php echo $_GET['miface'];?>).value = '';
+                    insertAtCursor(window.opener.document.getElementById('media_interface_' + <?php echo $_GET['miface'];?>), html);
+                <?php } else {?>
+                    insertAtCursor(window.opener.document.form.body_text, html);
+                <?php } ?>
 	}
 }
 

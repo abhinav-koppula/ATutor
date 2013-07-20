@@ -1639,7 +1639,7 @@ INSERT INTO `language_text` VALUES ('en', '_template','max_file_size','Max File 
 INSERT INTO `language_text` VALUES ('en', '_template','max_file_size_system','Maximum system allows','2003-10-14 14:32:52','php\'s max file size');
 INSERT INTO `language_text` VALUES ('en', '_template','mb','<acronym title=\"Megabyte\">MB</acronym>','2007-07-26 14:05:45','short for MB (megabytes)');
 INSERT INTO `language_text` VALUES ('en', '_template','media','Media','2007-06-15 14:41:08','');
-
+INSERT INTO `language_text` VALUES ('en', '_template','media_interface','Media Interface','2013-06-29 18:41:00','');
 INSERT INTO `language_text` VALUES ('en', '_template','media_player','Media Player','2013-06-22 13:12:41','user prefs');
 INSERT INTO `language_text` VALUES ('en', '_template','members','Members','2003-05-20 13:00:39','instructor course statistics/details');
 INSERT INTO `language_text` VALUES ('en', '_template','member_id','Member ID','2003-05-20 13:01:18','admin user manager column heading');
@@ -1791,6 +1791,7 @@ INSERT INTO `language_text` VALUES ('en', '_template','no_gadgets_installed','Yo
 INSERT INTO `language_text` VALUES ('en', '_template','no_glossary_items','No glossary terms found.','2005-03-07 10:52:11','edit glossary');
 INSERT INTO `language_text` VALUES ('en', '_template','no_groups_yet','You have not joined any groups yet.','2009-05-27 12:01:11','');
 INSERT INTO `language_text` VALUES ('en', '_template','no_icon','No Icon','2005-03-03 11:20:05','');
+INSERT INTO `language_text` VALUES ('en', '_template','no_media_tags_found','There are no media tags being used in this content page.','2013-06-23 16:37:51','content editor');
 INSERT INTO `language_text` VALUES ('en', '_template','no_month_data','There is no data for this month.','2003-05-20 14:01:42','instructor course statistics when nonne exist');
 INSERT INTO `language_text` VALUES ('en', '_template','no_pass_score','No pass score','2008-03-10 11:50:35','Test/Survey Property');
 INSERT INTO `language_text` VALUES ('en', '_template','no_post','No post found.','2003-05-20 14:02:44','forums message when attempting to view a post that no longer exists');

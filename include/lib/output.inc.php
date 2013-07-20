@@ -1046,6 +1046,10 @@ function find_terms($find_text) {
     return $found_terms;
 }
 
+function find_media($find_text) {
+    preg_match_all("#\[media(\|[0-9]*\|[0-9]*\|?)*([\s]?captions=([.\w\d]+[^\s\"]+))*([\s]?transcripts=([.\w\d]+[^\s\"]+))*\]([.\w\d]+[^\s\"]+)\[/media\]#iU", $find_text, $found_media_terms, PREG_PATTERN_ORDER);
+    return $found_media_terms;
+}
 /***********************************************************************
     @See /include/Classes/Message/Message.class.php
     Jacek Materna

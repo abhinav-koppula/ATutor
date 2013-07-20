@@ -451,7 +451,13 @@ $pid = intval($_REQUEST['pid']);
 	} else {
 		echo '<input type="hidden" name="allow_test_export" value="'.intval($_POST['allow_test_export']).'" />';
 	}
-
+        
+        //media terms
+        $media_matches = find_media(stripslashes($_POST['body_text']));
+	$num_media_terms = count($media_matches[0]);
+        
+        $media_url = $media_matches[6];
+        
 	if ($do_check) {
 		$changes_made = check_for_changes($content_row, $row_alternatives);
 	}
