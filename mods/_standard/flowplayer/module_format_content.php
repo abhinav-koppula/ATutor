@@ -26,6 +26,7 @@ $caption_init = "
             backgroundGradient: 'low',
             borderRadius: 4,
             border: 0,
+            ##DISPLAY_CAPTIONS##,
             style: {
                 'body': {
                 fontSize: '14',
@@ -194,6 +195,10 @@ for ($i=0;$i<count($media_replace);$i++){
                 {
                     $media_input = str_replace("##CAPTION_CODE##", $caption_init, $media_input);
                     $media_input = str_replace("##CAPTIONS##", 'captionUrl:"'.$matches[1].'"', $media_input);
+                    if($_SESSION['prefs']['PREF_USE_CAPTIONS'] == 1)
+                        $media_input = str_replace("##DISPLAY_CAPTIONS##", 'display:"block"', $media_input);
+                    else if($_SESSION['prefs']['PREF_USE_CAPTIONS'] == 0)
+                        $media_input = str_replace("##DISPLAY_CAPTIONS##", 'display:"none"', $media_input);
                 }
                 else
                 {
