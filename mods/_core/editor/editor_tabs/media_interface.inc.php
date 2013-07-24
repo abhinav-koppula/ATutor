@@ -51,14 +51,14 @@ for($i = 0; $i<$num_media_terms; $i++) {
         <td align="left" class="row1"><strong><?php echo $names[$k]?></strong></td>
         <td align="left" class="row1">
         <?php
-        if(substr($media_matches[$j][$k], -1, 1)== '|')
-            $media_matches[$j][$k] = substr($media_matches[$j][$k], 0, -1);
+        if(substr($media_matches[$j][$i], -1, 1)== '|')
+            $media_matches[$j][$i] = substr($media_matches[$j][$i], 0, -1);
         
         switch($k) {
             case 0: echo "<div id='media_tag_".$i."'>".$media_matches[$j][$i]."</div>";
                 break;
             case 1: 
-                if(empty($media_matches[$j][$k]))
+                if(empty($media_matches[$j][$i]))
                     echo '<input type="text" id="media_interface_'.$id_counter++.'" />x<input type="text" id="media_interface_'.$id_counter++.'" />';
                 else
                     echo '<input type="text" id="media_interface_'.$id_counter++.'" value="'.$width.'" />x<input type="text" id="media_interface_'.$id_counter++.'" value="'.$height.'" />';
