@@ -24,6 +24,7 @@
     $_pages['content_alternatives.php']          = 'Adapted Content';
     $_pages['accessibility.php']		 = 'Accessibility';
     $_pages['content_tests.php']		 = 'Associating Tests';
+    $_pages['content_media_interface.php']       = 'Media Interface';
     $_pages['content_packages.php']              = 'Import/Export Content';
     $_pages['content_usage.php']                 = 'Content Usage';
     $_pages['tile_repository.php']               = 'Content Search';

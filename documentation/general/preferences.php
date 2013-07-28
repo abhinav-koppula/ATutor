@@ -33,6 +33,8 @@
 
 	<dt>Content Editor</dt>
 	<dd>This preference controls how content is entered. Choose between <em>Plain Text</em> for entering content text that will escape any HTML markup and will be formatted as entered; <em>HTML</em> for entering HTML content manually; and <em>HTML - Visual Editor</em> for entering HTML content using the visual (also known as a <acronym title="What You See Is What You Get">WYSIWYG</acronym>) editor which represents the content as it will be displayed. It is also possible to change the editor manually for each item.</dd>
+    <dt>Media Player</dt>
+    <dd>This preference specifies which media-player is used to display media content. <em>Flowplayer</em> is the default media player. One can also choose <em>Fluidplayer</em>, an HTML5 player, to display media content.</dd>
 </dl>
 <h3>Text Settings</h3>
 <p>These settings are used to control the overall colours and fonts displayed.</p>
@@ -48,7 +50,7 @@
     <dd>If you are a person with a print related disability, or you prefer content in mutli-modal forms, select from these options to have alternate forms either replace text versions of the content, or have the alternate forms appended to the content.</dd>
 
     <dt>Alternatives to Audio</dt>
-    <dd>If you are a person with an auditory disability, or if you prefer to read along with audio, or view visual alternatives to audio, select from these options to have alternatives replace or append where ever there is audio content.</dd>
+    <dd>If you are a person with an auditory disability, or if you prefer to read along with audio, or view visual alternatives to audio, select from these options to have alternatives replace or append where ever there is audio content. Preferences to specify whether captions/transcripts should be displayed by default can also be found here.</dd>
 
     <dt>Alternatives to Visual</dt>
     <dd>If you are a person with a visual disability, of you prefer content without the usually larger, slow to load, visual information in content, select from these options to have alternatives to visual information either replace, or append to, visual information in the primary version of the content.</dd>

@@ -10,7 +10,7 @@
 	<p>Using the <code>Create Folder</code> button creates a folder for better organizing uploaded files. It is possible to create folders and move files into folders at any time.</p>
 
 <h3>Uploading Files</h3>
-	<p>Uploading files using the <em>File Manager</em> is one way of adding content to your course. After uploading a file, it can be added to a course by using the popup File Manager linked form the <a href="content.php">Content Editor</a> and the <code>Insert</code> button that appears next to each file. This will either create a link to a file, or insert an image into a content page. For various types of mutli media, the insert button will insert the [media] tag.</p>
+	<p>Uploading files using the <em>File Manager</em> is one way of adding content to your course. After uploading a file, it can be added to a course by using the popup File Manager linked form the <a href="content.php">Content Editor</a> and the <code>Insert</code> button that appears next to each file. This will either create a link to a file, or insert an image into a content page. For various types of multi media, the insert button will insert the [media] tag. For various types of captions and transcripts files, the insert button will insert the [media captions=file_name][/media] and [media transcripts=file_name][/media] tag respectively.</p>
 	
 	<p><code>Browse...</code> opens a local file browser window in which to choose the file for upload.</p>
 

@@ -138,7 +138,7 @@ if ($section == 'admin'){
 				'content_preview.php',
 				'arrange_content.php',
 				'content_alternatives.php',								'accessibility.php',
-					'content_tests.php'	
+					'content_tests.php', 'content_media_interface.php'
 													),
 									'content_packages.php',
 									'content_usage.php',
