@@ -1,0 +1,28 @@
+.chapters
+{
+    float: left;
+    border: 1px solid #cccccc;
+    width: 15em;
+    overflow: hidden;
+}
+
+.chapters-text
+{
+    cursor:pointer; 
+    overflow-x: hidden; 
+    overflow-y: scroll; 
+    height: 100%; 
+    word-spacing: 0.1em; 
+    position: relative;
+}
+
+.chapters-text span:hover
+{
+    color: #25b3d3;
+}
+
+.highlight 
+{
+    background-color:#25b3d3;
+    color:#fff;
+}

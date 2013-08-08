@@ -14,7 +14,7 @@ if (!isset($this) || (isset($this) && (strtolower(get_class($this)) != 'module')
  */
 define('AT_ADMIN_PRIV_FLOWPLAYER', $this->getAdminPrivilege());
 $AT_BASE_HREF = AT_print(AT_BASE_HREF,'url.base');
-global $_custom_head;
+global $_custom_head, $_custom_css;
 $_custom_head .='    <script type="text/javascript" src="'.$AT_BASE_HREF.'mods/_standard/flowplayer/flowplayer-3.2.12.min.js"></script>'."\n";
-
+$_custom_css = $AT_BASE_HREF . 'mods/_standard/flowplayer/module.css';
 ?>
