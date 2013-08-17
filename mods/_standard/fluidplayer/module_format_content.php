@@ -5,7 +5,7 @@ $AT_BASE_HREF = AT_print(AT_BASE_HREF,'url.base');
 $media_replace = array();
 $media_matches = array();
 $fluidplayerholder_class = "player";
-$caption_init_flowplayer = "
+$caption_init_flowplayer = ",
     captions: {
             url: '".AT_BASE_HREF."mods/_standard/flowplayer/flowplayer.captions-3.2.9.swf',
             // pointer to a content plugin
@@ -51,6 +51,80 @@ $transcripts_init = ",
                         }
                   ]
     ";                         
+$transcripts_init_flowplayer = "
+    var transcript_##DIVCLASS## = (function() {
+    var json_##DIVCLASS## = null;
+    $.ajax({
+        'async': false,
+        'global': false,
+        'url': '".AT_BASE_HREF."get.php/".$_content_base_href."##TRANSCRIPTS##',
+        'dataType': 'json',
+        'success': function (data) {
+        json_##DIVCLASS## = data;
+    }
+    });
+    return json_##DIVCLASS##;
+    })();
+                               
+    $.each(transcript_##DIVCLASS##, function(key, value){
+    $.each(value, function(index, element) {
+        intime_##DIVCLASS## = element.inTime.split(':');
+        hh_##DIVCLASS## = intime_##DIVCLASS##[0];
+        mm_##DIVCLASS## = intime_##DIVCLASS##[1];
+        ss_##DIVCLASS## = intime_##DIVCLASS##[2];
+        mss_##DIVCLASS## = Math.round((ss_##DIVCLASS##*10)/10)*1000;
+        intime_##DIVCLASS## = (parseInt(hh_##DIVCLASS##)*60*60 + parseInt(mm_##DIVCLASS##)*60)*1000 + mss_##DIVCLASS##;
+        
+        item_##DIVCLASS## = '<span rel=\"'+intime_##DIVCLASS##+'\" >'+element.transcript+'</span>';
+        $('###DIVCLASS##_chapters > #chapters-text').append(item_##DIVCLASS##+' ');
+    });
+    });      
+
+    var cuepoints = [],seekpos = 0, // seek target when player is not loaded
+    chapters = $('###DIVCLASS##_chapters > #chapters-text span');
+    i = 0;
+    
+    // collect cuepoints from rel attributes of chapter elements
+    \$f.each(chapters, function () {
+        cuepoints.push({
+        time: parseInt(this.getAttribute('rel'), 10),
+        index: i
+    });
+    i = i + 1;
+    });
+";
+$transcripts_init_cuepoint_code_flowplayer = "
+    onCuepoint: [
+        cuepoints,
+        function(clip, cuepoint) {
+            $('###DIVCLASS##_chapters > #chapters-text').children().removeClass('highlight');
+            $('###DIVCLASS##_chapters > #chapters-text').find('span[rel=\"'+cuepoint.time+'\"]').addClass('highlight');
+            var item = $('###DIVCLASS##_chapters > #chapters-text').find('span[rel=\"'+cuepoint.time+'\"]');
+            var offset = item.position().top;
+            var parent = item.parent();
+            var pos = parent.scrollTop();
+            
+            parent.animate({scrollTop: pos+offset},1000);
+        }
+    ],
+";
+$transcripts_init_cuepoint_seeking_code_flowplayer = "
+    \$f.each(chapters, function () {
+    var pos = parseInt(this.getAttribute('rel'), 10) / 1000;
+    var rel = pos*1000;
+    
+    this.onclick = function () {
+        if (!player_##DIVCLASS##.isLoaded()) {
+            player_##DIVCLASS##.play();
+            seekpos = pos;
+        } else {
+            player_##DIVCLASS##.seek(player_##DIVCLASS##.isPaused() && pos === 0 ? 1 : pos);
+        }
+        $(this).siblings().removeClass('highlight');
+        $(this).addClass('highlight');        
+    };
+    });
+";
 // .mp4
 preg_match_all("#\[media[0-9a-z\|]*([\s]?captions=[.\w\d]+[^\s\"]+\.vtt\|?)*([\s]?transcripts=[.\w\d]+[^\s\"]+\.json)*\]([.\w\d]+[^\s\"]+)\.mp4\[/media\]#i",$_input,$media_matches[],PREG_SET_ORDER);
 $media_replace[] = "<div>\n".
@@ -178,13 +252,31 @@ $media_replace[] = "<div>\n".
                    "</div>\n";
 
 // .flv
-preg_match_all("#\[media[0-9a-z\|]*([\s]?captions=[.\w\d]+[^\s\"]+\.srt)*([\s]?transcripts=[.\w\d]+[^\s\"]+\.json)*\]([.\w\d]+[^\s\"]+)\.flv\[/media\]#i",$_input,$media_matches[],PREG_SET_ORDER);
+preg_match_all("#\[media[0-9a-z\|]*([\s]?captions=[.\w\d]+[^\s\"]+\.srt\|?)*([\s]?transcripts=[.\w\d]+[^\s\"]+\.json)*\]([.\w\d]+[^\s\"]+)\.flv\[/media\]#i",$_input,$media_matches[],PREG_SET_ORDER);
 
 if (isset($_SESSION['flash']) && $_SESSION['flash'] == "yes") {
 	$media_replace[] = "<div>\n".
-	                   "  <div class=\"##DIVCLASS##\" style=\"display:block;width:##WIDTH##px;height:##HEIGHT##px;\" ></div>\n".
+	                   "  <div id=\"##DIVID##\" style=\"display:block;width:##WIDTH##px;height:##HEIGHT##px;float:left;\" ></div>\n".
+                           "  <div>".
+                           "<div id='##DIVID##_transcript-shortcut' class = 'transcript-shortcut' style='float:left;display: ##DISPLAY_TRANSCRIPT_SHORTCUT##;'>
+                            <ul style='margin-bottom:0px;'>
+		      		<li>
+                                    <a href='#' onclick='show_transcripts(\"##DIVID##\");return false;'>
+                                    <img src='".AT_BASE_HREF."mods/_standard/flowplayer/images/transcript.png' style='height:26px;width:26px' alt='Show Transcripts' title='Show Transcripts' class='shortcut_icon'><!-- Show transcripts -->
+                                    </a>
+                                </li>
+		      	    </ul>
+                            </div>".
+                           "  <div id='##DIVID##_chapters' class = 'chapters' style = 'height:##HEIGHT##px; display: ##DISPLAY_TRANSCRIPTS_FLOWPLAYER##'>
+                               <div id = '##DIVID##_transcript_controls' class = 'transcript-controls'><button type='button' class='close-button' title='Hide Transcripts' onclick='show_transcripts(\"##DIVID##\");return false;' ></button></div>
+                               <div id='chapters-text' class = 'chapters-text' ></div>
+                              </div>".
                            "  <script type=\"text/javascript\">
-                               \$f(\".##DIVCLASS##\", {
+                               $(document).ready(function(){
+
+                               ##TRANSCRIPTS_CODE_FLOWPLAYER##
+                               
+                               player_##DIVID## = \$f(\"##DIVID##\", {
                                 src: '".AT_BASE_HREF."mods/_standard/flowplayer/flowplayer-3.2.16.swf',
                                 SeamlessTabbing: false
                                 }, {
@@ -196,6 +288,8 @@ if (isset($_SESSION['flash']) && $_SESSION['flash'] == "yes") {
                                         break;
                                         case 67: this.getPlugin('content').toggle();//C key
                                         break;
+                                        case 84: show_transcripts(\"##DIVID##\");
+                                        break;
                                     }
                                 },
                                 plugins: {
@@ -205,7 +299,7 @@ if (isset($_SESSION['flash']) && $_SESSION['flash'] == "yes") {
                                 tooltips: {
                                     buttons: true
                                     }
-                                },
+                                }
                                 ##CAPTION_CODE##
                                 },
                                 clip: {
@@ -214,8 +308,12 @@ if (isset($_SESSION['flash']) && $_SESSION['flash'] == "yes") {
                                 autoPlay: false,
                                 baseUrl: \"".AT_BASE_HREF."get.php/".$_content_base_href."\",
                                 autoBuffering: true,
+                                ##TRANSCRIPTS_CUEPOINT_CODE##
                                 ##CAPTIONS##
                                 }
+                                });
+                                
+                                ##TRANSCRIPTS_CUEPOINT_SEEKING##
                                 });
                               </script>\n".
                               "<h2 class='box' style='width:200px;'>
@@ -228,6 +326,7 @@ if (isset($_SESSION['flash']) && $_SESSION['flash'] == "yes") {
                                     <li>Volume Up: Up Key</li>
                                     <li>Volume Down: Down Key</li>
                                     <li>Captions Toggle: C key</li>
+                                    <li>Transcripts Toggle: T key</li>
                                     <li>Fullscreen: F key</li>
                                 </ul>
                               </div>
@@ -289,21 +388,42 @@ for ($i=0;$i<count($media_replace);$i++){
                 if((!empty($media[2])) && (preg_match("/transcripts=([.\w\d]+[^\s\"]+\.json)/", $media[2], $matches)))
                 {
                     $media_input = str_replace("##TRANSCRIPTS_CODE##", $transcripts_init, $media_input);
+                    $media_input = str_replace("##TRANSCRIPTS_CODE_FLOWPLAYER##", $transcripts_init_flowplayer, $media_input);
+                        
                     $media_input = str_replace("##TRANSCRIPTS##", $matches[1], $media_input);
+                        
+                    $media_input = str_replace("##TRANSCRIPTS_CUEPOINT_CODE##", $transcripts_init_cuepoint_code_flowplayer, $media_input);
+                    $media_input = str_replace("##TRANSCRIPTS_CUEPOINT_SEEKING##", $transcripts_init_cuepoint_seeking_code_flowplayer, $media_input);
                     
-                    if($_SESSION['prefs']['PREF_USE_TRANSCRIPTS'] == 1)
+                    if($_SESSION['prefs']['PREF_USE_TRANSCRIPTS'] == 1) {
                         $media_input = str_replace("##DISPLAY_TRANSCRIPTS##", ',displayTranscripts: true', $media_input);
-                    else if($_SESSION['prefs']['PREF_USE_TRANSCRIPTS'] == 0)
+                        $media_input = str_replace("##DISPLAY_TRANSCRIPTS_FLOWPLAYER##", 'block', $media_input);
+                        $media_input = str_replace("##DISPLAY_TRANSCRIPT_SHORTCUT##", 'none', $media_input);
+                    }
+                    else if($_SESSION['prefs']['PREF_USE_TRANSCRIPTS'] == 0) {
                         $media_input = str_replace("##DISPLAY_TRANSCRIPTS##", '', $media_input);
+                        $media_input = str_replace("##DISPLAY_TRANSCRIPTS_FLOWPLAYER##", 'none', $media_input);
+                        $media_input = str_replace("##DISPLAY_TRANSCRIPT_SHORTCUT##", 'block', $media_input);
+                    }
                 }
                 else
                 {
                     $media_input = str_replace("##TRANSCRIPTS_CODE##", '', $media_input);
+                    $media_input = str_replace("##TRANSCRIPTS_CODE_FLOWPLAYER##", '', $media_input);
+                    
                     $media_input = str_replace("##TRANSCRIPTS##", '', $media_input);
+                    
                     $media_input = str_replace("##DISPLAY_TRANSCRIPTS##", '', $media_input);
+                    $media_input = str_replace("##DISPLAY_TRANSCRIPTS_FLOWPLAYER##", 'none', $media_input);
+                    
+                    $media_input = str_replace("##TRANSCRIPTS_CUEPOINT_CODE##", '', $media_input);
+                    $media_input = str_replace("##TRANSCRIPTS_CUEPOINT_SEEKING##", '', $media_input);
+                    
+                    $media_input = str_replace("##DISPLAY_TRANSCRIPT_SHORTCUT##", 'none', $media_input);
                 }
                 
                 $media_input = str_replace("##DIVCLASS##", $player_id, $media_input);
+                $media_input = str_replace("##DIVID##", $player_id, $media_input);
 		$media_input = str_replace("##WIDTH##","$width",$media_input);
 		$media_input = str_replace("##HEIGHT##","$height",$media_input);
 		$media_input = str_replace("##MEDIA1##","$media[3]",$media_input);
@@ -342,6 +462,12 @@ $_input.='
     ch = $(id).siblings(".box");
     ch.slideToggle();
     };
+    function show_transcripts(id)
+    {
+        console.log("#"+id+"_transcript-shortcut");
+        $("#"+id+"_transcript-shortcut").toggle();
+        $("#"+id+"_chapters").toggle();
+    }
     </script>
 ';
 ?>

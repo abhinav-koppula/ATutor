@@ -2,8 +2,10 @@
 {
     float: left;
     border: 1px solid #cccccc;
+    height: 100%;
     width: 15em;
     overflow: hidden;
+    
 }
 
 .chapters-text
@@ -11,7 +13,7 @@
     cursor:pointer; 
     overflow-x: hidden; 
     overflow-y: scroll; 
-    height: 100%; 
+    height: 90%; 
     word-spacing: 0.1em; 
     position: relative;
 }
@@ -25,4 +27,48 @@
 {
     background-color:#25b3d3;
     color:#fff;
+}
+
+.highlight:hover
+{
+    color:#fff;
+}
+
+div.transcript-shortcut
+{
+    border-left: thin solid #B7C68B;
+    border-right: thin solid #B7C68B;
+    border-bottom: thin solid #B7C68B;
+    border-radius: 0em 0em .5em .5em;
+}
+
+.transcript-shortcut ul
+{
+    float: right;
+    margin-bottom: 0em;
+    margin-left: 0em;
+    list-style-type: none;
+    padding-left: 0em;
+}
+
+.transcript-shortcut li
+{
+    display:inline;
+}
+
+.transcript-controls
+{
+    height:10%;
+    background-color: #f2f2f2;
+}
+
+.close-button
+{
+    float: right;
+    margin: 0.2em;
+    background-image: url('images/transcriptclose.png');
+    background-repeat: no-repeat;
+    background-position: center center;
+    width: 20px;
+    height: 20px;
 }

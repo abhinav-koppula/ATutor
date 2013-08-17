@@ -88,17 +88,17 @@ $transcripts_init_cuepoint_code = "
             var item = $('###DIVID##_chapters > #chapters-text').find('span[rel=\"'+cuepoint.time+'\"]');
             var offset = item.position().top;
             var parent = item.parent();
-            if (offset < 0 || offset > parent.height()) {
-                if (offset < 0)
-                offset = parent.scrollTop() + offset;
-            parent.animate({ scrollTop: offset }, 300);
-            }
+            var pos = parent.scrollTop();
+            
+            parent.animate({scrollTop: pos+offset},1000);
         }
     ],
 ";
 $transcripts_init_cuepoint_seeking_code = "
     \$f.each(chapters, function () {
     var pos = parseInt(this.getAttribute('rel'), 10) / 1000;
+    var rel = pos*1000;
+    
     this.onclick = function () {
         if (!player_##DIVID##.isLoaded()) {
             player_##DIVID##.play();
@@ -106,6 +106,8 @@ $transcripts_init_cuepoint_seeking_code = "
         } else {
             player_##DIVID##.seek(player_##DIVID##.isPaused() && pos === 0 ? 1 : pos);
         }
+        $(this).siblings().removeClass('highlight');
+        $(this).addClass('highlight');        
     };
     });
 ";
@@ -114,8 +116,19 @@ preg_match_all("#\[media[0-9a-z\|]*([\s]?captions=[.\w\d]+[^\s\"]+\.srt\|?)*([\s
 
 if (isset($_SESSION['flash']) && $_SESSION['flash'] == "yes") {
 	$media_replace[] = "<div>\n".
-	                   "  <div id=\"##DIVID##\" style=\"display:block;width:##WIDTH##px;height:##HEIGHT##px;;float:left;\" ></div>\n".
+	                   "  <div id=\"##DIVID##\" style=\"display:block;width:##WIDTH##px;height:##HEIGHT##px;float:left;\" ></div>\n".
+                           "  <div>".
+                           "<div id='##DIVID##_transcript-shortcut' class = 'transcript-shortcut' style='float:left;display: ##DISPLAY_TRANSCRIPT_SHORTCUT##;'>
+                            <ul style='margin-bottom:0px;'>
+		      		<li>
+                                    <a href='#' onclick='show_transcripts(\"##DIVID##\");return false;'>
+                                    <img src='".AT_BASE_HREF."mods/_standard/flowplayer/images/transcript.png' style='height:26px;width:26px' alt='Show Transcripts' title='Show Transcripts' class='shortcut_icon'><!-- Show transcripts -->
+                                    </a>
+                                </li>
+		      	    </ul>
+                            </div>".
                            "  <div id='##DIVID##_chapters' class = 'chapters' style = 'height:##HEIGHT##px; display: ##DISPLAY_TRANSCRIPTS##'>
+                               <div id = '##DIVID##_transcript_controls' class = 'transcript-controls'><button type='button' class='close-button' title='Hide Transcripts' onclick='show_transcripts(\"##DIVID##\");return false;' ></button></div>
                                <div id='chapters-text' class = 'chapters-text' ></div>
                               </div>".
                            "  <script type=\"text/javascript\">
@@ -134,6 +147,8 @@ if (isset($_SESSION['flash']) && $_SESSION['flash'] == "yes") {
                                         case 36: this.stop();this.play();           //Home key
                                         break;
                                         case 67: this.getPlugin('content').toggle();//C key
+                                        break;
+                                        case 84: show_transcripts(\"##DIVID##\");
                                         break;
                                     }
                                 },
@@ -171,6 +186,7 @@ if (isset($_SESSION['flash']) && $_SESSION['flash'] == "yes") {
                                     <li>Volume Up: Up Key</li>
                                     <li>Volume Down: Down Key</li>
                                     <li>Captions Toggle: C key</li>
+                                    <li>Transcripts Toggle: T key</li>
                                     <li>Fullscreen: F key</li>
                                 </ul>
                               </div>
@@ -184,13 +200,23 @@ if (isset($_SESSION['flash']) && $_SESSION['flash'] == "yes") {
 
 // .mp4
 preg_match_all("#\[media[0-9a-z\|]*([\s]?captions=[.\w\d]+[^\s\"]+\.srt\|?)*([\s]?transcripts=[.\w\d]+[^\s\"]+\.json)*\]([.\w\d]+[^\s\"]+)\.mp4\[/media\]#i",$_input,$media_matches[],PREG_SET_ORDER);
-//$media_replace[] ="<a class=\"".$flowplayerholder_class."\" style=\"display:block;width:##WIDTH##px;height:##HEIGHT##px;\" href=\"".AT_BASE_HREF."get.php/".$_content_base_href."##MEDIA1##.mp4\"></a>";
 if (isset($_SESSION['flash']) && $_SESSION['flash'] == "yes") {
 	$media_replace[] = "<div>\n".
 	                   "  <div id=\"##DIVID##\" style=\"display:block;width:##WIDTH##px;height:##HEIGHT##px;float:left;\" ></div>\n".
-                           "  <div id='##DIVID##_chapters' class = 'chapters' style = 'height:##HEIGHT##px; display: ##DISPLAY_TRANSCRIPTS##'>
+                           "  <div>".
+                           "<div id='##DIVID##_transcript-shortcut' class = 'transcript-shortcut' style='float:left;display: ##DISPLAY_TRANSCRIPT_SHORTCUT##;'>
+                            <ul style='margin-bottom:0px;'>
+		      		<li>
+                                    <a href='#' onclick='show_transcripts(\"##DIVID##\");return false;'>
+                                    <img src='".AT_BASE_HREF."mods/_standard/flowplayer/images/transcript.png' style='height:26px;width:26px' alt='Show Transcripts' title='Show Transcripts' class='shortcut_icon'><!-- Show transcripts -->
+                                    </a>
+                                </li>
+		      	    </ul>
+                            </div>".
+                           "  <div id = '##DIVID##_chapters' class = 'chapters' style = 'height:##HEIGHT##px; display: ##DISPLAY_TRANSCRIPTS##'>
+                               <div id = '##DIVID##_transcript_controls' class = 'transcript-controls'><button type='button' class='close-button' title='Hide Transcripts' onclick='show_transcripts(\"##DIVID##\");return false;' ></button></div>
                                <div id='chapters-text' class = 'chapters-text' ></div>
-                              </div>".
+                              </div>\n".
                            "  <script type=\"text/javascript\">
                                $(document).ready(function(){
                                
@@ -207,6 +233,8 @@ if (isset($_SESSION['flash']) && $_SESSION['flash'] == "yes") {
                                         case 36: this.stop();this.play();           //Home key
                                         break;
                                         case 67: this.getPlugin('content').toggle();//C key
+                                        break;
+                                        case 84: show_transcripts(\"##DIVID##\");
                                         break;
                                     }
                                 },
@@ -244,6 +272,7 @@ if (isset($_SESSION['flash']) && $_SESSION['flash'] == "yes") {
                                     <li>Volume Up: Up Key</li>
                                     <li>Volume Down: Down Key</li>
                                     <li>Captions Toggle: C key</li>
+                                    <li>Transcripts Toggle: T key</li>
                                     <li>Fullscreen: F key</li>
                                 </ul>
                               </div>\n
@@ -306,10 +335,14 @@ for ($i=0;$i<count($media_replace);$i++){
                     $media_input = str_replace("##TRANSCRIPTS_CUEPOINT_CODE##", $transcripts_init_cuepoint_code, $media_input);
                     $media_input = str_replace("##TRANSCRIPTS_CUEPOINT_SEEKING##", $transcripts_init_cuepoint_seeking_code, $media_input);
                     
-                    if($_SESSION['prefs']['PREF_USE_TRANSCRIPTS'] == 1) 
+                    if($_SESSION['prefs']['PREF_USE_TRANSCRIPTS'] == 1) {
                         $media_input = str_replace("##DISPLAY_TRANSCRIPTS##", 'block', $media_input);
-                    else if($_SESSION['prefs']['PREF_USE_TRANSCRIPTS'] == 0) 
+                        $media_input = str_replace("##DISPLAY_TRANSCRIPT_SHORTCUT##", 'none', $media_input);
+                    }
+                    else if($_SESSION['prefs']['PREF_USE_TRANSCRIPTS'] == 0) {
                         $media_input = str_replace("##DISPLAY_TRANSCRIPTS##", 'none', $media_input);
+                        $media_input = str_replace("##DISPLAY_TRANSCRIPT_SHORTCUT##", 'block', $media_input);
+                    }
                 }
                 else
                 {
@@ -319,6 +352,7 @@ for ($i=0;$i<count($media_replace);$i++){
                     $media_input = str_replace("##TRANSCRIPTS_CUEPOINT_SEEKING##", '', $media_input);
                     
                     $media_input = str_replace("##DISPLAY_TRANSCRIPTS##", 'none', $media_input);
+                    $media_input = str_replace("##DISPLAY_TRANSCRIPT_SHORTCUT##", 'none', $media_input);
                 }
                 
                 $media_input = str_replace("##DIVID##", $player_id, $media_input);
@@ -360,6 +394,13 @@ $_input.='
     ch = $(id).siblings(".box");
     ch.slideToggle();
     };
+    
+    function show_transcripts(id)
+    {
+        console.log("#"+id+"_transcript-shortcut");
+        $("#"+id+"_transcript-shortcut").toggle();
+        $("#"+id+"_chapters").toggle();
+    }
     </script>
 ';
 // Include the javascript only if:
