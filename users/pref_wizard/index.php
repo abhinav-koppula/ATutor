@@ -6,6 +6,7 @@ define('ALT_TO_AUDIO', 3);
 define('ALT_TO_VISUAL', 4);
 define('SUPPORT', 5);
 define('ATUTOR', 6);
+define('MEDIA_PLAYER_SETTINGS', 7);
 
 define('AT_INCLUDE_PATH', '../../include/');
 
@@ -134,6 +135,9 @@ else {
 		case ATUTOR:
 			$savant->assign('pref_template', '../atutor_settings.inc.php');
 			break;
+                case MEDIA_PLAYER_SETTINGS:
+                        $savant->assign('pref_template', '../media_player_settings.inc.php');
+                        break;
 	}
 	$savant->display('users/pref_wizard/index.tmpl.php');
 }

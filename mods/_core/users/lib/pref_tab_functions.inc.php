@@ -26,6 +26,7 @@ function get_tabs() {
 		$tabs[2] = array('content_settings', 'content_settings.inc.php', 'g');
 		$tabs[3] = array('tool_settings', 'tool_settings.inc.php', 'r');
 		$tabs[4] = array('control_settings', 'control_settings.inc.php', 'a');	
+                $tabs[5] = array('media_player_settings', 'media_player_settings.inc.php', 'o');
 	}
 	return $tabs;
 }
@@ -143,6 +144,16 @@ global $addslashes;
 	if (isset($_POST['show_next_previous_buttons'])) $temp_prefs['PREF_SHOW_NEXT_PREVIOUS_BUTTONS'] = intval($_POST['show_next_previous_buttons']);
 	if (isset($_POST['show_bread_crumbs'])) $temp_prefs['PREF_SHOW_BREAD_CRUMBS'] = intval($_POST['show_bread_crumbs']);
 		
+        // media player settings (tab 5)
+        if (isset($_POST['flowplayer_backgroundColor'])) $temp_prefs['PREF_FLOWPLAYER_BGCOLOR'] = $addslashes($_POST['flowplayer_backgroundColor']);
+        if (isset($_POST['flowplayer_buttonColor'])) $temp_prefs['PREF_FLOWPLAYER_BTNCOLOR'] = $addslashes($_POST['flowplayer_buttonColor']);
+        if (isset($_POST['flowplayer_buttonOverColor'])) $temp_prefs['PREF_FLOWPLAYER_BTNOVERCOLOR'] = $addslashes($_POST['flowplayer_buttonOverColor']);
+        if (isset($_POST['flowplayer_volumeColor'])) $temp_prefs['PREF_FLOWPLAYER_VOLCOLOR'] = $addslashes($_POST['flowplayer_volumeColor']);
+        if (isset($_POST['flowplayer_volumeSliderColor'])) $temp_prefs['PREF_FLOWPLAYER_VOLSLIDERCOLOR'] = $addslashes($_POST['flowplayer_volumeSliderColor']);
+        if (isset($_POST['flowplayer_canvas'])) $temp_prefs['PREF_FLOWPLAYER_CANVAS'] = $addslashes($_POST['flowplayer_canvas']);
+        if (isset($_POST['flowplayer_gradient'])) $temp_prefs['PREF_FLOWPLAYER_GRADIENT'] = $addslashes($_POST['flowplayer_gradient']);
+        if (isset($_POST['flowplayer_height'])) $temp_prefs['PREF_FLOWPLAYER_HEIGHT'] = intval($_POST['flowplayer_height']);
+        
 	return $temp_prefs;
 }
 

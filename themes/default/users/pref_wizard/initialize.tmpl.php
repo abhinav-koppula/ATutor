@@ -39,6 +39,11 @@
         <label for="atutor_pref"><?php echo _AT('prefs_set_init_atutor'); ?></label>
     </div>
     
+    <div>
+        <input type="checkbox" name="pref_wiz[]" value="<?php echo MEDIA_PLAYER_SETTINGS ?>" id="media_player_pref" <?php if ($prefs_set && in_array(MEDIA_PLAYER_SETTINGS, $_POST['pref_wiz'])) echo checked ?> />
+        <label for="media_player_pref"><?php echo _AT('prefs_set_init_mediaplayer'); ?></label>
+    </div>
+    
     <input type="hidden" value="-1" name="pref_index" id="pref_index" /><br />
     <input type="hidden" value="<?php echo $_SESSION['course_id']; ?>" name="course_id" id="course_id" /><br />
     <input class="button" type="submit" name="set_default" value="<?php echo _AT("reapply_default"); ?>" accesskey="d" />

@@ -93,6 +93,11 @@ echo '<div id="container"><br />';
 			echo '	<input type="hidden" name="content_editor" value="'.$_POST['content_editor'].'" />'."\n\r";
 		else if (isset($_SESSION['prefs']['PREF_CONTENT_EDITOR']))
 			echo '	<input type="hidden" name="content_editor" value="'.$_SESSION['prefs']['PREF_CONTENT_EDITOR'].'" />'."\n\r";
+                
+                if (isset($_POST['media_player']))
+			echo '	<input type="hidden" name="media_player" value="'.$_POST['media_player'].'" />'."\n\r";
+		else if (isset($_SESSION['prefs']['PREF_MEDIA_PLAYER']))
+			echo '	<input type="hidden" name="media_player" value="'.$_SESSION['prefs']['PREF_MEDIA_PLAYER'].'" />'."\n\r";
 	}
 
 	if ($current_tab != 1) 
@@ -245,7 +250,50 @@ echo '<div id="container"><br />';
 		else if (isset($_SESSION['prefs']['PREF_SHOW_BREAD_CRUMBS']))
 			echo '	<input type="hidden" name="show_bread_crumbs" value="'.$_SESSION['prefs']['PREF_SHOW_BREAD_CRUMBS'].'" />'."\n\r";
 	}
-
+        
+        if ($current_tab !=5)
+        {
+                if (isset($_POST['flowplayer_backgroundColor']))
+                    echo ' <input type="hidden" id = "flowplayer_backgroundColor" name="flowplayer_backgroundColor" value="'. $_POST['flowplayer_backgroundColor'] .'" />';
+                else if (isset($_SESSION['prefs']['PREF_FLOWPLAYER_BGCOLOR']))
+                    echo ' <input type="hidden" id = "flowplayer_buttonColor" name="flowplayer_buttonColor" value="' .$_SESSION['prefs']['PREF_FLOWPLAYER_BGCOLOR']. '" />';
+                
+                if (isset($_POST['flowplayer_buttonColor']))
+                    echo '<input type="hidden" id = "flowplayer_buttonColor" name="flowplayer_buttonColor" value="'. $_POST['flowplayer_buttonColor']. '" />';
+                else if (isset($_SESSION['prefs']['PREF_FLOWPLAYER_BTNCOLOR']))
+                    echo '<input type="hidden" id = "flowplayer_buttonColor" name="flowplayer_buttonColor" value="'. $_SESSION['prefs']['PREF_FLOWPLAYER_BTNCOLOR']. '" />';
+                
+                if (isset($_POST['flowplayer_buttonOverColor']))
+                    echo '<input type="hidden" id = "flowplayer_buttonOverColor" name="flowplayer_buttonOverColor" value="'. $_POST['flowplayer_buttonOverColor']. '" />';
+                else if (isset($_SESSION['prefs']['PREF_FLOWPLAYER_BTNOVERCOLOR']))
+                    echo '<input type="hidden" id = "flowplayer_buttonOverColor" name="flowplayer_buttonOverColor" value="'. $_SESSION['prefs']['PREF_FLOWPLAYER_BTNOVERCOLOR']. '" />';
+                
+                if (isset($_POST['flowplayer_volumeColor']))
+                    echo '<input type="hidden" id = "flowplayer_volumeColor" name="flowplayer_volumeColor" value="'. $_POST['flowplayer_volumeColor'] .'" />';
+                else if (isset($_SESSION['prefs']['PREF_FLOWPLAYER_VOLCOLOR']))
+                    echo '<input type="hidden" id = "flowplayer_volumeColor" name="flowplayer_volumeColor" value="'. $_SESSION['prefs']['PREF_FLOWPLAYER_VOLCOLOR'] .'" />';
+                    
+                if (isset($_POST['flowplayer_volumeSliderColor']))
+                    echo '<input type="hidden" id = "flowplayer_volumeSliderColor" name="flowplayer_volumeSliderColor" value="'. $_POST['flowplayer_volumeSliderColor'] .'" />';
+                else if (isset($_SESSION['prefs']['PREF_FLOWPLAYER_VOLSLIDERCOLOR']))
+                    echo '<input type="hidden" id = "flowplayer_volumeSliderColor" name="flowplayer_volumeSliderColor" value="'. $_SESSION['prefs']['PREF_FLOWPLAYER_VOLSLIDERCOLOR'] .'" />';
+                    
+                if (isset($_POST['flowplayer_canvas']))
+                    echo '<input type="hidden" id = "flowplayer_canvas" name="flowplayer_canvas" value="'. $_POST['flowplayer_canvas'] .'" />';
+                else if (isset($_SESSION['prefs']['PREF_FLOWPLAYER_CANVAS']))
+                    echo '<input type="hidden" id = "flowplayer_canvas" name="flowplayer_canvas" value="'. $_SESSION['prefs']['PREF_FLOWPLAYER_CANVAS'] .'" />';
+                
+                if (isset($_POST['flowplayer_gradient']))
+                    echo '<input type="hidden" id = "flowplayer_gradient" name="flowplayer_gradient" value="'. $_POST['flowplayer_gradient'] .'" />';
+                else if (isset($_SESSION['prefs']['PREF_FLOWPLAYER_GRADIENT']))
+                    echo '<input type="hidden" id = "flowplayer_gradient" name="flowplayer_gradient" value="'. $_SESSION['prefs']['PREF_FLOWPLAYER_GRADIENT'] .'" />';
+                
+                if (isset($_POST['flowplayer_height']))
+                    echo '<input type="hidden" id = "flowplayer_height" name="flowplayer_height" value="'. $_POST['flowplayer_height'] .'" />';
+                else if (isset($_SESSION['prefs']['PREF_FLOWPLAYER_HEIGHT']))
+                    echo '<input type="hidden" id = "flowplayer_height" name="flowplayer_height" value="'. $_SESSION['prefs']['PREF_FLOWPLAYER_HEIGHT'] .'" />';
+        }
+        
 	echo '<fieldset class="group_form">';
 	include(AT_INCLUDE_PATH .'../users/'.$tabs[$current_tab][1]);
 	echo '</fieldset>';

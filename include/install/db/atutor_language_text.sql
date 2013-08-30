@@ -1641,6 +1641,7 @@ INSERT INTO `language_text` VALUES ('en', '_template','mb','<acronym title=\"Meg
 INSERT INTO `language_text` VALUES ('en', '_template','media','Media','2007-06-15 14:41:08','');
 INSERT INTO `language_text` VALUES ('en', '_template','media_interface','Media Interface','2013-06-29 18:41:00','');
 INSERT INTO `language_text` VALUES ('en', '_template','media_player','Media Player','2013-06-22 13:12:41','user prefs');
+INSERT INTO `language_text` VALUES ('en', '_template','media_player_settings','Media Player Settings','2013-08-29 08:56:34','');
 INSERT INTO `language_text` VALUES ('en', '_template','members','Members','2003-05-20 13:00:39','instructor course statistics/details');
 INSERT INTO `language_text` VALUES ('en', '_template','member_id','Member ID','2003-05-20 13:01:18','admin user manager column heading');
 INSERT INTO `language_text` VALUES ('en', '_template','member_stats','Student Specific Usage','2005-03-03 15:25:57','');
@@ -1991,11 +1992,13 @@ INSERT INTO `language_text` VALUES ('en', '_template','prefs_set_init','You may 
 INSERT INTO `language_text` VALUES ('en', '_template','prefs_set_init_atutor','I would like to change or review my ATutor preferences.','2010-04-12 16:15:51','');
 INSERT INTO `language_text` VALUES ('en', '_template','prefs_set_init_audio','I would like alternatives to audio content.','2010-04-12 16:13:48','');
 INSERT INTO `language_text` VALUES ('en', '_template','prefs_set_init_legend','What preferences would you like to setup?','2010-04-12 16:16:51','');
+INSERT INTO `language_text` VALUES ('en', '_template','prefs_set_init_mediaplayer','I would like to change or review my Media Player preferences.','2013-08-29 16:10:07','');
 INSERT INTO `language_text` VALUES ('en', '_template','prefs_set_init_nav','I would like to enhance the navigation of the content.','2010-04-12 16:10:07','');
 INSERT INTO `language_text` VALUES ('en', '_template','prefs_set_init_see','I would like to make the text on the screen easier to see.','2010-04-12 16:09:35','');
 INSERT INTO `language_text` VALUES ('en', '_template','prefs_set_init_text','I would like alternatives to textual content.','2010-04-12 16:13:09','');
 INSERT INTO `language_text` VALUES ('en', '_template','prefs_set_init_tool','I would like access to learner support tools.','2010-04-12 16:15:10','');
 INSERT INTO `language_text` VALUES ('en', '_template','prefs_set_init_visual','I would like alternatives to visual content.','2010-04-12 16:14:32','');
+INSERT INTO `language_text` VALUES ('en', '_template','prefs_set_mediaplayer','Select the settings you would like added to Media Player.','2013-08-29 16:34:38','');
 INSERT INTO `language_text` VALUES ('en', '_template','prefs_set_nav','Select the navigation features you would like added to ATutor.','2010-04-12 16:19:49','');
 INSERT INTO `language_text` VALUES ('en', '_template','prefs_set_text','If you want alternatives to text content when it is available, select \"Yes\", choose the type of Preferred Alternative, then choose to have the alternative appended to, or replace the original text content','2010-04-12 16:21:58','');
 INSERT INTO `language_text` VALUES ('en', '_template','prefs_set_tools','You may choose from the available Learner Support Tools to make them available while in a course.','2010-04-12 16:26:59','');

@@ -111,6 +111,49 @@ $transcripts_init_cuepoint_seeking_code = "
     };
     });
 ";
+if(isset($_SESSION['prefs']['PREF_FLOWPLAYER_BGCOLOR']) && ($_SESSION['prefs']['PREF_FLOWPLAYER_BGCOLOR'])!='')
+    $bgcolor = $_SESSION['prefs']['PREF_FLOWPLAYER_BGCOLOR'];
+else
+    $bgcolor = '#222222';
+
+if(isset($_SESSION['prefs']['PREF_FLOWPLAYER_BTNCOLOR']) && ($_SESSION['prefs']['PREF_FLOWPLAYER_BTNCOLOR'])!='')
+    $btncolor = $_SESSION['prefs']['PREF_FLOWPLAYER_BTNCOLOR'];
+else
+    $btncolor = '#ffffff';
+
+if(isset($_SESSION['prefs']['PREF_FLOWPLAYER_BTNOVERCOLOR']) && ($_SESSION['prefs']['PREF_FLOWPLAYER_BTNOVERCOLOR'])!='')
+    $btnovercolor = $_SESSION['prefs']['PREF_FLOWPLAYER_BTNOVERCOLOR'];
+else
+    $btnovercolor = '#ffffff';
+
+if(isset($_SESSION['prefs']['PREF_FLOWPLAYER_VOLCOLOR']) && ($_SESSION['prefs']['PREF_FLOWPLAYER_VOLCOLOR'])!='')
+    $volcolor = $_SESSION['prefs']['PREF_FLOWPLAYER_VOLCOLOR'];
+else
+    $volcolor = '#ffffff';
+
+if(isset($_SESSION['prefs']['PREF_FLOWPLAYER_VOLSLIDERCOLOR']) && ($_SESSION['prefs']['PREF_FLOWPLAYER_VOLSLIDERCOLOR'])!='')
+    $volslidercolor = $_SESSION['prefs']['PREF_FLOWPLAYER_VOLSLIDERCOLOR'];
+else
+    $volslidercolor = '#ffffff';
+
+if(isset($_SESSION['prefs']['PREF_FLOWPLAYER_GRADIENT']) && ($_SESSION['prefs']['PREF_FLOWPLAYER_GRADIENT'])!='') {
+    $gradient = $_SESSION['prefs']['PREF_FLOWPLAYER_GRADIENT'];
+    if($gradient == 'custom')
+        $gradient = "[0.1, 0.2, 0.5]";
+}
+else
+    $gradient = 'medium';
+
+if(isset($_SESSION['prefs']['PREF_FLOWPLAYER_HEIGHT']))
+    $cbar_height = $_SESSION['prefs']['PREF_FLOWPLAYER_HEIGHT'];
+else
+    $cbar_height = 24;
+
+if(isset($_SESSION['prefs']['PREF_FLOWPLAYER_CANVAS']) && ($_SESSION['prefs']['PREF_FLOWPLAYER_CANVAS'])!='')
+    $canvas = $_SESSION['prefs']['PREF_FLOWPLAYER_CANVAS'];
+else
+    $canvas = '#000000';
+
 // .flv
 preg_match_all("#\[media[0-9a-z\|]*([\s]?captions=[.\w\d]+[^\s\"]+\.srt\|?)*([\s]?transcripts=[.\w\d]+[^\s\"]+\.json)*\]([.\w\d]+[^\s\"]+)\.flv\[/media\]#i",$_input,$media_matches[],PREG_SET_ORDER);
 
@@ -153,7 +196,16 @@ if (isset($_SESSION['flash']) && $_SESSION['flash'] == "yes") {
                                     }
                                 },
                                 plugins: {
+                                canvas: { backgroundColor: '". $canvas. "' },
                                 controls: {
+                                backgroundColor: '". $bgcolor ."',
+                                buttonColor: '". $btncolor. "',
+                                buttonOverColor: '". $btnovercolor. "',
+                                volumeColor: '". $volcolor. "',
+                                volumeSliderColor: '". $volslidercolor. "',
+                                backgroundGradient: '". $gradient. "',
+                                height: '". $cbar_height. "', 
+                                
                                 autoHide: false,
           
                                 tooltips: {
@@ -238,8 +290,17 @@ if (isset($_SESSION['flash']) && $_SESSION['flash'] == "yes") {
                                         break;
                                     }
                                 },
+                                canvas: { backgroundColor: '". $canvas. "' },
                                 plugins: {
                                 controls: {
+                                backgroundColor: '". $bgcolor ."',
+                                buttonColor: '". $btncolor. "',
+                                buttonOverColor: '". $btnovercolor. "',
+                                volumeColor: '". $volcolor. "',
+                                volumeSliderColor: '". $volslidercolor. "',
+                                backgroundGradient: '". $gradient. "',
+                                height: '". $cbar_height. "', 
+                                    
                                 autoHide: false,
           
                                 tooltips: {
