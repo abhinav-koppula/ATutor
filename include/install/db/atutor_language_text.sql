@@ -801,6 +801,7 @@ INSERT INTO `language_text` VALUES ('en', '_template','cache_directory','Cache D
 INSERT INTO `language_text` VALUES ('en', '_template','calculator','Calculator','2008-09-09 09:03:56','');
 INSERT INTO `language_text` VALUES ('en', '_template','cancel','Cancel','2003-05-18 12:16:07','global cancel button');
 INSERT INTO `language_text` VALUES ('en', '_template','cannot_find_remote_languages','ATutor was unable to connect to the ATutor.ca website to retrieve the list of available languages.','2004-10-18 14:28:15','');
+INSERT INTO `language_text` VALUES ('en', '_template','captioning_tool','Captioning Tool','2013-06-22 18:41:00','');
 INSERT INTO `language_text` VALUES ('en', '_template','categories','Categories','2005-02-22 10:12:23','');
 INSERT INTO `language_text` VALUES ('en', '_template','category','Category','2003-05-18 12:16:54','links database');
 INSERT INTO `language_text` VALUES ('en', '_template','cats_all','All Categories','2005-02-23 10:22:07','');
