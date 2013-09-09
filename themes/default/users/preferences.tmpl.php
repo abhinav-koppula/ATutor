@@ -162,6 +162,16 @@ echo '<div id="container"><br />';
 		else if (isset($_SESSION['prefs']['PREF_ALT_TO_AUDIO']))
 		echo '	<input type="hidden" name="preferred_alt_to_audio" value="'.$_SESSION['prefs']['PREF_ALT_TO_AUDIO'].'" />'."\n\r";
 		
+                if (isset($_POST['use_captions']))
+		echo '	<input type="hidden" name="use_captions" value="'.$_POST['use_captions'].'" />'."\n\r";
+		else if (isset($_SESSION['prefs']['PREF_USE_CAPTIONS']))
+		echo '	<input type="hidden" name="use_captions" value="'.$_SESSION['prefs']['PREF_USE_CAPTIONS'].'" />'."\n\r";
+                
+                if (isset($_POST['use_transcripts']))
+		echo '	<input type="hidden" name="use_transcripts" value="'.$_POST['use_transcripts'].'" />'."\n\r";
+		else if (isset($_SESSION['prefs']['PREF_USE_TRANSCRIPTS']))
+		echo '	<input type="hidden" name="use_transcripts" value="'.$_SESSION['prefs']['PREF_USE_TRANSCRIPTS'].'" />'."\n\r";
+                
 		if (isset($_POST['alt_to_audio_append_or_replace']))
 		echo '	<input type="hidden" name="alt_to_audio_append_or_replace" value="'.$_POST['alt_to_audio_append_or_replace'].'" />'."\n\r";
 		else if (isset($_SESSION['prefs']['PREF_ALT_TO_AUDIO_APPEND_OR_REPLACE']))
