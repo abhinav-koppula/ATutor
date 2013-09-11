@@ -15,6 +15,207 @@
 if (!defined('AT_INCLUDE_PATH')) { exit; }
 
 
+function get_lang_options($counter, $lang)
+{
+    $languageCodes = array(
+ "aa" => "Afar",
+ "ab" => "Abkhazian",
+ "ae" => "Avestan",
+ "af" => "Afrikaans",
+ "ak" => "Akan",
+ "am" => "Amharic",
+ "an" => "Aragonese",
+ "ar" => "Arabic",
+ "as" => "Assamese",
+ "av" => "Avaric",
+ "ay" => "Aymara",
+ "az" => "Azerbaijani",
+ "ba" => "Bashkir",
+ "be" => "Belarusian",
+ "bg" => "Bulgarian",
+ "bh" => "Bihari",
+ "bi" => "Bislama",
+ "bm" => "Bambara",
+ "bn" => "Bengali",
+ "bo" => "Tibetan",
+ "br" => "Breton",
+ "bs" => "Bosnian",
+ "ca" => "Catalan",
+ "ce" => "Chechen",
+ "ch" => "Chamorro",
+ "co" => "Corsican",
+ "cr" => "Cree",
+ "cs" => "Czech",
+ "cu" => "Church Slavic",
+ "cv" => "Chuvash",
+ "cy" => "Welsh",
+ "da" => "Danish",
+ "de" => "German",
+ "dv" => "Divehi",
+ "dz" => "Dzongkha",
+ "ee" => "Ewe",
+ "el" => "Greek",
+ "en" => "English",
+ "eo" => "Esperanto",
+ "es" => "Spanish",
+ "et" => "Estonian",
+ "eu" => "Basque",
+ "fa" => "Persian",
+ "ff" => "Fulah",
+ "fi" => "Finnish",
+ "fj" => "Fijian",
+ "fo" => "Faroese",
+ "fr" => "French",
+ "fy" => "Western Frisian",
+ "ga" => "Irish",
+ "gd" => "Scottish Gaelic",
+ "gl" => "Galician",
+ "gn" => "Guarani",
+ "gu" => "Gujarati",
+ "gv" => "Manx",
+ "ha" => "Hausa",
+ "he" => "Hebrew",
+ "hi" => "Hindi",
+ "ho" => "Hiri Motu",
+ "hr" => "Croatian",
+ "ht" => "Haitian",
+ "hu" => "Hungarian",
+ "hy" => "Armenian",
+ "hz" => "Herero",
+ "ia" => "Interlingua",
+ "id" => "Indonesian",
+ "ie" => "Interlingue",
+ "ig" => "Igbo",
+ "ii" => "Sichuan Yi",
+ "ik" => "Inupiaq",
+ "io" => "Ido",
+ "is" => "Icelandic",
+ "it" => "Italian",
+ "iu" => "Inuktitut",
+ "ja" => "Japanese",
+ "jv" => "Javanese",
+ "ka" => "Georgian",
+ "kg" => "Kongo",
+ "ki" => "Kikuyu",
+ "kj" => "Kwanyama",
+ "kk" => "Kazakh",
+ "kl" => "Kalaallisut",
+ "km" => "Khmer",
+ "kn" => "Kannada",
+ "ko" => "Korean",
+ "kr" => "Kanuri",
+ "ks" => "Kashmiri",
+ "ku" => "Kurdish",
+ "kv" => "Komi",
+ "kw" => "Cornish",
+ "ky" => "Kirghiz",
+ "la" => "Latin",
+ "lb" => "Luxembourgish",
+ "lg" => "Ganda",
+ "li" => "Limburgish",
+ "ln" => "Lingala",
+ "lo" => "Lao",
+ "lt" => "Lithuanian",
+ "lu" => "Luba-Katanga",
+ "lv" => "Latvian",
+ "mg" => "Malagasy",
+ "mh" => "Marshallese",
+ "mi" => "Maori",
+ "mk" => "Macedonian",
+ "ml" => "Malayalam",
+ "mn" => "Mongolian",
+ "mr" => "Marathi",
+ "ms" => "Malay",
+ "mt" => "Maltese",
+ "my" => "Burmese",
+ "na" => "Nauru",
+ "nb" => "Norwegian Bokmal",
+ "nd" => "North Ndebele",
+ "ne" => "Nepali",
+ "ng" => "Ndonga",
+ "nl" => "Dutch",
+ "nn" => "Norwegian Nynorsk",
+ "no" => "Norwegian",
+ "nr" => "South Ndebele",
+ "nv" => "Navajo",
+ "ny" => "Chichewa",
+ "oc" => "Occitan",
+ "oj" => "Ojibwa",
+ "om" => "Oromo",
+ "or" => "Oriya",
+ "os" => "Ossetian",
+ "pa" => "Panjabi",
+ "pi" => "Pali",
+ "pl" => "Polish",
+ "ps" => "Pashto",
+ "pt" => "Portuguese",
+ "qu" => "Quechua",
+ "rm" => "Raeto-Romance",
+ "rn" => "Kirundi",
+ "ro" => "Romanian",
+ "ru" => "Russian",
+ "rw" => "Kinyarwanda",
+ "sa" => "Sanskrit",
+ "sc" => "Sardinian",
+ "sd" => "Sindhi",
+ "se" => "Northern Sami",
+ "sg" => "Sango",
+ "si" => "Sinhala",
+ "sk" => "Slovak",
+ "sl" => "Slovenian",
+ "sm" => "Samoan",
+ "sn" => "Shona",
+ "so" => "Somali",
+ "sq" => "Albanian",
+ "sr" => "Serbian",
+ "ss" => "Swati",
+ "st" => "Southern Sotho",
+ "su" => "Sundanese",
+ "sv" => "Swedish",
+ "sw" => "Swahili",
+ "ta" => "Tamil",
+ "te" => "Telugu",
+ "tg" => "Tajik",
+ "th" => "Thai",
+ "ti" => "Tigrinya",
+ "tk" => "Turkmen",
+ "tl" => "Tagalog",
+ "tn" => "Tswana",
+ "to" => "Tonga",
+ "tr" => "Turkish",
+ "ts" => "Tsonga",
+ "tt" => "Tatar",
+ "tw" => "Twi",
+ "ty" => "Tahitian",
+ "ug" => "Uighur",
+ "uk" => "Ukrainian",
+ "ur" => "Urdu",
+ "uz" => "Uzbek",
+ "ve" => "Venda",
+ "vi" => "Vietnamese",
+ "vo" => "Volapuk",
+ "wa" => "Walloon",
+ "wo" => "Wolof",
+ "xh" => "Xhosa",
+ "yi" => "Yiddish",
+ "yo" => "Yoruba",
+ "za" => "Zhuang",
+ "zh" => "Chinese",
+ "zu" => "Zulu"
+);
+    $select = "<select id='media_interface_".$counter."'>";
+    $selected= "";
+    foreach($languageCodes as $language=>$value)
+    {
+        if($language==$lang)
+            $selected='selected';
+        else
+            $selected='';
+        $select.="<option name='".$language."' ". $selected ." >". $value ."</option>";
+    }
+    $select.= "</select><br/>";
+    return $select;
+}
 ?>
 
 <div class="row">
@@ -63,6 +264,23 @@ for($i = 0; $i<$num_media_terms; $i++) {
                 else
                     echo '<input type="text" id="media_interface_'.$id_counter++.'" value="'.$width.'" />x<input type="text" id="media_interface_'.$id_counter++.'" value="'.$height.'" />';
                 break;
+            case 3:
+                $transcripts_lang = explode('|',$media_matches[$j][$i]);
+                if(empty($transcripts_lang))
+                    echo '<input type="text" id="media_interface_'.$id_counter++.'" />x<input type="text" id="media_interface_'.$id_counter++.'" />';
+                else
+                {
+                    foreach($transcripts_lang as $transcript)
+                    {
+                        $file_lang = explode(':', $transcript);
+                        $transcript_file = $file_lang[0];
+                        $transcript_lang = $file_lang[1];
+                        if($transcript_lang=='')
+                            $transcript_lang="en";
+                        echo '<input type="text" id="media_interface_'.$id_counter.'" value="'.$transcript_file.'"/>&nbsp;<input type="button" onclick="launchFileManager('.$id_counter++.');" value="Change" />&nbsp;'. get_lang_options($id_counter++, $transcript_lang);
+                    }
+                }
+                break;
             default:
                 if(empty($media_matches[$j][$i])) {
                     echo '<input type="text" id="media_interface_'.$id_counter.'"/>&nbsp;<input type="button" onclick="launchFileManager('.$id_counter++.');" value="Insert" />';
@@ -106,10 +324,26 @@ for($i = 0; $i<$num_media_terms; $i++) {
         new_height = $('#media_interface_'+ (start_id+1)).val();
         new_captions = $('#media_interface_'+ (start_id+2)).val();
         new_transcripts = $('#media_interface_'+ (start_id+3)).val();
-        new_source = $('#media_interface_'+ (start_id+4)).val();
+        if(new_transcripts)
+        new_transcripts += ":"+$('#media_interface_'+ (start_id+4)+ ' option:selected').attr('name');
+        id_counter=start_id+5;
+        while(id_counter < end_id)
+        {
+            name = $('#media_interface_'+ (id_counter)).val();
+            val = $('#media_interface_'+ (id_counter+1) + ' option:selected').attr('name');
+            if(name && val)
+                new_transcripts+= "|" + name + ":" + val;
+            id_counter+=2;
+        }
+        
+        if(new_transcripts.charAt(0)=='|')
+            new_transcripts = new_transcripts.substr(1);
+        new_source = $('#media_interface_'+ (id_counter)).val();
         
         if( !new_width && !new_height && !new_captions && !new_transcripts && new_source) //all except source field empty -- [media]src[/media]
             newhtml = newhtml+ ']'+ new_source + '[/media]';
+        else if( new_width && new_height && !new_captions && !new_transcripts && new_source)              //[media|width|height]src[/media]
+            newhtml = newhtml+ '|' + new_width + '|' + new_height +']'+ new_source + '[/media]';
         else if ( !new_width && !new_height && !new_transcripts && new_captions && new_source)            //[media captions=captions_file]src[/media]
             newhtml = newhtml + ' captions=' +new_captions + ']' + new_source + '[/media]';
         else if ( !new_width && !new_height && !new_captions && new_transcripts && new_source)            //[media transcripts=transcpripts_file]src[/media]
@@ -118,7 +352,7 @@ for($i = 0; $i<$num_media_terms; $i++) {
             newhtml = newhtml + '|' + new_width + '|' + new_height +'|captions=' + new_captions + ']' + new_source + '[/media]';
         else if (!new_captions && new_width && new_height && new_transcripts && new_source)               //[media|width|height|captions=captions_file]src[/media]
             newhtml = newhtml + '|' + new_width + '|' + new_height +'|transcripts=' + new_transcripts + ']' + new_source + '[/media]';
-        else if (new_height && new_width && new_captions && new_transcripts && new_source)
+        else if (new_height && new_width && new_captions && new_transcripts && new_source)                //[media|width|height|captions=captions_file|transcripts=transcripts_file1|transcripts_file2]src[/media]
             newhtml = newhtml + '|' + new_width + '|' + new_height +'|captions=' + new_captions + '|transcripts=' + new_transcripts + ']' + new_source + '[/media]';
         else {
             alert("There was an error detected. Please make sure that media source is not empty")

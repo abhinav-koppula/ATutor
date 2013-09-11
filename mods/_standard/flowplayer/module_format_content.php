@@ -7,6 +7,7 @@ global $_input, $_content_base_href;
 // The conversion performed by this module converts the [media] tag into flowplayer class
 // only when the flash is installed, otherwise, the [media] tag is converted into a plain 
 // <a> link.
+require_once('language_file.inc.php');
 $media_replace = array();
 $media_matches = array();
 $flowplayerholder_class = "player";  // style class used to play flowplayer medias
@@ -37,51 +38,29 @@ $caption_init = "
             }
         }
 ";
-$transcripts_init = "
-    var transcript_##DIVID## = (function() {
-    var json_##DIVID## = null;
-    $.ajax({
-        'async': false,
-        'global': false,
-        'url': '".AT_BASE_HREF."get.php/".$_content_base_href."##TRANSCRIPTS##',
-        'dataType': 'json',
-        'success': function (data) {
-        json_##DIVID## = data;
+$transcripts_prepare = "
+    if($('###DIVID##_transcript_languages option').length > 0)
+    {
+        $('###DIVID##_transcript_languages option').each(function()
+        {
+            ##DIVID##_transcripts.push(prepare_transcripts(this));
+        });
     }
-    });
-    return json_##DIVID##;
-    })();
-                               
-    $.each(transcript_##DIVID##, function(key, value){
-    $.each(value, function(index, element) {
-        intime_##DIVID## = element.inTime.split(':');
-        hh_##DIVID## = intime_##DIVID##[0];
-        mm_##DIVID## = intime_##DIVID##[1];
-        ss_##DIVID## = intime_##DIVID##[2];
-        mss_##DIVID## = Math.round((ss_##DIVID##*10)/10)*1000;
-        intime_##DIVID## = (parseInt(hh_##DIVID##)*60*60 + parseInt(mm_##DIVID##)*60)*1000 + mss_##DIVID##;
-        
-        item_##DIVID## = '<span rel=\"'+intime_##DIVID##+'\" >'+element.transcript+'</span>';
-        $('###DIVID##_chapters > #chapters-text').append(item_##DIVID##+' ');
-    });
-    });      
-
-    var cuepoints = [],seekpos = 0, // seek target when player is not loaded
-    chapters = $('###DIVID##_chapters > #chapters-text span');
-    i = 0;
-    
-    // collect cuepoints from rel attributes of chapter elements
-    \$f.each(chapters, function () {
-        cuepoints.push({
-        time: parseInt(this.getAttribute('rel'), 10),
-        index: i
-    });
-    i = i + 1;
+    console.log(##DIVID##_transcripts);
+";
+$transcripts_init = "
+    if($('###DIVID##_transcript_languages option').length > 0)
+    init_transcripts(\"##DIVID##\", ##DIVID##_transcripts, counter, player_##DIVID##);
+                                
+    $('###DIVID##_transcript_languages').change(function() {
+        id=$(this).attr('id');
+        counter = $('#'+id +' option:selected').attr('rel'); 
+        init_transcripts(\"##DIVID##\", ##DIVID##_transcripts, counter, player_##DIVID##);
     });
 ";
 $transcripts_init_cuepoint_code = "
     onCuepoint: [
-        cuepoints,
+        ##DIVID##_cuepointsobj[counter],
         function(clip, cuepoint) {
             $('###DIVID##_chapters > #chapters-text').children().removeClass('highlight');
             $('###DIVID##_chapters > #chapters-text').find('span[rel=\"'+cuepoint.time+'\"]').addClass('highlight');
@@ -94,23 +73,7 @@ $transcripts_init_cuepoint_code = "
         }
     ],
 ";
-$transcripts_init_cuepoint_seeking_code = "
-    \$f.each(chapters, function () {
-    var pos = parseInt(this.getAttribute('rel'), 10) / 1000;
-    var rel = pos*1000;
-    
-    this.onclick = function () {
-        if (!player_##DIVID##.isLoaded()) {
-            player_##DIVID##.play();
-            seekpos = pos;
-        } else {
-            player_##DIVID##.seek(player_##DIVID##.isPaused() && pos === 0 ? 1 : pos);
-        }
-        $(this).siblings().removeClass('highlight');
-        $(this).addClass('highlight');        
-    };
-    });
-";
+
 if(isset($_SESSION['prefs']['PREF_FLOWPLAYER_BGCOLOR']) && ($_SESSION['prefs']['PREF_FLOWPLAYER_BGCOLOR'])!='')
     $bgcolor = $_SESSION['prefs']['PREF_FLOWPLAYER_BGCOLOR'];
 else
@@ -155,7 +118,7 @@ else
     $canvas = '#000000';
 
 // .flv
-preg_match_all("#\[media[0-9a-z\|]*([\s]?captions=[.\w\d]+[^\s\"]+\.srt\|?)*([\s]?transcripts=[.\w\d]+[^\s\"]+\.json)*\]([.\w\d]+[^\s\"]+)\.flv\[/media\]#i",$_input,$media_matches[],PREG_SET_ORDER);
+preg_match_all("#\[media[0-9a-z\|]*([\s]?captions=[.\w\d]+[^\s\"]+\.srt\|?)*([\s]?transcripts=[.\w\d]+[^\s\"]+\.json[:a-z]*?)*\]([.\w\d]+[^\s\"]+)\.flv\[/media\]#i",$_input,$media_matches[],PREG_SET_ORDER);
 
 if (isset($_SESSION['flash']) && $_SESSION['flash'] == "yes") {
 	$media_replace[] = "<div>\n".
@@ -171,15 +134,26 @@ if (isset($_SESSION['flash']) && $_SESSION['flash'] == "yes") {
 		      	    </ul>
                             </div>".
                            "  <div id='##DIVID##_chapters' class = 'chapters' style = 'height:##HEIGHT##px; display: ##DISPLAY_TRANSCRIPTS##'>
-                               <div id = '##DIVID##_transcript_controls' class = 'transcript-controls'><button type='button' class='close-button' title='Hide Transcripts' onclick='show_transcripts(\"##DIVID##\");return false;' ></button></div>
+                               <div id = '##DIVID##_transcript_controls' class = 'transcript-controls'>
+                                   <button type='button' class='close-button' title='Hide Transcripts' onclick='show_transcripts(\"##DIVID##\");return false;' ></button>
+                                   <select id = '##DIVID##_transcript_languages' >##TRANSCRIPTS_OPTIONS##</select>
+                               </div>
                                <div id='chapters-text' class = 'chapters-text' ></div>
-                              </div>".
+                              </div>\n".
                            "  <script type=\"text/javascript\">
                                $(document).ready(function(){
-
-                               ##TRANSCRIPTS_CODE##
+                               var counter=0;
                                
-                               player_##DIVID## = \$f(\"##DIVID##\", {
+                               ##DIVID##_transcripts = [];
+                               ##DIVID##_cuepointsobj = [];
+                               ##DIVID##_chaptersobj = [];
+                               
+                               ##TRANSCRIPTS_PREPARE##
+                               
+                               if($('###DIVID##_transcript_languages option').length > 0)
+                               ##DIVID##_cuepointsobj = prepare_cuepoints(##DIVID##_transcripts);
+                               
+                                player_##DIVID## = \$f(\"##DIVID##\", {
                                 src: '".AT_BASE_HREF."mods/_standard/flowplayer/flowplayer-3.2.16.swf',
                                 SeamlessTabbing: false
                                 }, {
@@ -195,8 +169,8 @@ if (isset($_SESSION['flash']) && $_SESSION['flash'] == "yes") {
                                         break;
                                     }
                                 },
-                                plugins: {
                                 canvas: { backgroundColor: '". $canvas. "' },
+                                plugins: {
                                 controls: {
                                 backgroundColor: '". $bgcolor ."',
                                 buttonColor: '". $btncolor. "',
@@ -225,7 +199,7 @@ if (isset($_SESSION['flash']) && $_SESSION['flash'] == "yes") {
                                 }
                                 });
                                 
-                                ##TRANSCRIPTS_CUEPOINT_SEEKING##
+                                ##TRANSCRIPTS_INIT##
                                 });
                               </script>\n".
                               "<h2 class='box' style='width:200px;'>
@@ -251,11 +225,10 @@ if (isset($_SESSION['flash']) && $_SESSION['flash'] == "yes") {
 }
 
 // .mp4
-preg_match_all("#\[media[0-9a-z\|]*([\s]?captions=[.\w\d]+[^\s\"]+\.srt\|?)*([\s]?transcripts=[.\w\d]+[^\s\"]+\.json)*\]([.\w\d]+[^\s\"]+)\.mp4\[/media\]#i",$_input,$media_matches[],PREG_SET_ORDER);
+preg_match_all("#\[media[0-9a-z\|]*([\s]?captions=[.\w\d]+[^\s\"]+\.srt\|?)*([\s]?transcripts=[.\w\d]+[^\s\"]+\.json[:a-z]*?)*\]([.\w\d]+[^\s\"]+)\.mp4\[/media\]#i",$_input,$media_matches[],PREG_SET_ORDER);
 if (isset($_SESSION['flash']) && $_SESSION['flash'] == "yes") {
 	$media_replace[] = "<div>\n".
 	                   "  <div id=\"##DIVID##\" style=\"display:block;width:##WIDTH##px;height:##HEIGHT##px;float:left;\" ></div>\n".
-                           "  <div>".
                            "<div id='##DIVID##_transcript-shortcut' class = 'transcript-shortcut' style='float:left;display: ##DISPLAY_TRANSCRIPT_SHORTCUT##;'>
                             <ul style='margin-bottom:0px;'>
 		      		<li>
@@ -266,15 +239,27 @@ if (isset($_SESSION['flash']) && $_SESSION['flash'] == "yes") {
 		      	    </ul>
                             </div>".
                            "  <div id = '##DIVID##_chapters' class = 'chapters' style = 'height:##HEIGHT##px; display: ##DISPLAY_TRANSCRIPTS##'>
-                               <div id = '##DIVID##_transcript_controls' class = 'transcript-controls'><button type='button' class='close-button' title='Hide Transcripts' onclick='show_transcripts(\"##DIVID##\");return false;' ></button></div>
+                               <div id = '##DIVID##_transcript_controls' class = 'transcript-controls'>
+                                   <button type='button' class='close-button' title='Hide Transcripts' onclick='show_transcripts(\"##DIVID##\");return false;' ></button>
+                                   <select id = '##DIVID##_transcript_languages' >##TRANSCRIPTS_OPTIONS##</select>
+                               </div>
                                <div id='chapters-text' class = 'chapters-text' ></div>
                               </div>\n".
                            "  <script type=\"text/javascript\">
                                $(document).ready(function(){
+                               var counter=0;
                                
-                               ##TRANSCRIPTS_CODE##
+                               ##DIVID##_transcripts = [];
+                               ##DIVID##_cuepointsobj = [];
+                               ##DIVID##_chaptersobj = [];
                                
-                               player_##DIVID## = \$f(\"##DIVID##\", {
+                               ##TRANSCRIPTS_PREPARE##
+                               
+                               if($('###DIVID##_transcript_languages option').length > 0)
+                               ##DIVID##_cuepointsobj = prepare_cuepoints(##DIVID##_transcripts);
+                               
+                                
+                                player_##DIVID## = \$f(\"##DIVID##\", {
                                 src: '".AT_BASE_HREF."mods/_standard/flowplayer/flowplayer-3.2.16.swf',
                                 SeamlessTabbing: false
                                 }, {
@@ -320,7 +305,8 @@ if (isset($_SESSION['flash']) && $_SESSION['flash'] == "yes") {
                                 }
                                 });
                                 
-                                ##TRANSCRIPTS_CUEPOINT_SEEKING##
+                                ##TRANSCRIPTS_INIT##
+                               
                                 });
                               </script>\n".
                               "<h2 class='box' style='width:200px;'>
@@ -389,12 +375,28 @@ for ($i=0;$i<count($media_replace);$i++){
                     $media_input = str_replace("##CAPTION_CODE##", '', $media_input);
                     $media_input = str_replace("##CAPTIONS##", '', $media_input);
                 }
-                if((!empty($media[2])) && (preg_match("/transcripts=([.\w\d]+[^\s\"]+\.json)/", $media[2], $matches)))
+                if((!empty($media[2])) && (preg_match("/transcripts=([.\w\d]+[^\s\"]+\.json(:[a-z]*)*)/", $media[2], $matches)))
                 {
-                    $media_input = str_replace("##TRANSCRIPTS_CODE##", $transcripts_init, $media_input);
-                    $media_input = str_replace("##TRANSCRIPTS##", $matches[1], $media_input);
+                    //$media_input = str_replace("##TRANSCRIPTS_CODE##", $transcripts_init, $media_input);
+                    $transcripts = explode('|', $matches[1]);
+                    $transcript_options="";
+                    $transcript_counter=0;
+                    foreach($transcripts as $transcript)
+                    {
+                        $file_lang = explode(':', $transcript);
+                        $transcript_file = $file_lang[0];
+                        $transcript_lang = $file_lang[1];
+                        if($transcript_lang=='')
+                            $transcript_lang="en";
+                        $transcript_options.="<option name='".$transcript_file."' rel='".$transcript_counter."'>". $languageCodes[$transcript_lang] ."</option>";
+                        $transcript_counter++;
+                    }
+                    
+                    $media_input = str_replace("##TRANSCRIPTS_OPTIONS##", $transcript_options, $media_input);
+                    $media_input = str_replace("##TRANSCRIPTS_PREPARE##", $transcripts_prepare, $media_input);
+                    $media_input = str_replace("##TRANSCRIPTS_INIT##", $transcripts_init, $media_input);
+                    
                     $media_input = str_replace("##TRANSCRIPTS_CUEPOINT_CODE##", $transcripts_init_cuepoint_code, $media_input);
-                    $media_input = str_replace("##TRANSCRIPTS_CUEPOINT_SEEKING##", $transcripts_init_cuepoint_seeking_code, $media_input);
                     
                     if($_SESSION['prefs']['PREF_USE_TRANSCRIPTS'] == 1) {
                         $media_input = str_replace("##DISPLAY_TRANSCRIPTS##", 'block', $media_input);
@@ -407,10 +409,13 @@ for ($i=0;$i<count($media_replace);$i++){
                 }
                 else
                 {
-                    $media_input = str_replace("##TRANSCRIPTS_CODE##", '', $media_input);
-                    $media_input = str_replace("##TRANSCRIPTS##", '', $media_input);
+                    //$media_input = str_replace("##TRANSCRIPTS_CODE##", '', $media_input);
+                    
+                    $media_input = str_replace("##TRANSCRIPTS_OPTIONS##", '', $media_input);
+                    $media_input = str_replace("##TRANSCRIPTS_PREPARE##", '', $media_input);
+                    $media_input = str_replace("##TRANSCRIPTS_INIT##", '', $media_input);
                     $media_input = str_replace("##TRANSCRIPTS_CUEPOINT_CODE##", '', $media_input);
-                    $media_input = str_replace("##TRANSCRIPTS_CUEPOINT_SEEKING##", '', $media_input);
+                    
                     
                     $media_input = str_replace("##DISPLAY_TRANSCRIPTS##", 'none', $media_input);
                     $media_input = str_replace("##DISPLAY_TRANSCRIPT_SHORTCUT##", 'none', $media_input);
@@ -458,9 +463,88 @@ $_input.='
     
     function show_transcripts(id)
     {
-        console.log("#"+id+"_transcript-shortcut");
         $("#"+id+"_transcript-shortcut").toggle();
         $("#"+id+"_chapters").toggle();
+    }
+    function prepare_transcripts(id)
+    {
+        var transcript_file = $(id).attr("name");
+        var transcript = (function() {
+        var json_file = null;
+        $.ajax({
+            "async" : false,
+            "global" : false,
+            "url" : "'.AT_BASE_HREF.'get.php/'.$_content_base_href.'"+transcript_file,
+            "dataType" : "json",
+            "success" : function (data) {
+                json_file = data;
+            }
+        });
+        return json_file;
+        })();
+        
+        return transcript;
+    }
+    function prepare_cuepoints(transcriptobj)
+    {
+        var cuepointsobj=[];
+        var cuepoints=[];
+        $.each(transcriptobj, function(k, val) {
+        $.each(val, function(key, value){
+        $.each(value, function(index, element) {
+            intime = element.inTime.split(":");
+            hh = intime[0];
+            mm = intime[1];
+            ss = intime[2];
+            mss = Math.round((ss*10)/10)*1000;
+            intime = (parseInt(hh)*60*60 + parseInt(mm)*60)*1000 + mss;
+            item = "<span rel=\'"+intime+"\'>"+element.transcript+"</span>";
+            cuepoints.push({time:intime, text:item});
+        });
+        cuepointsobj.push(cuepoints);
+        cuepoints = [];
+        });
+        });
+        return cuepointsobj;
+    }
+    
+    function cuepoint_seeking(span_elem)
+    {
+        cuepoint = $(span_elem).attr("rel");
+        pos = parseInt(cuepoint, 10) / 1000;
+        
+        parent = $(span_elem).parent().parent().attr("id").split("_");
+        player = window["player_"+parent[0]];
+        
+        if (!player.isLoaded()) {
+                player.play();
+                seekpos = pos;
+        } else {
+                player.seek(player.isPaused() && pos === 0 ? 1 : pos);
+        }
+        $(span_elem).siblings().removeClass(\'highlight\');
+        $(span_elem).addClass(\'highlight\');        
+    }
+    
+    function init_transcripts(divid, transcripts, counter, playerholder)
+    {
+        var transcript = transcripts[counter];
+        
+    $("#"+divid+"_chapters > #chapters-text").empty();
+    $.each(transcript, function(key, value){
+    $.each(value, function(index, element) {
+        intime = element.inTime.split(":");
+        hh = intime[0];
+        mm = intime[1];
+        ss = intime[2];
+        mss = Math.round((ss*10)/10)*1000;
+        intime = (parseInt(hh)*60*60 + parseInt(mm)*60)*1000 + mss;
+        
+        item = "<span rel=\'"+intime+"\' onclick = \"cuepoint_seeking(this)\" >"+element.transcript+"</span>";
+        $("#"+divid+"_chapters > #chapters-text").append(item+" ");
+    });
+    });
+    
     }
     </script>
 ';
