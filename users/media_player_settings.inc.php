@@ -14,7 +14,7 @@
     <script type="text/javascript">
         // <![CDATA[
         window.onload = function() {
-            
+            //initialize dummy flowplayer with saved preferences
             $f("player", {
                 src: "<?php echo $AT_BASE_HREF ?>mods/_standard/flowplayer/flowplayer-3.2.16.swf",
                 SeamlessTabbing: true
@@ -171,11 +171,11 @@
                 var target = $(":input[name=target]:checked").val();
                 $('#flowplayer_'+target).val(color);
                 
-                // adjust canvas bgcolor. uses undocumented API call. not stabilized yet
+                //adjust canvas bgcolor.call flowplayer's api
                 if (target == 'canvas') {
                     player._api().fp_css("canvas", {backgroundColor: color});
 
-                    // adjust controlbar coloring
+                // adjust controlbar coloring
                 } else {
 
                     window.canvasColor = color;

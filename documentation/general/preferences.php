@@ -36,6 +36,16 @@
     <dt>Media Player</dt>
     <dd>This preference specifies which media-player is used to display media content. <em>Flowplayer</em> is the default media player. One can also choose <em>Fluidplayer</em>, an HTML5 player, to display media content.</dd>
 </dl>
+<h3>Media Player Settings</h3>
+<p>These settings are used to control the overall appearance of the Media Player - <b>Flowplayer</b></p>
+
+<dl>
+    <dt>Controlbar colors</dt>
+    <dd>Use the options below the player and the color-picker alongside to tweak the player colors.</dd>
+    
+    <dt>Controlbar styling</dt>
+    <dd>These options are used to change the background-gradient of the control-bar and the height of the control-bar.</dd>
+</dl>
 <h3>Text Settings</h3>
 <p>These settings are used to control the overall colours and fonts displayed.</p>
 

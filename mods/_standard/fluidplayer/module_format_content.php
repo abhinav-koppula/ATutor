@@ -6,6 +6,7 @@ require_once('language_file.inc.php');
 $media_replace = array();
 $media_matches = array();
 $fluidplayerholder_class = "player";
+//captions initialization for Flowplayer when captions are specified in media tag
 $caption_init_flowplayer = ",
     captions: {
             url: '".AT_BASE_HREF."mods/_standard/flowplayer/flowplayer.captions-3.2.9.swf',
@@ -32,6 +33,7 @@ $caption_init_flowplayer = ",
             }
         }
 ";
+//captions initialization for Fluidplayer when captions are specified in media tag
 $caption_init = ",
     captions: [
     {
@@ -42,6 +44,7 @@ $caption_init = ",
     }
     ]
     ";
+//add transcripts object in the Fluidplayer model
 function transcript_generator($file_name, $lang, $translated_lang)
 {
     global $_content_base_href;
@@ -60,6 +63,7 @@ $transcripts_init = ",
                         ##TRANSCRIPTS##
                   ]
     ";
+//preparing array of transcripts for Flowplayer
 $transcripts_prepare_flowplayer = "
     if($('###DIVID##_transcript_languages option').length > 0)
     {
@@ -68,8 +72,8 @@ $transcripts_prepare_flowplayer = "
             ##DIVID##_transcripts.push(prepare_transcripts(this));
         });
     }
-    console.log(##DIVID##_transcripts);
 ";
+//initializing the first prepared transcript as the default one to be shown and others are initialized when the select options are changed
 $transcripts_init_flowplayer = "
     if($('###DIVID##_transcript_languages option').length > 0)
     init_transcripts(\"##DIVID##\", ##DIVID##_transcripts, counter, player_##DIVID##);
@@ -80,6 +84,7 @@ $transcripts_init_flowplayer = "
         init_transcripts(\"##DIVID##\", ##DIVID##_transcripts, counter, player_##DIVID##);
     });
 ";
+//using flowplayer APIs to trigger events(seek control-bar and change highlighting) when cuepoints are reached
 $transcripts_init_cuepoint_code_flowplayer = "
     onCuepoint: [
         ##DIVID##_cuepointsobj[counter],
@@ -95,7 +100,7 @@ $transcripts_init_cuepoint_code_flowplayer = "
         }
     ],
 ";
-
+//initializing display preferences variables
 if(isset($_SESSION['prefs']['PREF_FLOWPLAYER_BGCOLOR']) && ($_SESSION['prefs']['PREF_FLOWPLAYER_BGCOLOR'])!='')
     $bgcolor = $_SESSION['prefs']['PREF_FLOWPLAYER_BGCOLOR'];
 else
@@ -265,7 +270,7 @@ $media_replace[] = "<div>\n".
                         </h2>\n".
                    "</div>\n";
 
-// .flv
+// .flv - Graceful Degradation to Flowplayer
 preg_match_all("#\[media[0-9a-z\|]*([\s]?captions=[.\w\d]+[^\s\"]+\.srt\|?)*([\s]?transcripts=[.\w\d]+[^\s\"]+\.json[:a-z]*?)*\]([.\w\d]+[^\s\"]+)\.flv\[/media\]#i",$_input,$media_matches[],PREG_SET_ORDER);
 
 if (isset($_SESSION['flash']) && $_SESSION['flash'] == "yes") {
@@ -393,21 +398,24 @@ for ($i=0;$i<count($media_replace);$i++){
 		//replace media tags with embedded media for each media tag
 		$media_input = $media_replace[$i];
                 
+                //initialize captions if captions are specified in the media tag and captions are in vtt format(supported by Fluidplayer)
                 if((!empty($media[1])) && (preg_match("/captions=([.\w\d]+[^\s\"]+\.vtt)/", $media[1], $matches)))
                 {
                     $media_input = str_replace("##CAPTION_CODE##", $caption_init, $media_input);
                     $media_input = str_replace("##CAPTIONS##", $matches[1], $media_input);
                     
+                    //show captions by default if preference is set
                     if($_SESSION['prefs']['PREF_USE_CAPTIONS'] == 1)
                         $media_input = str_replace("##DISPLAY_CAPTIONS##", ',displayCaptions: true', $media_input);
                     else if($_SESSION['prefs']['PREF_USE_CAPTIONS'] == 0)
                         $media_input = str_replace("##DISPLAY_CAPTIONS##", '', $media_input);
-                }
+                } //initialize captions if captions are specified in the media tag and captions are in srt format(supported by Flowplayer)
                 else if((!empty($media[1])) && (preg_match("/captions=([.\w\d]+[^\s\"]+\.srt)/", $media[1], $matches)))
                 {
                     $media_input = str_replace("##CAPTION_CODE##", $caption_init_flowplayer, $media_input);
                     $media_input = str_replace("##CAPTIONS##", 'captionUrl:"'.$matches[1].'"', $media_input);
                     
+                    //show captions by default if preference is set
                     if($_SESSION['prefs']['PREF_USE_CAPTIONS'] == 1)
                         $media_input = str_replace("##DISPLAY_CAPTIONS##", 'display:"block"', $media_input);
                     else if($_SESSION['prefs']['PREF_USE_CAPTIONS'] == 0)
@@ -420,9 +428,11 @@ for ($i=0;$i<count($media_replace);$i++){
                     $media_input = str_replace("##DISPLAY_CAPTIONS##", '', $media_input);
                 }
                 
+                //initialize transcripts if transcripts are specified in the media tag
                 if((!empty($media[2])) && (preg_match("/transcripts=([.\w\d]+[^\s\"]+\.json(:[a-z]*)*)/", $media[2], $matches)))
                 {
                     $media_input = str_replace("##TRANSCRIPTS_CODE##", $transcripts_init, $media_input);
+                    //explode the matched string to retrieve all the multiple language transcripts specified
                     $transcripts = explode('|', $matches[1]);
                     $transcripts_str = "";
                     $transcript_counter=0;
@@ -432,8 +442,10 @@ for ($i=0;$i<count($media_replace);$i++){
                         $file_lang = explode(':', $transcript);
                         $transcript_file = $file_lang[0];
                         $transcript_lang = $file_lang[1];
+                        //use English if nothing is specified
                         if($transcript_lang=='')
                             $transcript_lang="en";
+                        //populate the options of the select tag
                         $transcripts_str.=transcript_generator($transcript_file, $transcript_lang, $languageCodes[$transcript_lang]);
                         $transcript_options.="<option name='".$transcript_file."' rel='".$transcript_counter."'>". $languageCodes[$transcript_lang] ."</option>";
                         $transcript_counter++;
@@ -442,13 +454,11 @@ for ($i=0;$i<count($media_replace);$i++){
                     $media_input = str_replace("##TRANSCRIPTS##", $transcripts_str, $media_input);
                     $media_input = str_replace("##TRANSCRIPTS_OPTIONS##", $transcript_options, $media_input);
                     $media_input = str_replace("##TRANSCRIPTS_PREPARE##", $transcripts_prepare_flowplayer, $media_input);
-                    
-                        
-                    //$media_input = str_replace("##TRANSCRIPTS##", $matches[1], $media_input);
                         
                     $media_input = str_replace("##TRANSCRIPTS_CUEPOINT_CODE##", $transcripts_init_cuepoint_code_flowplayer, $media_input);
                     $media_input = str_replace("##TRANSCRIPTS_INIT##", $transcripts_init_flowplayer, $media_input);
                     
+                    //show transcripts by default if preference is set
                     if($_SESSION['prefs']['PREF_USE_TRANSCRIPTS'] == 1) {
                         $media_input = str_replace("##DISPLAY_TRANSCRIPTS##", ',displayTranscripts: true', $media_input);
                         $media_input = str_replace("##DISPLAY_TRANSCRIPTS_FLOWPLAYER##", 'block', $media_input);
@@ -517,12 +527,16 @@ $_input.='
     ch = $(id).siblings(".box");
     ch.slideToggle();
     };
+    
+    //toggle transcripts on clicking the shortcut
     function show_transcripts(id)
     {
         console.log("#"+id+"_transcript-shortcut");
         $("#"+id+"_transcript-shortcut").toggle();
         $("#"+id+"_chapters").toggle();
     }
+    
+    //get transcript file as json response
     function prepare_transcripts(id)
     {
         var transcript_file = $(id).attr("name");
@@ -542,6 +556,8 @@ $_input.='
         
         return transcript;
     }
+    
+    //prepare cuepoints(times when events are triggered) for each transcript
     function prepare_cuepoints(transcriptobj)
     {
         var cuepointsobj=[];
@@ -565,6 +581,7 @@ $_input.='
         return cuepointsobj;
     }
     
+    //seek the control-bar when transcript spans are clicked thus changing the highlighting as well
     function cuepoint_seeking(span_elem)
     {
         cuepoint = $(span_elem).attr("rel");
@@ -583,6 +600,7 @@ $_input.='
         $(span_elem).addClass(\'highlight\');        
     }
     
+    //initialize transcript spans when select options are changed
     function init_transcripts(divid, transcripts, counter, playerholder)
     {
         var transcript = transcripts[counter];
