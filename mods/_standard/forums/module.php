@@ -15,7 +15,7 @@ $this->_stacks['posts'] = array('title_var'=>'posts','file'=>AT_INCLUDE_PATH.'..
 $this->_list['forums'] = array('title_var'=>'forums','file'=>'mods/_standard/forums/sublinks.php');
 
 //tool manager
-$this->_tool['forums'] = array('title_var'=>'forums','file'=>'mods/_core/tool_manager/forums_tool.php','table'=>'content_forums_assoc');
+$this->_tool['forums'] = array('title_var'=>'forums','file'=>'mods/_core/tool_manager/forums_tool.php');
 
 //instructor pages
 $this->_pages['mods/_standard/forums/index.php']['title_var'] = 'forums';
@@ -23,21 +23,32 @@ $this->_pages['mods/_standard/forums/index.php']['parent']    = 'tools/index.php
 $this->_pages['mods/_standard/forums/index.php']['guide']     = 'instructor/?p=forums.php';
 $this->_pages['mods/_standard/forums/index.php']['children']  = array('mods/_standard/forums/add_forum.php');
 
-	$this->_pages['mods/_standard/forums/add_forum.php']['title_var']  = 'create_forum';
-	$this->_pages['mods/_standard/forums/add_forum.php']['parent'] = 'mods/_standard/forums/index.php';
+$this->_pages['mods/_standard/forums/add_forum.php']['title_var']  = 'create_forum';
+$this->_pages['mods/_standard/forums/add_forum.php']['parent'] = 'mods/_standard/forums/index.php';
 
-	$this->_pages['mods/_standard/forums/delete_forum.php']['title_var']  = 'delete_forum';
-	$this->_pages['mods/_standard/forums/delete_forum.php']['parent'] = 'mods/_standard/forums/forums/index.php';
+$this->_pages['mods/_standard/forums/delete_forum.php']['title_var']  = 'delete_forum';
+$this->_pages['mods/_standard/forums/delete_forum.php']['parent'] = 'mods/_standard/forums/forums/index.php';
 
-	$this->_pages['mods/_standard/forums/edit_forum.php']['title_var']  = 'edit_forum';
-	$this->_pages['mods/_standard/forums/edit_forum.php']['parent'] = 'mods/_standard/forums/index.php';
+$this->_pages['mods/_standard/forums/edit_forum.php']['title_var']  = 'edit_forum';
+$this->_pages['mods/_standard/forums/edit_forum.php']['parent'] = 'mods/_standard/forums/index.php';
+
+$this->_pages['mods/_standard/forums/add_forum.php']['title_var']  = 'create_forum';
+$this->_pages['mods/_standard/forums/add_forum.php']['parent'] = 'mods/_standard/forums/forum/list';
 
 //student pages
 $this->_pages['mods/_standard/forums/forum/list.php']['title_var']  = 'forums';
 $this->_pages['mods/_standard/forums/forum/list.php']['img']        = 'images/home-forums.png';
 $this->_pages['mods/_standard/forums/forum/list.php']['icon']		  = 'images/pin.png';		//added favicon
 //$this->_pages['forum/list.php']['text']		  = 'Sezione Forum';				//added text
+if($_SESSION['is_admin']){
+$this->_pages['mods/_standard/forums/add_forum.php']['title_var']  = 'create_forum';
+$this->_pages['mods/_standard/forums/add_forum.php']['parent'] = 'mods/_standard/forums/forum/list';
+$this->_pages['mods/_standard/forums/forum/list.php']['children']        = array('search.php?search_within[]=forums', 'mods/_standard/forums/add_forum.php');
+}else{
 $this->_pages['mods/_standard/forums/forum/list.php']['children']        = array('search.php?search_within[]=forums');
+
+}
+
 	//list.php's children
 	$this->_pages['search.php?search_within[]=forums']['title_var'] = 'search';
 	$this->_pages['search.php?search_within[]=forums']['parent']    = 'mods/_standard/forums/index.php';

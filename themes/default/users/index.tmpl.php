@@ -1,4 +1,6 @@
-<?php require(AT_INCLUDE_PATH.'header.inc.php'); ?>
+<?php 
+
+require(AT_INCLUDE_PATH.'header.inc.php'); ?>
 <div id="my_courses_container" <?php if($_config['show_current'] != 1){ echo ' style="width:90%;"'; } ?>>
 <table class="data" style="width:100%;">
 <tr><th></th>
@@ -18,28 +20,19 @@
 			      <img src="images/clr.gif" class="icon" border="1" width="79" height="79" alt="<?php echo htmlentities_utf8($row['title']); ?>" />
 	      <?php else: 
 			      echo $link;  
-
-		    $sql2="SELECT icon from ".TABLE_PREFIX."courses WHERE course_id='$row[course_id]'";
-				    $result2 = mysql_query($sql2, $db);
-				    
-				    while($row2=mysql_fetch_assoc($result2)){
-					    $filename = $row2['icon'];
-				    }
-		    
-		    $path = AT_CONTENT_DIR .$row['course_id'].'/custom_icons/'.$filename;
-		    
-		    if (file_exists($path)) {
-			if (defined('AT_FORCE_GET_FILE')) {
-			    $dir = 'get_course_icon.php?id='.$row['course_id'];
-			} else {
-			    $dir = 'content/' . $_SESSION['course_id'] . '/'.$row['icon'];
-			}
-		    } else {
-			    $dir = "images/courses/".$row['icon'];
-		    }
-		    ?>
-		    <img src="<?php echo $dir; ?>" class="icon" border="0" alt="<?php echo htmlentities_utf8($row['title']); ?>" />
-				    <?php echo $link2; ?>
+		    $path = AT_CONTENT_DIR .$row['course_id'].'/custom_icons/'.$this->icon[$row['course_id']];
+					if (file_exists($path)) {
+						if (defined('AT_FORCE_GET_FILE')) {
+							$dir = 'get_course_icon.php?id='.$row['course_id'];
+						} else {
+							$dir = 'content/' . $_SESSION['course_id'] . '/'.$row['icon'];
+						}
+					} else {
+						$dir = "images/courses/".$row['icon'];
+					}
+					?>
+					<img src="<?php echo $dir; ?>" class="icon" border="0" alt="<?php echo htmlentities_utf8($row['title']); ?>" />
+						<?php echo $link2; ?>
 		    <?php endif; ?>
 
 
@@ -101,7 +94,7 @@
 		
     //display current news
 
-    if(isset($_GET['p']) && $_GET['p'] == 0){
+    if(!isset($_GET['p']) && $_GET['p'] == 0){
       $p = 1;
     }else{
       $p = intval($_GET['p']);
@@ -119,6 +112,7 @@
 	$page = isset($$page) ? $page : '';
 	
     print_paginator($page, $num_pages, '', 1); 
+
     for($i=$start;$i<=$end; $i++){
 	$count = $i;
 	if (isset($this->all_news)) {

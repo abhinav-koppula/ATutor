@@ -144,7 +144,7 @@ acronym {
 
 <a name="structure"></a>
 <h2>Structure</h2>
-	<p>Modules are stored under ATutor's <kbd>mods</kbd> directory. <em>Core</em> modules are stored in the <kbd>mods/_core</kbd> subdirectory and are made available with every release of ATutor. These modules cannot be disabled by the administrator as they are vital to ATutor's functionality. <em>Standard</em> modules are stored in the <kbd>mods/_standard</kbd> subdirectory and are also made available with every release of ATutor. Standard modules can be disabled by the administrator. <em>Extra</em> modules are stored in the <kbd>mods</kbd> directory and are installed and distributed independently of ATutor. Although the process of developing modules is the same for each type of module, only <em>extra</em> modules can be distributed separately, while <em>core</em> and <em>standard</em> modules are added to the ATutor code repository (i.e. <acronym title="Subversion">SVN</acronym> trunk).</p>
+	<p>Modules are stored under ATutor's <kbd>mods</kbd> directory. <em>Core</em> modules are stored in the <kbd>mods/_core</kbd> subdirectory and are made available with every release of ATutor. These modules cannot be disabled by the administrator as they are vital to ATutor's functionality. <em>Standard</em> modules are stored in the <kbd>mods/_standard</kbd> subdirectory and are also made available with every release of ATutor. Standard modules can be disabled by the administrator. <em>Extra</em> modules are stored in the <kbd>mods</kbd> directory and are installed and distributed independently of ATutor. Although the process of developing modules is the same for each type of module, only <em>extra</em> modules can be distributed separately, while <em>core</em> and <em>standard</em> modules are added to the ATutor code repository (i.e. <acronym title="GitHub">GitHub</acronym> trunk).</p>
 
 	<p>Whenever a module identifier is needed within code, it should appear in lowercase with spaces converted to underscores.</p>
 
@@ -283,18 +283,45 @@ $this->_pages['mods/example_maker/index_instructor.php']['parent']   = 'tools/in
 $this->_pages['mods/example_maker/index.php']['title_var'] = 'example_maker';
 $this->_pages['mods/example_maker/index.php']['img']       = 'mods/example_maker/example_maker.jpg';
 
-
-/* public pages */
+/*******
+ * public pages
+ */
 $this->_pages[AT_NAV_PUBLIC] = array('mods/example_maker/index_public.php');
 $this->_pages['mods/example_maker/index_public.php']['title_var'] = 'example_maker';
 $this->_pages['mods/example_maker/index_public.php']['parent'] = 'login.php';
 $this->_pages['login.php']['children'] = array('mods/example_maker/index_public.php');
 
-/* my start page pages */
+/*******
+ * my start page pages
+ */
 $this->_pages[AT_NAV_START]  = array('mods/example_maker/index_mystart.php');
 $this->_pages['mods/example_maker/index_mystart.php']['title_var'] = 'example_maker';
 $this->_pages['mods/example_maker/index_mystart.php']['parent'] = 'users/index.php';
 $this->_pages['users/index.php']['children'] = array('mods/example_maker/index_mystart.php');
+
+/*******
+ * Add a new tool into the tools icon bar on the content editor page
+ * Only need to use one of the two methods listed below to add a tool.
+ */
+
+// The execution of the php code specified in 'file' field returns an array of the rows that are
+// desired to be displayed in the popup window mods/_core/tool_manager/index.php
+// @see mods/_core/tool_manager/index.php
+// @see mods/_core/tool_manager/forums_tool.php
+$this->_tool['example_maker'] = array('title_var'=>'example_maker','file'=>'mods/example_maker/action.php');
+
+// ** possible alternative: **
+// Provides more flexibility in terms of controlling the action at clicking on the tool icon.
+// Rather than always poping up mods/_core/tool_manager/index.php defined in $this->_tool, 
+// "js" field defines the listener for the click event on the new tool icon.
+//$this->_content_tools[] = array("id"=>"example_maker",
+//                                "class"=>"fl-col clickable",
+//                                "src"=>AT_BASE_HREF."mods/example_maker/images/example_maker.png",
+//                                "title"=>_AT('example_maker'),
+//                                "alt"=>_AT('example_maker'),
+//                                "text"=>_AT('example_maker_text'),
+//                                "js"=>AT_BASE_HREF."mods/example_maker/example_maker.js");
+
 ?>
 </pre>
 <a name="module.sql"></a>
@@ -825,7 +852,7 @@ function example_maker_delete($course) {
 <a name="news"></a>
 
 <h2>Module News <kbd>module_news.php</kbd></h2>
-<p>In ATutor 2.0 the <strong>Things Current</strong> area of My Start Page was added. It collects changing information from modules and displays it for users so it is one of the first things they see when they login, allowing them to quickly access things like recent forum messages, new news items, or recently added files for download. Things Current scans through all the <kbd>module_news.php</kbd> files, and outputs current activity relevant to each user, and each course. The example below is typical of the type of information that might be output to Things Current, but it can be virtually any data generated by a module. See the Forum module <a href="http://svn.atutor.ca/repos/atutor/trunk/docs/mods/_standard/forums/module_news.php">module_news.php</a> for another more complex example where the latest forum messages are output. </p>
+<p>In ATutor 2.0 the <strong>Things Current</strong> area of My Start Page was added. It collects changing information from modules and displays it for users so it is one of the first things they see when they login, allowing them to quickly access things like recent forum messages, new news items, or recently added files for download. Things Current scans through all the <kbd>module_news.php</kbd> files, and outputs current activity relevant to each user, and each course. The example below is typical of the type of information that might be output to Things Current, but it can be virtually any data generated by a module. See the Forum module <a href="https://github.com/atutor/ATutor/tree/master/mods/_standard/forums/module_news.php">module_news.php</a> for another more complex example where the latest forum messages are output. </p>
 
 <pre>
 &lt;?php
@@ -862,7 +889,7 @@ function mymod_news() {
 
 <p>ATutor uses the include/lib/output.inc.php file to maniputae how content gets rendered when it is displayed. For example, the [media][/media] get replaced by an appropriate object element inorder to display a given media type. It is possible to extend the output.inc.php rendering of content by creating a <kbd>module_format_content.php</kbd> file containing PHP string replacement functions. </p>
 
-<p> For example, replace a special tag "[black]The font is black.[/black]" with html "&lt;span style="color: black;"&gt;The font is black.&lt;/span&gt;". Also see the <kbd>module_format_content.php</kbd> for the <a href="http://svn.atutor.ca/repos/atutor/trunk/docs/mods/_standard/flowplayer/module_format_content.php">flowplayer module </a>for a more detailed example of content manipulation.</p>
+<p> For example, replace a special tag "[black]The font is black.[/black]" with html "&lt;span style="color: black;"&gt;The font is black.&lt;/span&gt;". Also see the <kbd>module_format_content.php</kbd> for the <a href="https://github.com/atutor/ATutor/blob/master/mods/_standard/flowplayer/module_format_content.php">flowplayer module </a>for a more detailed example of content manipulation.</p>
 
 <pre>
 &lt;?php

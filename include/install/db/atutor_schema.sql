@@ -646,11 +646,12 @@ INSERT INTO `modules` VALUES ('_standard/assignments',   2, 524288,    0, 0, 0);
 INSERT INTO `modules` VALUES ('_standard/gradebook',     2, 1048576, 4096, 0, 0);
 INSERT INTO `modules` VALUES ('_standard/student_tools', 2, 2097152,   0, 0, 0);
 INSERT INTO `modules` VALUES ('_standard/farchive',      2, 4194304, 0, 0, 0);
-INSERT INTO `modules` VALUES ('_standard/social',	 2, 8388608, 0, 0, 0);
-INSERT INTO `modules` VALUES ('_standard/photos',	 2, 16777216, 0, 0, 0);
+INSERT INTO `modules` VALUES ('_standard/social',	     2, 8388608, 0, 0, 0);
+INSERT INTO `modules` VALUES ('_standard/photos',	     2, 16777216, 0, 0, 0);
 INSERT INTO `modules` VALUES ('_standard/flowplayer',	 2, 33554432, 0, 0, 0);
-INSERT INTO `modules` VALUES ('_standard/basiclti', 2, 67108864, 16384, 0, 0);
+INSERT INTO `modules` VALUES ('_standard/basiclti',      2, 67108864, 16384, 0, 0);
 INSERT INTO `modules` VALUES ('_standard/assignment_dropbox', 2, 134217728, 0, 0, 0);
+INSERT INTO `modules` VALUES ('_standard/calendar',      2, 268435456, 0, 0, 0);
 INSERT INTO `modules` VALUES ('_core/users',             2, 0,         2, 0, 0);
 INSERT INTO `modules` VALUES ('_core/courses',           2, 0,         4, 0, 0);
 INSERT INTO `modules` VALUES ('_core/backups',           2, 1,         8, 0, 0);
@@ -666,12 +667,13 @@ INSERT INTO `modules` VALUES ('_core/content_packaging', 2, 0, 0, 0, 0);
 INSERT INTO `modules` VALUES ('_standard/google_search', 2, 0, 0, 0, 0);
 INSERT INTO `modules` VALUES ('_standard/blogs',         2, 0, 0, 0, 0);
 INSERT INTO `modules` VALUES ('_standard/profile_pictures', 2, 0, 0, 0, 0);
-INSERT INTO `modules` VALUES ('_standard/patcher', 2, 0, 1024, 0, 0);
+INSERT INTO `modules` VALUES ('_standard/patcher',       2, 0, 1024, 0, 0);
 INSERT INTO `modules` VALUES ('_standard/support_tools', 2, 0, 2048, 0, 0);
 # added by Bologna CC. Please check if it is the right position to insert it!
-INSERT INTO `modules` VALUES ('_core/tool_manager', 2, 0, 0, 0, 0);
-INSERT INTO `modules` VALUES ('_core/modules', 2, 0, 8192, 0, 0);
-INSERT INTO `modules` VALUES('_standard/vimeo', 2, 0, 1, 0, 0);
+INSERT INTO `modules` VALUES ('_core/tool_manager',      2, 0, 0, 0, 0);
+INSERT INTO `modules` VALUES ('_core/modules',           2, 0, 8192, 0, 0);
+INSERT INTO `modules` VALUES('_standard/vimeo',          2, 0, 1, 0, 0);
+
 INSERT INTO `modules` VALUES('_standard/fluidplayer', 2, 0, 0, 0, 0);
 # --------------------------------------------------------
 # Table structure for table `news`
@@ -1632,3 +1634,36 @@ INSERT INTO `config` (`name`,`value`) VALUES ('transformable_oauth_expire','9360
 ########
 # Set the default Home URL to atutorspaces.com
 INSERT INTO `config` (`name`,`value`) VALUES ('home_url','http://www.atutorspaces.com');
+
+########
+# sql  for calendar module
+
+CREATE TABLE `calendar_events` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `title` varchar(256),
+  `start` datetime,
+  `end` datetime,
+  `allDay` varchar(20),
+  `userid` int(8),
+  PRIMARY KEY (`id`)
+) ENGINE = MyISAM;
+
+CREATE TABLE `calendar_google_sync` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `token` varchar(256),
+  `userid` int(8),
+  `calids` text,
+  PRIMARY KEY (`id`)
+) ENGINE = MyISAM;
+
+CREATE TABLE `calendar_bookmark` (
+  `memberid` int(11),
+  `ownerid` int(8),
+  `courseid` int(8),
+  `calname` varchar(256)
+) ENGINE = MyISAM;
+
+CREATE TABLE `calendar_notification` (
+  `memberid` int(11),
+  `status` int(8)
+) ENGINE = MyISAM;
