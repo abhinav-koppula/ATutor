@@ -18,13 +18,15 @@ require(AT_INCLUDE_PATH.'../mods/_standard/tests/lib/test_result_functions.inc.p
 $_custom_head .= '<script type="text/javascript" src="'.AT_BASE_HREF.'mods/_standard/tests/js/tests.js"></script>';
 
 authenticate(AT_PRIV_TESTS);
-
+tool_origin();
 $test_type = 'normal';
 
 if (isset($_POST['cancel'])) {
     $msg->addFeedback('CANCELLED');
-    header('Location: index.php');
-    exit;
+        $return_url = $_SESSION['tool_origin']['url'];
+        tool_origin('off');
+		header('Location: '.$return_url);
+		exit;
 } else if (isset($_POST['submit'])) {
     $missing_fields                = array();
     $_POST['title']                = $addslashes(trim($_POST['title']));
@@ -196,8 +198,10 @@ if (isset($_POST['cancel'])) {
         }
 
         $msg->addFeedback('ACTION_COMPLETED_SUCCESSFULLY');
-        header('Location: index.php');
-        exit;
+        $return_url = $_SESSION['tool_origin']['url'];
+        tool_origin('off');
+		header('Location: '.$return_url);
+		exit;
     }
 }
 
@@ -230,11 +234,16 @@ $msg->printErrors();
     <div class="row">
         <label for="num_t"><?php echo _AT('num_takes_test'); ?></label><br />
         <select name="num_takes" id="num_t">
-            <option value="<?php echo AT_TESTS_TAKE_UNLIMITED; ?>" <?php if ($_POST['num_takes'] == AT_TESTS_TAKE_UNLIMITED) { echo 'selected="selected"'; } ?>><?php echo _AT('unlimited'); ?></option>
+            <option value="<?php echo AT_TESTS_TAKE_UNLIMITED; ?>" <?php if ($_POST['num_takes'] == AT_TESTS_TAKE_UNLIMITED) { echo ''; } ?>><?php echo _AT('unlimited'); ?></option>
             <?php 
             foreach(array(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 20) as $e) {
                 $selected = ($_POST['num_takes'] == $e) ? ' selected="selected"' : '';
-                echo sprintf('<option value="%d" %s>%d</option>', $e, $selected, $e);
+                // Set to 1 attempt by default
+                if(!isset($_POST['num_takes']) && $e == 1){
+                    echo sprintf('<option value="%d" selected="selected">%d</option>', $e, $e);
+                }else{
+                    echo sprintf('<option value="%d" %s>%d</option>', $e, $selected, $e);
+                }
             }
             ?>
         </select>

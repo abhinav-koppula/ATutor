@@ -89,37 +89,39 @@ if (isset($_custom_head)) {
 
 // Set session timeout warning if user is logged in
 if(isset($_SESSION['valid_user'])){
-// Setup the timeout warning when a user logs in
-if($_config['session_timeout']){
-	$_at_timeout = ($_config['session_timeout']*60);
-}else{
-	$_at_timeout = '1200';
-}
+    // Setup the timeout warning when a user logs in
+    if($_config['session_timeout']){
+        $_at_timeout = ($_config['session_timeout']*60);
+    }else{
+        $_at_timeout = '1200';
+    }
 
-$session_timeout = intVal($_at_timeout) * 1000;
-$session_warning = 300 * 1000;                      // 5 minutes
+    $session_timeout = intVal($_at_timeout) * 1000;
+    $session_warning = 300 * 1000;                      // 5 minutes
 
-$custom_head .= '
-	
-	<script src="'.AT_print($_base_path, 'url.base').'jscripts/infusion/lib/jquery/core/js/jquery.js" type="text/javascript"></script>
-	<script src="'.AT_print($_base_path, 'url.base').'jscripts/lib/jquery-ui.min.js" type="text/javascript"></script>
-	<script src="'.AT_print($_base_path, 'url.base').'jscripts/lib/jquery.cookie.js" type="text/javascript"></script>
-	<script src="'.AT_print($_base_path, 'url.base').'jscripts/ATutorAutoLogout.js" type="text/javascript"></script>
-	<script type="text/javascript">
-	$(document).ready(function() {
-        ATutor.autoLogout({
-            timeLogout              : '.$session_timeout.',
-            timeWarningBeforeLogout : '.$session_warning.',
-            logoutUrl               : "'.AT_print($_base_path, 'url.base').'logout.php",
-            title                   : "'._AT('session_timeout_title').'",
-            textButtonLogout        : "'._AT('session_timeout_logout_now').'",
-            textButtonStayConnected : "'._AT('session_timeout_stay_connected').'",
-            message                 : "'._AT('session_will_expire').'"
+    $custom_head .= '
+        <link rel="stylesheet" href="'.AT_print($_base_path, 'url.base').'jscripts/lib/jquery-ui.css" />
+        <script src="'.AT_print($_base_path, 'url.base').'jscripts/infusion/lib/jquery/core/js/jquery.js" type="text/javascript"></script>
+        <script src="'.AT_print($_base_path, 'url.base').'jscripts/lib/jquery-ui.min.js" type="text/javascript"></script>
+        <script src="'.AT_print($_base_path, 'url.base').'jscripts/lib/jquery.cookie.js" type="text/javascript"></script>
+        <script src="'.AT_print($_base_path, 'url.base').'jscripts/ATutorAutoLogout.js" type="text/javascript"></script>';
+    
+    if(isset($_SESSION['member_id'])){
+        $custom_head .= "\n".'    <script type="text/javascript">
+        $(document).ready(function() {
+            ATutor.autoLogout({
+                timeLogout              : '.$session_timeout.',
+                timeWarningBeforeLogout : '.$session_warning.',
+                logoutUrl               : "'.AT_print($_base_path, 'url.base').'logout.php",
+                title                   : "'._AT('session_timeout_title').'",
+                textButtonLogout        : "'._AT('session_timeout_logout_now').'",
+                textButtonStayConnected : "'._AT('session_timeout_stay_connected').'",
+                message                 : "'._AT('session_will_expire').'"
+            });
         });
-	});
-	
-	</script>
-  ';
+    
+        </script>';
+    }
 }
 // End session timeout warning
 
@@ -161,20 +163,103 @@ if (empty($_top_level_pages)) {
 		$_top_level_pages = get_main_navigation($_pages[AT_NAV_COURSE][0]);
 	}
 }
+
+/****
+Toggle the hide_admin Session variable to turn admin tools on or off
+****/
+
+if($_GET['hide_admin'] == '2'){
+	global $msg;
+	//unset($_SESSION['hide_admin']);
+	if(isset($_GET['cid'])){
+		$tcid ="?cid=".intval($_GET['cid']).SEP;
+		$cid = intval($_GET['cid']);
+	} else if(isset($_GET['tcid'])){
+		$tcid ="?cid=".intval($_GET['tcid']).SEP;
+		$cid = intval($_GET['cid']);
+	}
+	unset($_SESSION['prefs']['PREF_HIDE_ADMIN']);
+	save_prefs();
+	$msg->addFeedback('TOOLS_OFF');
+	header('Location:'.$_SERVER['PHP_SELF'].$tcid);
+	exit;
+} else if($_GET['hide_admin'] == '1') {
+	global $msg;
+	if(isset($_GET['cid'])){
+		$tcid ="?cid=".intval($_GET['cid']).SEP;
+		$cid = intval($_GET['cid']);
+	} else if(isset($_GET['tcid'])){
+		$tcid ="?cid=".intval($_GET['tcid']).SEP;
+		$cid = intval($_GET['cid']);
+	}
+	//$_SESSION['hide_admin'] = 1;
+	$_SESSION['prefs']['PREF_HIDE_ADMIN'] = 1;
+	save_prefs();
+	$msg->addFeedback('TOOLS_ON');
+	header('Location:'.$_SERVER['PHP_SELF'].$tcid);
+	exit;
+}
+/****
+Toggle to switch between mobile and responsive themes
+****/
+if($_GET['mobile'] == '2'){
+	global $msg;
+	unset($_SESSION['prefs']['PREF_RESPONSIVE'] );
+	if(isset($_GET['cid'])){
+		$cid="?cid=".$_GET['cid'];
+	}
+	//unset($_COOKIE['responsive']);
+	setcookie("responsive", NULL, -1);
+	save_prefs();
+	$msg->addFeedback('MOBILE_ON');
+	header('Location:'.$_SERVER['PHP_SELF'].$cid);
+	exit;
+} else if($_GET['mobile'] == '1') {
+	global $msg;
+	$_SESSION['prefs']['PREF_RESPONSIVE'] = 1;
+	if(isset($_GET['cid'])){
+		$cid="?cid=".$_GET['cid'];
+	}
+	save_prefs();
+	setcookie("responsive", $_SESSION['prefs']['PREF_RESPONSIVE'], (time()+60*60*24*30)); // 30 day expire
+	$msg->addFeedback('MOBILE_OFF');
+	header('Location:'.$_SERVER['PHP_SELF'].$cid);
+	exit;
+}
 $_sub_level_pages        = get_sub_navigation($current_page);
 
 $_current_sub_level_page = get_current_sub_navigation_page($current_page);
 
 $_path = get_path($current_page);
-
 unset($_path[0]);
-if (isset($_path[2]['url'], $_sub_level_pages[0]['url']) && $_path[2]['url'] == $_sub_level_pages[0]['url']) {
+if (isset($_pages[$current_page]['title'])) {
+	$_page_title = $_pages[$current_page]['title'];
+} else {
+	$_page_title = _AT($_pages[$current_page]['title_var']);
+}
+
+/*****
+* When setting the back_to_page, determine the URL the tool is being accessed from
+* and the title of that page, and hold in the SESSION for as long as that tool
+* is being used. Allows return via a student page or the Manage page.
+****/
+if(!isset($_SESSION['tool_origin'])){
+    $_SESSION['origin_title'] = $_page_title;
+}
+if(isset($_SESSION['tool_origin'])){
+    if($_SESSION['tool_origin']['url'] == $_base_href.$current_page){
+        unset($_SESSION['tool_origin']);
+        unset($back_to_page);
+    }else{
+        $back_to_page = $_SESSION['tool_origin'];
+    }
+} else if (isset($_path[2]['url'], $_sub_level_pages[0]['url']) && $_path[2]['url'] == $_sub_level_pages[0]['url']) {
 	$back_to_page = $_path[3];
 } else if (isset($_path[1]['url'], $_sub_level_pages[0]['url']) && $_path[1]['url'] == $_sub_level_pages[0]['url']) {
 	$back_to_page = isset($_path[2]) ? $_path[2] : null;
 } else if (isset($_path[1])) {
 	$back_to_page = $_path[1];
-}
+} 
 
 if (isset($_SESSION['course_id']) && $_SESSION['course_id'] > 0) {
 	$_path[] = array('url' => AT_print($_base_path . url_rewrite('index.php'),'url.base'), 'title' => $_SESSION['course_title']);
@@ -189,13 +274,13 @@ if (isset($_SESSION['member_id']) && $_SESSION['member_id']) {
 }
 
 $_path = array_reverse($_path);
-
+/*
 if (isset($_pages[$current_page]['title'])) {
 	$_page_title = $_pages[$current_page]['title'];
 } else {
 	$_page_title = _AT($_pages[$current_page]['title_var']);
 }
-
+*/
 
 
 /* calculate the section_title: */
@@ -233,7 +318,7 @@ if (isset($_SESSION['course_id']) && $_SESSION['course_id'] > 0) {
 } else if (!$_SESSION['course_id']) {
 	$section_title = _AT('my_start_page');
 }
-//debug($_path);
+
 $savant->assign('current_top_level_page', $_current_top_level_page);
 $savant->assign('sub_level_pages', $_sub_level_pages);
 $savant->assign('current_sub_level_page', $_current_sub_level_page);
@@ -303,13 +388,52 @@ if (isset($_SESSION['course_id']) && $_SESSION['course_id'] > -1) {
 	*/
 }
 
+function admin_switch(){ 
+	if($_SESSION['is_admin'] > 0) {?>
+		<ul id="admin_switch">
+			<?php
+			if(isset($_GET['cid'])){
+			 	$tcid ="cid=".intval($_GET['cid']).SEP;
+			} else if(isset($_GET['tcid'])){
+				$tcid ="cid=".intval($_GET['tcid']).SEP;
+			}
+			?>
+			<?php if($_SESSION['prefs']['PREF_HIDE_ADMIN'] > 0){ ?>
+				<li  class="active left"><?php echo _AT('manage'); ?></li>
+			<?php }else{ ?>
+				<li  class="disabled left"><a href="<?php echo $_SERVER['PHP_SELF']; ?>?<?php echo $tcid; ?>hide_admin=1"><?php echo _AT('manage'); ?></a></li>
+			<?php } ?>
+			 <?php if($_SESSION['prefs']['PREF_HIDE_ADMIN']> 0){ ?>
+				<li class="disabled right"><a href="<?php echo $_SERVER['PHP_SELF']; ?>?<?php echo $tcid; ?>hide_admin=2"><?php echo _AT('off'); ?></a></li>
+			<?php }else{ ?>
+				<li class="active right"><?php echo _AT('off'); ?></li>
+			<?php } ?>   
+		</ul>
+    <?php } ?>
+<?php } 
+function mobile_switch(){ 
+	if(is_mobile_device() > 0) {?>
+		<ul id="admin_switch">
+			 <?php if($_SESSION['prefs']['PREF_RESPONSIVE'] > 0){ ?>
+				<li class="disabled left"><a href="<?php echo $_SERVER['PHP_SELF']; ?>?mobile=2"><?php echo _AT('mobile'); ?></a></li>
+			<?php }else{ ?>
+				<li class="active left"><?php echo _AT('mobile'); ?></li>
+			<?php } ?>
+			<?php if($_SESSION['prefs']['PREF_RESPONSIVE'] > 0){ ?>
+				<li  class="active right"><?php echo _AT('off'); ?></li>
+			<?php }else{ ?>
+				<li  class="disabled right"><a href="<?php echo $_SERVER['PHP_SELF']; ?>?mobile=1"><?php echo _AT('off'); ?></a></li>
+			<?php } ?>
+   
+		</ul>
+    <?php } ?>
+<?php } 
 // array of content tools for shortcuts tool bar.
 if (isset($_tool_shortcuts)) $savant->assign('shortcuts', $_tool_shortcuts);
 
 /* Register our Errorhandler on everypage */
 //require_once(AT_INCLUDE_PATH . 'classes/ErrorHandler/ErrorHandler.class.php');
 //$err = new ErrorHandler();
-
 
 //TODO*******************BOLOGNA*******************REMOVE ME*******************/
 // if filemanager is a inside a popup or a frame
@@ -341,5 +465,5 @@ if ((isset($_REQUEST['framed']) && $_REQUEST['framed']) || (isset($_REQUEST['pop
     $savant->display('include/header.tmpl.php');
 }
 
-
+//tool_origin('off');
 ?>

@@ -16,7 +16,7 @@ global $_base_href;
     <?php if (is_array($this->item)) : ?>
         <ul>
         <?php foreach($this->item as $i) : ?>
-            <li><?php echo $i; ?></li>
+            <li role="alert"><?php echo $i; ?></li>
         <?php endforeach; ?>
         </ul>
     <?php endif; ?>

@@ -9,7 +9,8 @@
  
 // header
 ?>
-<div id="feedback">
+<div id="feedback" role="alert">
+<a href="<?php echo $_SERVER['PHP_SELF']; ?>" class="message_link"><img src="<?php echo $this->img; ?>close_icon.png" alt="<?php echo _AT('close'); ?>"/></a>
 	<?php if (is_array($this->item)) : ?>
 		<ul>
 		<?php foreach($this->item as $e) : ?>

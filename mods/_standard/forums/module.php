@@ -25,6 +25,7 @@ $this->_pages['mods/_standard/forums/index.php']['children']  = array('mods/_sta
 
 $this->_pages['mods/_standard/forums/add_forum.php']['title_var']  = 'create_forum';
 $this->_pages['mods/_standard/forums/add_forum.php']['parent'] = 'mods/_standard/forums/index.php';
+$this->_pages['mods/_standard/forums/add_forum.php']['children']  = array('mods/_standard/forums/forum/list.php','search.php?search_within[]=forums');
 
 $this->_pages['mods/_standard/forums/delete_forum.php']['title_var']  = 'delete_forum';
 $this->_pages['mods/_standard/forums/delete_forum.php']['parent'] = 'mods/_standard/forums/forums/index.php';
@@ -40,10 +41,12 @@ $this->_pages['mods/_standard/forums/forum/list.php']['title_var']  = 'forums';
 $this->_pages['mods/_standard/forums/forum/list.php']['img']        = 'images/home-forums.png';
 $this->_pages['mods/_standard/forums/forum/list.php']['icon']		  = 'images/pin.png';		//added favicon
 //$this->_pages['forum/list.php']['text']		  = 'Sezione Forum';				//added text
-if($_SESSION['is_admin']){
+
+if(($_SESSION['is_admin'] > 0 || authenticate(AT_PRIV_FORUMS, TRUE)) && $_SESSION['prefs']['PREF_HIDE_ADMIN'] == 1){	
 $this->_pages['mods/_standard/forums/add_forum.php']['title_var']  = 'create_forum';
-$this->_pages['mods/_standard/forums/add_forum.php']['parent'] = 'mods/_standard/forums/forum/list';
+$this->_pages['mods/_standard/forums/add_forum.php']['parent'] = 'mods/_standard/forums/forum/list.php';
 $this->_pages['mods/_standard/forums/forum/list.php']['children']        = array('search.php?search_within[]=forums', 'mods/_standard/forums/add_forum.php');
+
 }else{
 $this->_pages['mods/_standard/forums/forum/list.php']['children']        = array('search.php?search_within[]=forums');
 
@@ -78,11 +81,8 @@ if (admin_authenticate(AT_ADMIN_PRIV_FORUMS, TRUE) || admin_authenticate(AT_ADMI
 }
 
 function forums_get_group_url($group_id) {
-	global $db;
-	$sql = "SELECT forum_id FROM ".TABLE_PREFIX."forums_groups WHERE group_id=$group_id";
-	$result = mysql_query($sql, $db);
-	$row = mysql_fetch_assoc($result);
-
+	$sql = "SELECT forum_id FROM %sforums_groups WHERE group_id=%d";
+	$row = queryDB($sql, array(TABLE_PREFIX, $group_id), TRUE);
 	return 'mods/_standard/forums/forum/index.php?fid='.$row['forum_id'];
 }
 ?>

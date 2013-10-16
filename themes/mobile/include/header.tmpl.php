@@ -151,11 +151,13 @@ $wurflObj->getCapabilitiesFromAgent(null, $capabilities, $data_format);
 				<?php endif; ?>
 				</h1>
 		</div>
+
 	</div> <!--  END HEADER -->
 
-
 	<div id="contentwrapper">
+
 	<div id="navigation-contentwrapper">
+		<?php mobile_switch(); ?>
 	<div id="navigation-bar">
 
 			<?php if ($this->current_sub_level_page): ?>
@@ -285,7 +287,7 @@ $wurflObj->getCapabilitiesFromAgent(null, $capabilities, $data_format);
 		<div class="subnavcontain-contain" role="menu" aria-live="assertive">	
 			<div class="subnavcontain">
 				<div class="rectangle">
-				<a id="content_link_phone"  class="content-expand" href="javascript:void(0);" >View Course Content</a> 
+				<a id="content_link_phone"  class="content-expand" href="javascript:void(0);" ><?php echo _AT(view_course_content); ?></a> 
 				<!-- <a href="#">content</a> -->
 				</div>
 			</div>
@@ -363,12 +365,11 @@ $wurflObj->getCapabilitiesFromAgent(null, $capabilities, $data_format);
 		</div>
 
 	
-	<div id="navigation-contentwrapper" role="menubar" >
+<div id="navigation-contentwrapper" role="menubar" >
 	
 			<?php if ($this->current_sub_level_page): ?>
-			<div id="topnavlistcontainer" role="navigation" aria-live="assertive" class="topnavlistcontainer fl-container" >
+		<div id="topnavlistcontainer" role="navigation" aria-live="assertive" class="topnavlistcontainer fl-container" >
 			<a class="navigation-bar-button topnavlist-link" id="topnavlist-link" href="javascript:void(0);" tabindex="1"><?php echo _AT('navigation'); ?></a>
-			
 				<div id="navigation-column">
 				<?php if ($this->current_sub_level_page): ?>
 				<ul id="topnavlist-tablet"  class="fl-list-menu" role="menu">
@@ -390,8 +391,8 @@ $wurflObj->getCapabilitiesFromAgent(null, $capabilities, $data_format);
 					 
 				</ul>
 				<?php endif; ?>
-			</div>
-			</div>
+			</div> 
+			</div> 
 			<?php endif; ?>	
 		
 <?php  ?><ul class="home-guide fl-tabs" id="home-guide" role="menu">
@@ -459,9 +460,9 @@ $wurflObj->getCapabilitiesFromAgent(null, $capabilities, $data_format);
 	
 		
 
-	
-
-	
+	<div style="float:left;clear:both; height:auto; margin-top: 1em;">
+	<?php mobile_switch(); ?>
+	</div>
 	</div>
 	</div> <!--  END HEADER -->
 
@@ -521,7 +522,9 @@ $wurflObj->getCapabilitiesFromAgent(null, $capabilities, $data_format);
 	
 	
 	<!-- </div>end #main -->
+			
 		<div id="contentwrapper" class="fl-container" >
+
 		<a name="page-title" id="page-title"></a>
 		<h2 class="page-title" ><?php echo $this->page_title; ?></h2>
 		<div id="subnavbacktopage" >
@@ -544,5 +547,6 @@ $wurflObj->getCapabilitiesFromAgent(null, $capabilities, $data_format);
 			</div>
 	  <?php } ?>
 	 <?php endif; ?> 
-				
+
 <?php endif; ?><!--  end header template for ipad/tablets -->
+		

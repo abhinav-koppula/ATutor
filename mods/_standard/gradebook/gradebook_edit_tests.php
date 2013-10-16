@@ -17,12 +17,14 @@ $page = 'gradebook';
 define('AT_INCLUDE_PATH', '../../../include/');
 require_once(AT_INCLUDE_PATH.'vitals.inc.php');
 authenticate(AT_PRIV_GRADEBOOK);
-
+tool_origin();
 require_once("lib/gradebook.inc.php");
 if (isset($_POST['cancel'])) 
 {
 	$msg->addFeedback('CANCELLED');
-	header('Location: gradebook_tests.php');
+    $return_url = $_SESSION['tool_origin']['url'];
+    tool_origin('off');
+	header('Location: '.$return_url);
 	exit;
 } 
 else if (isset($_POST['save'])) 
@@ -48,7 +50,7 @@ else if (isset($_POST['save']))
 
 	if (!$msg->containsErrors()) 
 	{
-		$sql = "UPDATE ".TABLE_PREFIX."gradebook_tests SET ";
+		$sql = "UPDATE %sgradebook_tests SET ";
 		
 		if (isset($_POST["title"])) $sql .= "title = '".$_POST["title"]. "', ";
 		if ($_POST["has_due_date"] == 'true')
@@ -58,35 +60,34 @@ else if (isset($_POST['save']))
 		}
 		else
 			$sql .= "due_date = '', ";
-		
-		$sql .= "grade_scale_id=".$_POST["selected_grade_scale_id"]." WHERE gradebook_test_id = ". $_REQUEST["gradebook_test_id"];
-		$result = mysql_query($sql, $db) or die(mysql_error());
+
+		$sql .= "grade_scale_id=%d WHERE gradebook_test_id = %d";
+		$result = queryDB($sql, array(TABLE_PREFIX, $_POST["selected_grade_scale_id"], $_REQUEST["gradebook_test_id"]));
 
 		$msg->addFeedback('ACTION_COMPLETED_SUCCESSFULLY');
-		header('Location: gradebook_tests.php');
+        $return_url = $_SESSION['tool_origin']['url'];
+        tool_origin('off');
+	    header('Location: '.$return_url);
 		exit;
 	}
 } 
 
-$sql = "SELECT * FROM ".TABLE_PREFIX."gradebook_tests WHERE gradebook_test_id=" . $_REQUEST["gradebook_test_id"];
-$result = mysql_query($sql, $db) or die(mysql_error());
-
-$sql = "(SELECT g.gradebook_test_id, g.type, t.title, DATE_FORMAT(end_date, '%Y-%m-%d %H:%i:00') AS due_date, g.grade_scale_id".
-				" FROM ".TABLE_PREFIX."gradebook_tests g, ".TABLE_PREFIX."tests t".
+$sql = "(SELECT g.gradebook_test_id, g.type, t.title, DATE_FORMAT(end_date, '%%Y-%%m-%%d %%H:%%i:00') AS due_date, g.grade_scale_id".
+				" FROM %sgradebook_tests g, %stests t".
 				" WHERE g.type='ATutor Test'".
 				" AND g.id = t.test_id".
-				" AND g.gradebook_test_id=".$_GET['gradebook_test_id'].")".
-				" UNION (SELECT g.gradebook_test_id, g.type, a.title, DATE_FORMAT(date_due, '%Y-%m-%d %H:%i:00') AS due_date, g.grade_scale_id".
-				" FROM ".TABLE_PREFIX."gradebook_tests g, ".TABLE_PREFIX."assignments a".
+				" AND g.gradebook_test_id=%d)".
+				" UNION (SELECT g.gradebook_test_id, g.type, a.title, DATE_FORMAT(date_due, '%%Y-%%m-%%d %%H:%%i:00') AS due_date, g.grade_scale_id".
+				" FROM %sgradebook_tests g, %sassignments a".
 				" WHERE g.type='ATutor Assignment'".
 				" AND g.id = a.assignment_id".
-				" AND g.gradebook_test_id=".$_GET['gradebook_test_id'].")".
-				" UNION (SELECT gradebook_test_id, type, title, DATE_FORMAT(due_date, '%Y-%m-%d %H:%i:00') AS due_date,grade_scale_id ".
-				" FROM ".TABLE_PREFIX."gradebook_tests".
+				" AND g.gradebook_test_id=%d)".
+				" UNION (SELECT gradebook_test_id, type, title, DATE_FORMAT(due_date, '%%Y-%%m-%%d %%H:%%i:00') AS due_date,grade_scale_id ".
+				" FROM %sgradebook_tests".
 				" WHERE type='External'".
-				" AND gradebook_test_id=".$_GET['gradebook_test_id'].")";
-$result	= mysql_query($sql, $db) or die(mysql_error());
-$row_this = mysql_fetch_assoc($result);
+				" AND gradebook_test_id=%d)";
+$row_this	= queryDB($sql, array(TABLE_PREFIX, TABLE_PREFIX, $_GET['gradebook_test_id'],TABLE_PREFIX, TABLE_PREFIX, $_GET['gradebook_test_id'], TABLE_PREFIX, $_GET['gradebook_test_id']), TRUE);
+
 
 if ($row_this["type"] == "External")
 {

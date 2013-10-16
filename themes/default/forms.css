@@ -1,16 +1,19 @@
 div.input-form {
-	width: 95%; 
+	width: 100%; 
 	margin-left:auto; 
 	margin-right:auto;
-	border: 1px #685642 solid;
+	background-color:#FAFAFA;
+	/*border: 1px #685642 solid; */
+/*	border-top:1px solid #E5E5E5;*/
+	border-bottom:1px solid #E5E5E5; 
 	margin-bottom: 10px;
 	line-height:150%;
-	background-color: #F4F0CB;
-	border-radius:.5em;
-	-moz-border-radius: .5em .5em .5em .5em;
+/*    box-shadow: 0em .1em 0em #cccccc inset;*/
+
 /*    -moz-box-shadow:.1em .1em .2em #999999;
     box-shadow: .1em .1em .2em #999999;*/
 	padding:.2em;
+	padding-left: 1em;
 }
 
 div.input-form div.row h3 {
@@ -25,7 +28,7 @@ div.input-form div.row {
 
 /*<img> and <a> tags: on mouse hover the color of the background will keep the same!*/
 div.input-form div.row img,a:hover{
-    background-color:#F4F0CB;
+
 }
 
 div.input-form .footer {
@@ -69,18 +72,18 @@ input[type=checkbox]{
 }
 
 div.input-form div.buttons {
-	text-align: right;
+	/* text-align: right; */
+	margin-left:1em;
 	padding:8px;
 }
 div.input-form div.buttons input {
-background-color: #B3A580;
     border: 1px solid #F4F0CB;
-    color: #FFFFFF;
+    color: #000000;
 }
 
 
 div.input-form div.buttons input:hover, div.input-form div.buttons input:focus{
-	background-color: #DED29E;
+	background-color: #DADADA;
 	color: #685642;
 }
 
@@ -131,12 +134,16 @@ div.input-form input[type=submit]{
 /*	font-size:100%;*/
 }
 select{
-	background-color:#F4F0CB;
+	background-color:#E5E5E5;
 	border-radius: .2em .2em .2em .2em;
 	-moz-border-radius: .2em .2em .2em .2em;
 /*	-moz-box-shadow:.2em .2em .3em #999999;
 	box-shadow: .2em .2em .3em #999999;*/
 /*	font-size:100%;*/
+}
+select:focus{
+	background-color:#ffffff;
+
 }
 .test_instruction{
 	background-color: #F4F0CB; 
@@ -149,4 +156,15 @@ select{
 	width: 50%; 
 	text-align: right; 
 	font-weight: bold;
+}
+
+@media screen and (max-device-width: 640px) {
+    input{
+        font-size:1.2em !important;
+    }
+}
+@media screen and (max-device-width: 1024px) {
+    input{
+        font-size:1em !important;
+    }
 }

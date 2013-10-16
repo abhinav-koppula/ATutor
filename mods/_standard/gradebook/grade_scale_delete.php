@@ -17,26 +17,33 @@ $page = 'gradebook';
 define('AT_INCLUDE_PATH', '../../../include/');
 require(AT_INCLUDE_PATH.'vitals.inc.php');
 authenticate(AT_PRIV_GRADEBOOK);
+tool_origin();
 
 if (isset($_POST['submit_no'])) {
 	$msg->addFeedback('CANCELLED');
+//        $return_url = $_SESSION['tool_origin']['url'];
+//        tool_origin('off');
+//header('Location: '.$return_url);
 	header('Location: grade_scale.php');
 	exit;
 } else if (isset($_POST['submit_yes'])) {
 	/* delete has been confirmed, delete this category */
 	$grade_scale_id	= intval($_POST['grade_scale_id']);
 
-	$sql = "DELETE FROM ".TABLE_PREFIX."grade_scales WHERE grade_scale_id=$grade_scale_id";
-	$result = mysql_query($sql, $db) or die(mysql_error());
+	$sql = "DELETE FROM %sgrade_scales WHERE grade_scale_id=%d";
+	$result = queryDB($sql, array(TABLE_PREFIX, $grade_scale_id));
 
-	$sql = "DELETE FROM ".TABLE_PREFIX."grade_scales_detail WHERE grade_scale_id=$grade_scale_id";
-	$result = mysql_query($sql, $db) or die(mysql_error());
+	$sql = "DELETE FROM %sgrade_scales_detail WHERE grade_scale_id=%d";
+    $result = queryDB($sql, array(TABLE_PREFIX, $grade_scale_id));
 
-	$sql = "UPDATE ".TABLE_PREFIX."gradebook_tests SET grade_scale_id=0 WHERE grade_scale_id=$grade_scale_id";
-	$result = mysql_query($sql, $db) or die(mysql_error());
+	$sql = "UPDATE %sgradebook_tests SET grade_scale_id=0 WHERE grade_scale_id=%d";
+	$result = queryDB($sql, array(TABLE_PREFIX, $grade_scale_id));
 
-	$msg->addFeedback('ACTION_COMPLETED_SUCCESSFULLY');
-	header('Location: grade_scale.php');
+    $msg->addFeedback('ACTION_COMPLETED_SUCCESSFULLY');
+    $return_url = $_SESSION['tool_origin']['url'];
+    tool_origin('off');
+    header('Location: '.$return_url);
+	//header('Location: grade_scale.php');
 	exit;
 }
 
@@ -44,14 +51,13 @@ require(AT_INCLUDE_PATH.'header.inc.php');
 
 $_GET['grade_scale_id'] = intval($_GET['grade_scale_id']); 
 
-$sql = "SELECT grade_scale_id, scale_name FROM ".TABLE_PREFIX."grade_scales g WHERE g.grade_scale_id=$_GET[grade_scale_id]";
-$result = mysql_query($sql,$db) or die(mysql_error());
+$sql = "SELECT grade_scale_id, scale_name FROM %sgrade_scales g WHERE g.grade_scale_id=%d";
+$row = queryDB($sql,array(TABLE_PREFIX, $_GET['grade_scale_id']), TRUE);
 
-if (mysql_num_rows($result) == 0) {
+if(count($row) == 0){
 	$msg->printErrors('ITEM_NOT_FOUND');
 } else {
-	$row = mysql_fetch_assoc($result);
-	
+
 	$hidden_vars['scale_name']= $row['scale_name'];
 	$hidden_vars['grade_scale_id']	= $row['grade_scale_id'];
 
