@@ -89,7 +89,7 @@ jQuery(document).ready(function () {
 function remove_module(module)
 {
 	jQuery.post("'.AT_BASE_HREF.'move_module.php", { "remove":module, "from":"course_index" }, function(data) {});
-	jQuery("div[id=\""+module.replace(/\//g,"-")+"\"]").remove();
+	jQuery("div[id=\""+module.replace(/\//g,"-")+"\"]").hide("slow");
 }
 //-->
 </script>
@@ -121,7 +121,7 @@ if (!$module->isEnabled()) {
 	$sql	= "SELECT COUNT(*) AS cnt FROM %snews WHERE course_id=%d";
 	$row = queryDB($sql, array(TABLE_PREFIX, $course_id), TRUE);
 }
-//debug($row);
+
 if ($row['cnt'] > 0) {
 
 	$num_results = $row['cnt'];
