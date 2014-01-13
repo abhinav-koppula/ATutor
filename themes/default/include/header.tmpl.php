@@ -125,7 +125,7 @@ global $system_courses, $_custom_css, $db;
 	<?php if (isset($_SESSION['valid_user']) && $_SESSION['valid_user']): 
 		echo '<div class="site-name">'.stripslashes(SITE_NAME).'</div>'; 
 	else:
-		echo '<br />';	
+		echo '<div class="site-name">&nbsp;</div>';	
 	endif; ?>
 
 	<div id="top-links"  role="navigation"> 
@@ -203,21 +203,13 @@ global $system_courses, $_custom_css, $db;
 		<?php if ((isset($this->course_id) && $this->course_id > 0) && ($_SESSION['enroll'] == AT_ENROLL_NO)) : ?> 
 			- <small><a href="<?php echo $this->base_path; ?>enroll.php?course=<?php echo $this->course_id; ?>"><?php echo _AT('enroll_me'); ?></a></small>
 		<?php endif; ?>
-	</h1>
-	
+    </h1>
 	<?php else: ?>
-	
 	<h1 id="site-name-lrg"><?php echo $this->section_title; ?>
 	</h1>
-	
 	<?php endif; ?>
 	</div>
-
-
 </div>
-
-	
-				
 <!-- the main navigation. in our case, tabs -->
 <div id="lrg_topnav">
     <div id="topnavlistcontainer" role="navigation">
@@ -241,7 +233,7 @@ global $system_courses, $_custom_css, $db;
 
 <div class="logoutbar">
 <?php  admin_switch(); ?>
-	<div>
+	<div id="userlinks">
 		<?php if (isset($_SESSION['valid_user']) && $_SESSION['valid_user']): ?>
 		<?php $path_parts = explode("/", $this->current_top_level_page); 
 		      $last_path_part = $path_parts[sizeof($path_parts) - 1];
@@ -427,13 +419,17 @@ global $system_courses, $_custom_css, $db;
             <a name="admin_tools"></a>
 			<ul id="subnavlist_i" role="navigation"  aria-label="<?php echo _AT('manage_navigation_bar'); ?>">
             <span id="manage_on" title="<?php echo _AT('manage_tools_on'); ?>" aria-live="polite"></span>
-			<?php for ($i=0; $i<$num_pages_i; $i++): ?>
+			<?php for ($i=0; $i<$num_pages_i; $i++): 
+			?>
 
-				<?php if ($this->sub_level_pages_i[$i]['url'] == $this->current_sub_level_page): ?>
+				<?php if ($this->sub_level_pages_i[$i]['url'] == $this->current_sub_level_page){ ?>
 				      <li class="active"><?php echo stripslashes(htmlentities_utf8($this->sub_level_pages_i[$i]['title'])); ?></li>
-				<?php else: ?>
-					<li><a href="<?php echo $this->sub_level_pages_i[$i]['url'].$fcid; ?>"><?php echo stripslashes(htmlentities_utf8($this->sub_level_pages_i[$i]['title'])); ?></a></li>
-				<?php endif; ?>
+				<?php }else if(preg_match("/add_content.php/", $this->sub_level_pages_i[$i]['url'])){ ?>
+					    <li><a href="<?php echo $this->sub_level_pages_i[$i]['url']; ?>"><?php echo stripslashes(htmlentities_utf8($this->sub_level_pages_i[$i]['title'])); ?></a></li>
+				
+				<?php } else { ?>
+					    <li><a href="<?php echo $this->sub_level_pages_i[$i]['url'].$fcid; ?>"><?php echo stripslashes(htmlentities_utf8($this->sub_level_pages_i[$i]['title'])); ?></a></li>
+				<?php } ?>
 				<?php if ($i < $num_pages-1): 
 					echo " ";?>
 				<?php endif; ?>

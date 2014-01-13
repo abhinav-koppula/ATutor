@@ -69,7 +69,7 @@ foreach($rows_categories as $row){
 	<form method="get" action="<?php echo $_SERVER['PHP_SELF']; ?>" name="form">
 <?php endif; ?>
 <br style="clear:both;" />
-<table class="data" summary="" rules="cols">
+<table class="data" summary="">
 <thead>
 <tr>
 	<th scope="col">&nbsp;</th>
@@ -149,7 +149,7 @@ if (!$question_flag) {
 </table>
 </form>
 
-<script language="javascript" type="text/javascript">
+<script type="text/javascript">
 // <!--
 	function selectCat(catID, cat) {
 		for (var i=0;i<document.form.elements.length;i++) {

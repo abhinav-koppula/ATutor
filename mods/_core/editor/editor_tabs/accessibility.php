@@ -13,27 +13,13 @@
 
 define('AT_INCLUDE_PATH', '../../../include/');
 
-require(AT_INCLUDE_PATH.'vitals.inc.php');
-require(AT_INCLUDE_PATH.'../mods/_core/editor/editor_tab_functions.inc.php');
-
 $cid = intval($_POST['cid']);
-
-if ($cid == 0) {
-	require(AT_INCLUDE_PATH.'header.inc.php');
-	$missing_fields[] = _AT('content_id');
-	$msg->addError(array('EMPTY_FIELDS', $missing_fields));
-	require (AT_INCLUDE_PATH.'footer.inc.php');
-	exit;
-}
 
 $rows_content = $contentManager->getContentPage($cid);
 
 foreach($rows_content as $content_row){
     if(!isset($content_row['content_id'])){
-        require(AT_INCLUDE_PATH.'header.inc.php');
         $msg->printErrors('PAGE_NOT_FOUND');
-        require (AT_INCLUDE_PATH.'footer.inc.php');
-        exit;
     }
 }
 $course_base_href = '';
@@ -71,7 +57,6 @@ else if (isset($_POST['reverse']))
 	}
 }
 
-require(AT_INCLUDE_PATH.'header.inc.php');
 ?>
 <form action="<?php echo $_SERVER['PHP_SELF']; ?>?popup=1" method="post" name="form">
   <div class="row">
@@ -118,6 +103,3 @@ if ($_POST['body_text'] != '') {
 ?>
   </div>
 </form>
-<?php 
-require(AT_INCLUDE_PATH.'footer.inc.php');
-?>

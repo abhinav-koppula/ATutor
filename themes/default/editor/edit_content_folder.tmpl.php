@@ -54,7 +54,7 @@ if ($this->shortcuts):
 	</div>
 
 	<div class="row">
-	<table class="data" summary="Title, status, release results, and pass score of available tests" style="width: 98%" rules="cols">
+	<table class="data" summary="Title, status, release results, and pass score of available tests" style="width: 98%">
 	<thead>
 	<tr>
 		<th scope="col">&nbsp;</th>
@@ -94,7 +94,7 @@ if ($this->shortcuts):
 </div>
 </form>
 
-<script language="javascript" type="text/javascript">
+<script type="text/javascript">
 	function toggleTestSelect(r_id){
 		var row = document.getElementById(r_id);
 		var checkBox = row.cells[0].firstChild;

@@ -172,7 +172,7 @@ $count = 0;
 ?>
 <form name="form" method="post" action="<?php echo $_SERVER['PHP_SELF']; ?>">
 <input type="hidden" name="id" value="<?php echo $id; ?>" />
-<table class="data static"  rules="rows">
+<table class="data static">
 <thead>
 	<tr>
 		<th><?php echo _AT('login');      ?></th>
@@ -213,7 +213,7 @@ $count = 0;
 </table>
 </form>
 
-<script type="text/javascript" language="javascript">
+<script type="text/javascript">
 // <!--
 function hirow(obj, row) {
 	if (obj.value && obj.value == <?php echo $_GET['gid']; ?>) {
