@@ -11,46 +11,57 @@
 /************************************************************************/
 // $Id$
 if (AT_INCLUDE_PATH !== 'NULL') {
-function at_db_connect($db_host, $db_port, $db_login, $db_password){
 
-    $db = @mysql_connect($db_host . ':' . $db_port, $db_login,$db_password);
-    
-	if (!$db) {
-		// AT_ERROR_NO_DB_CONNECT 
-		require_once(AT_INCLUDE_PATH . 'classes/ErrorHandler/ErrorHandler.class.php');
-		$err = new ErrorHandler();
-		trigger_error('VITAL#Unable to connect to db.', E_USER_ERROR);
-		exit;
-	}
-    return $db;
-}
+    function at_db_connect($db_host, $db_port, $db_login, $db_password, $db_name){
+         if(defined('MYSQLI_ENABLED')){
+            if($db_name == ''){
+                $db = new mysqli($db_host, $db_login, $db_password);
+                $db->query("SET NAMES 'utf8'"); 
+            }else{
+                $db = new mysqli($db_host, $db_login,$db_password, $db_name, $db_port);
+                $db->query("SET NAMES 'utf8'"); 
+            }
+         } else{
+            $db = @mysql_connect($db_host . ':' . $db_port, $db_login, $db_password);
+         }   
+        if (!$db) {
+            // AT_ERROR_NO_DB_CONNECT 
+            require_once(AT_INCLUDE_PATH . 'classes/ErrorHandler/ErrorHandler.class.php');
+            $err = new ErrorHandler();
+            trigger_error('VITAL#Unable to connect to db.', E_USER_ERROR);
+            exit;
+        }
+        return $db;
+    }
 
-function at_db_select($db_name, $db){
+    function at_db_select($db_name, $db){
+     if(defined('MYSQLI_ENABLED')){
+        if(!$db->select_db($db_name)){
+            require_once(AT_INCLUDE_PATH . 'classes/ErrorHandler/ErrorHandler.class.php');
+            $err = new ErrorHandler();
+            trigger_error('VITAL#DB connection established, but database "'.DB_NAME.'" cannot be selected.',
+                            E_USER_ERROR);
+            exit;
+        }
 
-    if (!@mysql_select_db($db_name, $db)) {
-		require_once(AT_INCLUDE_PATH . 'classes/ErrorHandler/ErrorHandler.class.php');
-		$err = new ErrorHandler();
-		trigger_error('VITAL#DB connection established, but database "'.DB_NAME.'" cannot be selected.',
-						E_USER_ERROR);
-		exit;
-	}
-}
-/*
-		//get set_utf8 config
-	$sql = 'SELECT * FROM '.TABLE_PREFIX."config WHERE name='set_utf8'";
-	$result = mysql_query($sql, $db);
-	if ($result){
-		$row = mysql_fetch_assoc($result);
-	}
-	if ($row['value']==1){
-		mysql_query("SET NAMES 'utf8'", $db); 
-	}	
-*/
+     }else{
+        if (!@mysql_select_db($db_name, $db)) {
+            require_once(AT_INCLUDE_PATH . 'classes/ErrorHandler/ErrorHandler.class.php');
+            $err = new ErrorHandler();
+            trigger_error('VITAL#DB connection established, but database "'.DB_NAME.'" cannot be selected.',
+                            E_USER_ERROR);
+            exit;
+        }
+     }
+ 
+    }
+
 }
 //functions for properly escaping input strings
 function my_add_null_slashes( $string ) {
+    global $db;
     if(defined('MYSQLI_ENABLED')){
-        return mysqli_real_escape_string(stripslashes($string));
+        return $db->real_escape_string(stripslashes($string));
     }else{
         return mysql_real_escape_string(stripslashes($string));
     }
@@ -66,7 +77,10 @@ if ( get_magic_quotes_gpc() == 1 ) {
     $stripslashes = 'stripslashes';
 } else {
     if(defined('MYSQLI_ENABLED')){
-        $addslashes   = 'mysqli_real_escape_string';
+        // mysqli_real_escape_string requires 2 params, breaking wherever
+        // current $addslashes with 1 param exists. So hack with trim and 
+        // manually run mysqli_real_escape_string requires during sanitization below
+        $addslashes   = 'trim';
     }else{
         $addslashes   = 'mysql_real_escape_string';
     }
@@ -86,7 +100,9 @@ if ( get_magic_quotes_gpc() == 1 ) {
  * @author  Alexey Novak, Cindy Li, Greg Gay
  */
 function queryDB($query, $params=array(), $oneRow = false, $sanitize = true, $callback_func = "mysql_affected_rows", $array_type = MYSQL_ASSOC) {
-
+    if(defined('MYSQLI_ENABLED') && $callback_func == "mysql_affected_rows"){
+        $callback_func = "mysqli_affected_rows";
+    }
     $sql = create_sql($query, $params, $sanitize);
     return execute_sql($sql, $oneRow, $callback_func, $array_type);
 
@@ -99,14 +115,19 @@ function sqlout($sql){
 }
 
 function create_sql($query, $params=array(), $sanitize = true){
-    global $addslashes;
-
+    global $addslashes, $db;
     // Prevent sql injections through string parameters passed into the query
     if ($sanitize) {
         foreach($params as $i=>$value) {
-            $params[$i] = $addslashes($value);
+         if(defined('MYSQLI_ENABLED')){  
+             $value = $addslashes(htmlspecialchars_decode($value, ENT_QUOTES));  
+             $params[$i] = $db->real_escape_string($value);
+            }else {
+             $params[$i] = $addslashes($value);           
+            }
         }
     }
+
     $sql = vsprintf($query, $params);
     return $sql;
 }
@@ -123,11 +144,11 @@ function execute_sql($sql, $oneRow, $callback_func, $array_type){
         // BUT  ! Use for debugging purposes ONLY. Creates very large logs if left running.
         
     //error_log(print_r($sql, true), 0);    
-
+    
         // Query DB and if something goes wrong then log the problem
-        if(defined('MSQLI_ENABLED')){
-               $result = mysqli_query($sql, $db) or (error_log(print_r(mysqli_error(), true), 0) and $msg->addError($displayErrorMessage)); 
-               
+        if(defined('MYSQLI_ENABLED')){
+               $result = $db->query($sql) or (error_log(print_r($db->error, true), 0) and $msg->addError($displayErrorMessage));                
+
         }else{
                $result = mysql_query($sql, $db) or (error_log(print_r(mysql_error(), true), 0) and $msg->addError($displayErrorMessage));
         }
@@ -149,21 +170,42 @@ function execute_sql($sql, $oneRow, $callback_func, $array_type){
         
         // If we need only one row then just grab it otherwise get all the results
         if ($oneRow) {
-            $row = mysql_fetch_array($result, $array_type);
+              if(defined('MYSQLI_ENABLED')){            
+                $row = $result->fetch_array($array_type);              
+
+              }else {
+                $row = mysql_fetch_array($result, $array_type);              
+              }
+
             // Check that there are no more than 1 row expected.
-            if (mysql_fetch_array($result, $array_type)) {
-                error_log(print_r($oneRowErrorMessage, true), 0);
-                $msg->addError($displayErrorMessage);
-                //return array();
-                return at_affected_rows($db);
-            }
+            
+              if(defined('MYSQLI_ENABLED')){
+                   if ($result->fetch_array($array_type)) {
+                    //error_log(print_r($oneRowErrorMessage, true), 0);
+                    $msg->addError($displayErrorMessage);
+                    return at_affected_rows($db);
+                    }           
+              }else{
+                  if (mysql_fetch_array($result, $array_type)) {
+                    error_log(print_r($oneRowErrorMessage, true), 0);
+                    $msg->addError($displayErrorMessage);
+                    return at_affected_rows($db);
+                    }            
+              }
+
             unset($result);
             return ($row) ? $row : array();
         }
         
         $resultArray = array();
-        while ($row = mysql_fetch_array($result, $array_type)) {
-            $resultArray[] = $row;
+        if(defined('MYSQLI_ENABLED')){
+            while ($row = $result->fetch_array($array_type)) {
+                $resultArray[] = $row;
+            }    
+        }else{
+            while ($row = mysql_fetch_array($result, $array_type)) {
+                $resultArray[] = $row;
+            }
         }
         unset($result);
         return $resultArray;
@@ -176,9 +218,9 @@ function queryDBresult($sql, $params = array(), $sanitize = true){
         global $db, $msg;
         $sql = create_sql($sql, $params, $sanitize);
 
-        if(defined('MSQLI_ENABLED')){
-               $result = mysqli_query($sql, $db) or (error_log(print_r(mysqli_error(), true), 0) and $msg->addError($displayErrorMessage)); 
-               
+        if(defined('MYSQLI_ENABLED')){
+               $result = $db->query($sql) or (error_log(print_r(mysqli_error(), true), 0) and $msg->addError($displayErrorMessage));        
+
         }else{
                $result = mysql_query($sql, $db) or (error_log(print_r(mysql_error(), true), 0) and $msg->addError($displayErrorMessage));
         }
@@ -186,53 +228,97 @@ function queryDBresult($sql, $params = array(), $sanitize = true){
     return $result;
 }
 function at_affected_rows($db){
-    return mysql_affected_rows($db);
+    if(defined('MYSQLI_ENABLED')){
+        return $db->affected_rows;    
+    }else{
+        return mysql_affected_rows($db);
+    }
 }
 function at_db_version($db){
- 	$sql = "SELECT VERSION() AS version";
-	$result = mysql_query($sql, $db);
-	$row = mysql_fetch_assoc($result);
+ 	$sql = "SELECT VERSION() AS version";	
+ 	if(defined('MYSQLI_ENABLED')){ 
+        $result = $db->query($sql);
+        $row = $result->fetch_assoc();	
+ 	}else{
+        $result = mysql_query($sql, $db);
+        $row = mysql_fetch_assoc($result);
+	}
 	return $row;
 }	
 function at_db_create($sql, $db){
-    $result = mysql_query($sql, $db);
+ 	if(defined('MYSQLI_ENABLED')){	
+        $result = $db->query($sql);	
+ 	}else{
+        $result = mysql_query($sql, $db);
+    }
     return $result;
 }
 
 function at_insert_id(){
     global $db;
-    return mysql_insert_id($db);
+    if(defined('MYSQLI_ENABLED')){
+        return $db->insert_id;
+    }else{
+        return mysql_insert_id($db);
+    }
 }
 function at_db_errno(){
     global $db;
-    return mysql_errno($db);
+    if(defined('MYSQLI_ENABLED')){    
+        return $db->errno;
+    }else{
+        return mysql_errno($db);
+    }
 }
 function at_db_error(){
     global $db;
-    return mysql_error($db);
+    if(defined('MYSQLI_ENABLED')){    
+        return $db->error; 
+    }else{
+        return mysql_error($db);
+    }
 }
 
 /////////
 /// USED in classes/CSVExport.class.php & CSVImport.class.php
 function at_field_type($result, $i){
-    return mysql_field_type($result, $i);
-//mysqli_fetch_field_direct() [type]
+    if(defined('MYSQLI_ENABLED')){  
+        return $result->fetch_field_direct($i);  
+    }else{
+        return mysql_field_type($result, $i);    
+    }
+
 }
 function at_num_fields($result){
-    return mysql_num_fields($result);
-    //return mysqli_field_count()
+    if(defined('MYSQLI_ENABLED')){   
+        return $result->field_count; 
+    }else{
+        return mysql_num_fields($result);    
+    }
+
 }
 function at_free_result($result){
-    return mysql_free_result($result);
-    //return mysqli_free_result($result);
+    if(defined('MYSQLI_ENABLED')){  
+        return $result->free_result;   
+    }else{
+        return mysql_free_result($result);    
+    }
+
 }
 function at_field_flags($result, $i){
-        return mysql_field_flags($result, $i);
-//return mysqli_fetch_field_direct() [flags]
+    if(defined('MYSQLI_ENABLED')){   
+        return $result->field_flags($i); 
+    }else{
+        return mysql_field_flags($result, $i);   
+    }
+
 }
 function at_field_name($result, $i){
-    return mysql_field_name($result, $i);
-    //return mysqli_fetch_field_direct() [name] or [orgname]
+    if(defined('MYSQLI_ENABLED')){  
+        return $result->fetch_field_direct($i);
+    }else{
+        return mysql_field_name($result, $i);   
+    }
 }
 
 ////

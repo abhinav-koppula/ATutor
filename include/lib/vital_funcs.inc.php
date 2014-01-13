@@ -14,11 +14,10 @@
 if (!defined('AT_INCLUDE_PATH')) { exit; }
 
 /* test for mysqli presence */
-/*
 if(function_exists('mysqli_connect')){
 	define('MYSQLI_ENABLED',	1);
 } 
-*/
+
 
 // Emulate register_globals off. src: http://php.net/manual/en/faq.misc.php#faq.misc.registerglobals
 function unregister_GLOBALS() {
@@ -221,15 +220,6 @@ if (version_compare(phpversion(), '4.3.0') < 0) {
 
 		return $content;
 	}
-    if(defined('MYSQLI_ENABLED')){
-        function mysqli_real_escape_string($input) {
-            return mysqli_escape_string($input);
-        }
-    }else{
-        function mysql_real_escape_string($input) {
-            return mysql_escape_string($input);
-        }
-    }
 }
 
 

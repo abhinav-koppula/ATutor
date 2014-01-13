@@ -27,10 +27,11 @@ define('AT_SUBSITE_THEME_DIR', realpath(AT_SITE_PATH . "themes") . "/");
 define('AT_MULTISITE_CONFIG_FILE', AT_INCLUDE_PATH . 'config_multisite.inc.php');
 
 // Inform IE6 Users They must upgrade
-if(strpos($_SERVER['HTTP_USER_AGENT'], 'MSIE 6.') !== FALSE){
-    header("Location: ie6.html");
+if(isset($_SERVER['HTTP_USER_AGENT'])){
+    if(strpos($_SERVER['HTTP_USER_AGENT'], 'MSIE 6.') !== FALSE){
+        header("Location: ie6.html");
+    }
 }
-
 // check if the subsite is enabled
 if (defined('IS_SUBSITE') && IS_SUBSITE) {
 	include_once(AT_INCLUDE_PATH . '../mods/manage_multi/lib/mysql_multisite_connect.inc.php');
@@ -81,8 +82,15 @@ if (!defined('AT_REDIRECT_LOADED')){
 
 if (!defined('AT_REDIRECT_LOADED')){
 	require_once(AT_INCLUDE_PATH.'lib/mysql_connect.inc.php');
-	$db = at_db_connect(DB_HOST, DB_PORT, DB_USER, DB_PASSWORD);
+	     
+    if(defined('MYSQLI_ENABLED')){
+ 	$db = at_db_connect(DB_HOST, DB_PORT, DB_USER, DB_PASSWORD, DB_NAME);   
+    }else{
+	$db = at_db_connect(DB_HOST, DB_PORT, DB_USER, DB_PASSWORD, '');
 	at_db_select(DB_NAME, $db);
+    }
+	//$db = at_db_connect(DB_HOST, DB_PORT, DB_USER, DB_PASSWORD);
+	//at_db_select(DB_NAME, $db);
 }
 
 /* get config variables. if they're not in the db then it uses the installation default value in constants.inc.php */
@@ -237,6 +245,12 @@ require(AT_INCLUDE_PATH.'classes/Savant2/Savant2.php');       /* for the theme a
 $savant = new Savant2();
 $savant->addPath('template', AT_INCLUDE_PATH . '../themes/default/');
 
+/**************************************************/
+/* load in message handler                        */
+/**************************************************/
+require(AT_INCLUDE_PATH.'classes/Message/Message.class.php');
+$msg = new Message($savant);
+
 //if user has requested theme change, make the change here
 if ((isset($_POST['theme']) || isset($_POST['mobile_theme'])) && isset($_POST['submit'])) {
 	//http://atutor.ca/atutor/mantis/view.php?id=4781
@@ -282,10 +296,11 @@ if (isset($_SESSION['prefs']['PREF_THEME']) && isset($_SESSION['valid_user']) &&
 	if ($row['status'] == 0) {
 		// get user defined default theme if the preference theme is disabled
 		$default_theme = get_default_theme();
-		if (!is_dir(AT_SYSTEM_THEME_DIR . $default_theme['dir_name']) && !is_dir(AT_SUBSITE_THEME_DIR . $default_theme['dir_name'])) {
+		if (!is_dir(AT_SYSTEM_THEME_DIR . $default_theme) && !is_dir(AT_SUBSITE_THEME_DIR . $default_theme)) {
 			$default_theme = get_system_default_theme();
 		}
 		$_SESSION['prefs']['PREF_THEME'] = $default_theme;
+    $msg->addError('THEME_PREVIEW_DISABLED');
 	}
 }
 
@@ -305,11 +320,6 @@ if (is_customized_theme($_SESSION['prefs']['PREF_THEME'])) {
 
 define('AT_CUSTOMIZED_DATA_DIR', AT_BASE_HREF . $theme_path);
 
-/**************************************************/
-/* load in message handler                        */
-/**************************************************/
-require(AT_INCLUDE_PATH.'classes/Message/Message.class.php');
-$msg = new Message($savant);
 
 /**************************************************/
 /* load in content manager                        */

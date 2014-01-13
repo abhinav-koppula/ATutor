@@ -27,25 +27,28 @@ $_GET['id'] = intval($_GET['id']);
 $_SESSION['last_visited_page'] = $_base_href.'profile.php?id='.$_GET['id'];
 
 $sql	= 'SELECT member_id, login, website, first_name, second_name, last_name, email, private_email, phone FROM %smembers WHERE member_id=%d';
-$profile_row = queryDB($sql, array(TABLE_PREFIX, $_GET['id']), TRUE);
+$profile_row = queryDB($sql,array(TABLE_PREFIX, $_GET['id']), TRUE);
 
-if (isset($profile_row['member_id']) && $profile_row['member_id'] != '') {
+if (count($profile_row) > 0) {	
 	//get privs
 	$sql	= 'SELECT `privileges`, approved FROM %scourse_enrollment WHERE member_id=%d';
-	$rows_en = queryDB($sql,array(TABLE_PREFIX, $_GET['id']));
-    foreach($rows_en as $row_en){
-        if ($system_courses[$_SESSION['course_id']]['member_id'] == $_GET['id']) {
-            $status = _AT('instructor');
-        } else if ( ($row_en['approved'] == 'y') && $row_en['privileges'] ) {
-            $status = _AT('assistant');
-        } else if ($row_en['approved'] == 'y') {
-            $status = _AT('enrolled');
-        }
-    }
+	$row_en = mysql_query($sql,array(TABLE_PREFIX, $_GET['id']));
+
+	if ($system_courses[$_SESSION['course_id']]['member_id'] == $_GET['id']) {
+		$status = _AT('instructor');
+	} else if ( ($row_en['approved'] == 'y') && $row_en['privileges'] ) {
+		$status = _AT('assistant');
+	} else if ($row_en['approved'] == 'y') {
+		$status = _AT('enrolled');
+	}
+
 	$_pages['profile.php']['title'] = _AT($display_name_formats[$_config['display_name_format']], $profile_row['login'], $profile_row['first_name'], $profile_row['second_name'], $profile_row['last_name']);
 
-	require(AT_INCLUDE_PATH.'header.inc.php');
+    $sql = 'SELECT id FROM %spa_albums WHERE member_id=%d AND type_id='.AT_PA_TYPE_PERSONAL;
+    $aid = queryDB($sql, array(TABLE_PREFIX, $_GET['id']), TRUE);
 
+	require(AT_INCLUDE_PATH.'header.inc.php');
+    $savant->assign('aid', $aid['id']);
 	$savant->assign('row', $profile_row);
 	$savant->assign('status', $status);
 	$savant->display('profile.tmpl.php');

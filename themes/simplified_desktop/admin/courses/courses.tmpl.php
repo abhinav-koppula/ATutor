@@ -118,7 +118,7 @@
 		
 			<h3><?php echo _AT('results_found', $this->num_results); ?></h3>
 		<div id="hide-show-container">		
-			<a id="results-hide-show-link" class="content-expand" href="javascript:void(0);" tabindex="1">Refine Results</a>
+			<a id="results-hide-show-link" class="content-expand" href="javascript:void(0);" tabindex="1"><?php echo _AT('refine_results'); ?></a>
 		</div>
 	
 		
@@ -157,7 +157,7 @@
 
 <form name="form" method="get" action="<?php echo $_SERVER['PHP_SELF']; ?>">
 <div class="table-surround">
-<table class="data" summary="Course title, instructor, and enrollment." >
+<table class="data" summary="<?php echo _AT('course_title_instructor_enrolment'); ?>" >
 <colgroup>
 	<?php if ($col == 'title'): ?>
 		<col />
@@ -203,7 +203,7 @@
 </tfoot>
 <tbody>
 <?php if ($this->num_rows): ?>
-	<?php while ($row = mysql_fetch_assoc($this->result)): ?>
+	<?php foreach($this->rows_course_list as $row){ ?>
 		<tr onkeydown="document.form['m<?php echo $row['course_id']; ?>'].checked = true; rowselect(this);" onmousedown="document.form['m<?php echo $row['course_id']; ?>'].checked = true; rowselect(this);" id="r_<?php echo $row['course_id']; ?>">
 			<td><input type="radio" name="id" value="<?php echo $row['course_id']; ?>" id="m<?php echo $row['course_id']; ?>" /></td>
 			<td><label for="m<?php echo $row['course_id']; ?>"><?php echo AT_print($row['title'], 'courses.title'); ?></label></td>
@@ -214,7 +214,7 @@
 			<td><?php echo ($this->enrolled[$row['course_id']]['y'] ? $this->enrolled[$row['course_id']]['y'] : 0); ?></td>
 		<!-- 	<td><?php //echo ($this->enrolled[$row['course_id']]['a'] ? $this->enrolled[$row['course_id']]['a'] : 0); ?></td> -->
 		</tr>
-	<?php endwhile; ?>
+	<?php } ?>
 <?php else: ?>
 	<tr>
 		<td colspan="8"><?php echo _AT('none_found'); ?></td>

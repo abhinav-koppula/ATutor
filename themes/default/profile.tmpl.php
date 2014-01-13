@@ -26,14 +26,8 @@ global $display_name_formats, $moduleFactory, $db, $_modules;
 				<dd><?php if (profile_image_exists($this->row['member_id'])): ?>
 				<?php
 					//run a check to see if any personal album exists, if not, create one.
-					$sql = 'SELECT * FROM '.TABLE_PREFIX.'pa_albums WHERE member_id='.$this->row['member_id'].' AND type_id='.AT_PA_TYPE_PERSONAL;
-					$result = mysql_query($sql, $db);
-					if ($result){
-						$row = mysql_fetch_assoc($result);	//album info.
-						$aid = $row['id'];
-					}
 					if (in_array('mods/_standard/photos/index.php', $_modules)){
-						$img_link = AT_PA_BASENAME.'albums.php?id='.$aid;
+						$img_link = AT_PA_BASENAME.'albums.php?id='.$this->aid;
 					} else {
 						$img_link = 'get_profile_img.php?id='.$this->row['member_id'].SEP.'size=o';
 					}

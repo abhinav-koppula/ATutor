@@ -23,21 +23,39 @@ if (isset($_POST['submit_no'])) {
 } else if (isset($_POST['submit_yes'])) {
 	$course = intval($_POST['course']);
 	if ($system_courses[$course]['member_id'] != $_SESSION['member_id']) {
-		$sql	= "DELETE FROM ".TABLE_PREFIX."course_enrollment WHERE member_id=$_SESSION[member_id] AND course_id=$course";
-		$result = mysql_query($sql, $db) or die(mysql_error());
-
+	
+		$sql	= "DELETE FROM %scourse_enrollment WHERE member_id=%d AND course_id=%d";
+		$result = queryDB($sql, array(TABLE_PREFIX, $_SESSION['member_id'], $course));
+		
 		// Unsubscribe from forums and threads of the course
-		$sql	= "DELETE FROM ".TABLE_PREFIX."forums_subscriptions 
-		         WHERE forum_id IN (SELECT forum_id FROM ".TABLE_PREFIX."forums_courses WHERE course_id=$course)
-		           AND member_id=".$_SESSION[member_id];
-		$result = mysql_query($sql, $db) or die(mysql_error());
+		
+		$sql	= "DELETE FROM %sforums_subscriptions 
+		         WHERE forum_id IN (SELECT forum_id FROM %sforums_courses WHERE course_id=%d)
+		           AND member_id=%d";
 
-		$sql	= "UPDATE ".TABLE_PREFIX."forums_accessed 
+		$result = queryDB($sql, array(TABLE_PREFIX, TABLE_PREFIX, $course, $_SESSION['member_id'] ));
+
+		$sql	= "UPDATE %sforums_accessed 
 		           SET subscribe = 0
-		         WHERE post_id IN (SELECT distinct t.post_id FROM ".TABLE_PREFIX."forums_courses c, ".TABLE_PREFIX."forums_threads t WHERE c.course_id=$course)
-		           AND member_id=".$_SESSION[member_id];
-		$result = mysql_query($sql, $db) or die(mysql_error());
+		         WHERE post_id IN (SELECT distinct t.post_id FROM %sforums_courses c, %sforums_threads t WHERE c.course_id=$course)
+		           AND member_id=%d";
+		$result = queryDB($sql, array(TABLE_PREFIX, TABLE_PREFIX, TABLE_PREFIX, $_SESSION['member_id']));
+        
+    // Unsubscribe from group forums and threads of the group forums
+    $group_list = implode(',', $_SESSION['groups']);
+    if(!empty($group_list)) {
+        $sql	= "DELETE FROM %sforums_subscriptions 
+		     WHERE forum_id IN (SELECT forum_id FROM %sforums_groups WHERE group_id IN (%s))
+		       AND member_id=%d";
 
+        $result = queryDB($sql, array(TABLE_PREFIX, TABLE_PREFIX, $group_list, $_SESSION['member_id'] ));
+        
+        $sql	= "UPDATE %sforums_accessed 
+		       SET subscribe = 0
+		     WHERE post_id IN (SELECT distinct t.post_id FROM %sforums_groups g, %sforums_threads t WHERE g.group_id IN (%s))
+		       AND member_id=%d";
+        $result = queryDB($sql, array(TABLE_PREFIX, TABLE_PREFIX, TABLE_PREFIX, $group_list, $_SESSION['member_id']));
+    }
 		$msg->addFeedback('COURSE_REMOVED');
 	}
 	header("Location: ".AT_BASE_HREF."users/index.php");

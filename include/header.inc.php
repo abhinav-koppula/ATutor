@@ -91,6 +91,9 @@ if (isset($_custom_script)) {
 	$custom_head .= '
 ' . $_custom_script;
 }
+$custom_head .= '
+    <script type="text/javascript" src="'.AT_print($_base_path, 'url.base').'jscripts/lib/jquery-scrolltofixed-min.js"></script>
+    <script type="text/javascript" src="'.AT_print($_base_path, 'url.base').'jscripts/lib/jquery.cookie.js"></script>';
 // Set session timeout warning if user is logged in
 if(isset($_SESSION['valid_user'])){
     // Setup the timeout warning when a user logs in
@@ -102,15 +105,15 @@ if(isset($_SESSION['valid_user'])){
 
     $session_timeout = intVal($_at_timeout) * 1000;
     $session_warning = 300 * 1000;                      // 5 minutes
-
+    
     $custom_head .= '
         <link rel="stylesheet"  type="text/css" href="'.AT_print($_base_path, 'url.base').'jscripts/lib/jquery-ui.css" />
         <script type="text/javascript" src="'.AT_print($_base_path, 'url.base').'jscripts/infusion/lib/jquery/core/js/jquery.js"></script>
         <script type="text/javascript" src="'.AT_print($_base_path, 'url.base').'jscripts/lib/jquery-ui.min.js"></script>
-        <script type="text/javascript" src="'.AT_print($_base_path, 'url.base').'jscripts/lib/jquery.cookie.js"></script>
         <script type="text/javascript" src="'.AT_print($_base_path, 'url.base').'jscripts/ATutorAutoLogout.js"></script>
+        <script type="text/javascript" src="'.AT_print($_base_path, 'url.base').'jscripts/lib/jquery.cookie.js"></script>
+        <script type="text/javascript" src="'.AT_print($_base_path, 'url.base').'jscripts/lib/jquery-scrolltofixed-min.js"></script>
     	<script type="text/javascript" src="'.AT_print($_base_path, 'url.base').'jscripts/lib/jquery.switch.min.js"></script>
-	    <script type="text/javascript" src="'.AT_print($_base_path, 'url.base').'jscripts/lib/jquery-scrolltofixed-min.js"></script>
         <link rel="stylesheet" type="text/css" href="'.AT_print($_base_path, 'url.base').'jscripts/lib/jquery.switch.css">';
     if(isset($_SESSION['member_id'])){
         $custom_head .= "\n".'    <script type="text/javascript">
@@ -200,7 +203,6 @@ if($_GET['mobile'] == '2'){
 }
 $_sub_level_pages        = get_sub_navigation($current_page);
 $_sub_level_pages_i        = get_sub_navigation_i($current_page);
-
 $_current_sub_level_page = get_current_sub_navigation_page($current_page);
 $_current_sub_level_page_i = get_current_sub_navigation_page_i($current_page);
 
@@ -315,7 +317,7 @@ $savant->assign('sub_level_pages', $_sub_level_pages);
 $savant->assign('sub_level_pages_i', $_sub_level_pages_i);
 $savant->assign('path', $_path);
 $savant->assign('back_to_page', isset($back_to_page) ? $back_to_page : null);
-$savant->assign('page_title', htmlspecialchars($_page_title, ENT_COMPAT, "UTF-8"));
+$savant->assign('page_title', stripslashes(htmlspecialchars($_page_title, ENT_COMPAT, "UTF-8")));
 $savant->assign('top_level_pages', $_top_level_pages);
 $savant->assign('section_title', $section_title);
 $savant->assign('content_keywords', $content_keywords);
@@ -383,30 +385,30 @@ function admin_switch(){
         <div class="admin_switch">	
             <form>
               <select id="admin_switch" name="hide_admin" title="switch">
-              <option value="1">Manage on</option>
-              <option value="0">Manage off</option>
+              <option value="1"><?php echo _AT('manage_on'); ?></option>
+              <option value="0"><?php echo _AT('manage_off'); ?></option>
                 </select>
             </form>
             <ul></ul>
 
         </div>
         <div class="bypass">
-            <a href="<?php echo htmlspecialchars($_SERVER['REQUEST_URI'], ENT_QUOTES); ?>#content">jump to admin tools</a>
+            <a href="<?php echo htmlspecialchars($_SERVER['REQUEST_URI'], ENT_QUOTES); ?>#admin_tools"><?php echo _AT('jump_to_admin_tools'); ?></a>
         </div>
     <?php } ?>
 <?php } 
 function mobile_switch(){ 
 	if(is_mobile_device() > 0) {?>
-		<ul id="mobile_switch">
+		<ul id="mobile_switch" title="<?php echo _AT('mobile_toggle'); ?>">
 			 <?php if($_SESSION['prefs']['PREF_RESPONSIVE'] > 0){ ?>
-				<li class="disabled left"><a href="<?php echo $_SERVER['PHP_SELF']; ?>?mobile=2"><?php echo _AT('mobile'); ?></a></li>
+				<li class="disabled left"><a href="<?php echo $_SERVER['PHP_SELF']; ?>?mobile=2"  title="<?php echo _AT("mobile_disabled"); ?>" aria-disabled="true"><?php echo _AT('mobile'); ?></a></li>
 			<?php }else{ ?>
 				<li class="active left"><?php echo _AT('mobile'); ?></li>
 			<?php } ?>
 			<?php if($_SESSION['prefs']['PREF_RESPONSIVE'] > 0){ ?>
 				<li  class="active right"><?php echo _AT('off'); ?></li>
 			<?php }else{ ?>
-				<li  class="disabled right"><a href="<?php echo $_SERVER['PHP_SELF']; ?>?mobile=1"><?php echo _AT('off'); ?></a></li>
+				<li  class="disabled right"><a href="<?php echo $_SERVER['PHP_SELF']; ?>?mobile=1"  title="<?php echo _AT("mobile_active"); ?>" aria-disabled="false"><?php echo _AT('off'); ?></a></li>
 			<?php } ?>
    
 		</ul>

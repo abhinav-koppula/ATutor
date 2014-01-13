@@ -381,6 +381,7 @@ function _AT() {
         }
         if (query_bit($_field_formatting[$name], AT_FORMAT_QUOTES)) {
             $input = str_replace('"', '&quot;', $input);
+            $input = str_replace('\\\'', '&apos;', $input);
             $input = str_replace('\'', '&apos;', $input);
         }
 
@@ -975,7 +976,7 @@ function format_content($input, $html = 0, $glossary, $simple = false) {
             // when the jquery UI tooltip supports the html display.
             //$def = htmlspecialchars($v, ENT_QUOTES, 'UTF-8');
             $def = htmlspecialchars(strip_tags($v), ENT_QUOTES, 'UTF-8');
-            
+
             if ($simple) {
                 $input = preg_replace
                         ("/(\[\?\])$term(\[\/\?\])/i",

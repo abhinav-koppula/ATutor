@@ -56,11 +56,11 @@ global $system_courses, $_custom_css, $db, $_base_path, $contentManager;
 // 1. any click on the page closes the content menu but the link "content_link" itself
 // 2. the click on link "content_link" opens the content menu
 
-require ('TeraWurflRemoteClient.php');
-$wurflObj = new TeraWurflRemoteClient('http://wurfl.thesedays.com/webservice.php');
-$capabilities = array("product_info");
-$data_format = TeraWurflRemoteClient::$FORMAT_JSON;
-$wurflObj->getCapabilitiesFromAgent(null, $capabilities, $data_format);
+//require ('TeraWurflRemoteClient.php');
+///$wurflObj = new TeraWurflRemoteClient('http://wurfl.thesedays.com/webservice.php');
+//$capabilities = array("product_info");
+//$data_format = TeraWurflRemoteClient::$FORMAT_JSON;
+//$wurflObj->getCapabilitiesFromAgent(null, $capabilities, $data_format);
 ?>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -287,7 +287,7 @@ $wurflObj->getCapabilitiesFromAgent(null, $capabilities, $data_format);
 		<div class="subnavcontain-contain" role="menu" aria-live="assertive">	
 			<div class="subnavcontain">
 				<div class="rectangle">
-				<a id="content_link_phone"  class="content-expand" href="javascript:void(0);" ><?php echo _AT(view_course_content); ?></a> 
+				<a id="content_link_phone"  class="content-expand" href="javascript:void(0);" ><?php echo _AT('view_course_content'); ?></a> 
 				<!-- <a href="#">content</a> -->
 				</div>
 			</div>
@@ -316,14 +316,14 @@ $wurflObj->getCapabilitiesFromAgent(null, $capabilities, $data_format);
 						if ($this->sequence_links['previous']): ?>
 					
 						<li class="rectangle2 arrow back">
-							<a  href="<?php echo $this->sequence_links['previous']['url']; ?>" class="arrow back" title="<?php echo _AT('previous_topic').': '. $this->sequence_links['previous']['title']; ?>"> <?php echo "Previous"; ?> </a>
+							<a  href="<?php echo $this->sequence_links['previous']['url']; ?>" class="arrow back" title="<?php echo _AT('previous_topic').': '. $this->sequence_links['previous']['title']; ?>"> <?php echo _AT('previous'); ?> </a>
 						</li>
 						
 					<?php endif;
 						if ($this->sequence_links['next']): ?>
 						
 						<li class=" rectangle2 arrow forward">
-							<a  href="<?php echo $this->sequence_links['next']['url']; ?>" class=""  title="<?php echo _AT('next_topic').': '.$this->sequence_links['next']['title']; ?>"> <?php echo "Next"; ?></a>
+							<a  href="<?php echo $this->sequence_links['next']['url']; ?>" class=""  title="<?php echo _AT('next_topic').': '.$this->sequence_links['next']['title']; ?>"> <?php echo _AT('next'); ?></a>
 						</li>
 						
 					<?php endif; ?>
@@ -429,12 +429,12 @@ $wurflObj->getCapabilitiesFromAgent(null, $capabilities, $data_format);
 						</li>
 				<?php else:
 					if ($this->sequence_links['previous']): ?>
-						<li  class="arrow back"><a  href="<?php echo $this->sequence_links['previous']['url']; ?>" class="arrow back" title="<?php echo _AT('previous_topic').': '. $this->sequence_links['previous']['title']; ?>"> <?php echo "Previous"; ?> </a>
+						<li  class="arrow back"><a  href="<?php echo $this->sequence_links['previous']['url']; ?>" class="arrow back" title="<?php echo _AT('previous_topic').': '. $this->sequence_links['previous']['title']; ?>"> <?php echo _AT('previous'); ?> </a>
 						</li>
 					<?php endif;
 					if ($this->sequence_links['next']): ?>
 						<li class="arrow forward">
-						<a href="<?php echo $this->sequence_links['next']['url']; ?>" class=""  title="<?php echo _AT('next_topic').': '.$this->sequence_links['next']['title']; ?>"> <?php echo "Next"; ?></a>
+						<a href="<?php echo $this->sequence_links['next']['url']; ?>" class=""  title="<?php echo _AT('next_topic').': '.$this->sequence_links['next']['title']; ?>"> <?php echo _AT('next'); ?></a>
 						</li>
 					<?php endif; ?>
 				<?php endif; ?>
@@ -447,7 +447,7 @@ $wurflObj->getCapabilitiesFromAgent(null, $capabilities, $data_format);
 		<?php if(isset($_SESSION['course_id']) && $_SESSION['course_id'] > 0): ?> 	
 		<div id="course-level-navigation" role="navigation" aria-live="assertive">
 			<div id="content-link-container" role="navigation" aria-live="assertive" class="flc-screenNavigator-navbar ">
-				<a id="content_link" class="content_link_tablet content_link"  href="javascript:void(0);"><?php echo "Content";//_AT("content_navigation"); ?></a>	
+				<a id="content_link" class="content_link_tablet content_link"  href="javascript:void(0);"><?php echo _AT("content"); ?></a>	
 			</div>	
 				<div id="content">
 					<?php $contentManager->printMainMenu(); ?>
@@ -491,7 +491,7 @@ $wurflObj->getCapabilitiesFromAgent(null, $capabilities, $data_format);
 									<?php endif; ?> 
 								<?php endif;?>
 								<?php if($i== 7): ?>
-									<li role="menuitem" class="more-button-surround" style="font-size: 14px; padding-left: .313em; padding-right: .313em; position: relative; top: .313em;"><a class="more-button" href="javascript:void(0);" tabindex="1"><img id="switch" border="" width="20" height="20" alt="More menu items" title="More menu items" src="<?php echo $this->base_href; ?>images/showmenu.gif"/></a></li>
+									<li role="menuitem" class="more-button-surround" style="font-size: 14px; padding-left: .313em; padding-right: .313em; position: relative; top: .313em;"><a class="more-button" href="javascript:void(0);" tabindex="1"><img id="switch" border="" width="20" height="20" alt="<?php echo _AT('more_menu_items'); ?>" title="<?php echo _AT('more_menu_items'); ?>" src="<?php echo $this->base_href; ?>images/showmenu.gif"/></a></li>
 									<li role="menuitem">
 									<ul class="subnavlist-more">
 									<li role="menuitem" class="more-item" style="font-size: 14px; list-style-type: bullet"><a href="<?php echo $this->sub_level_pages[$i]['url']; ?>"><?php echo $this->sub_level_pages[$i]['title']; ?></a></li>
