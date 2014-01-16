@@ -263,6 +263,10 @@ table.etabbed-table	{
 	text-decoration:none;
 	
 }
+.imggoback{
+height:1.5em;
+width:1.5em;
+}
 
 
 /* FROM HERE COPIED FROM THE BOTTOM OF DEFAULT/STYLES.CSS	 */
@@ -296,6 +300,14 @@ table.etabbed-table	{
     background:0 !important;
     background-image:0 !important;
     background-color:#F3F3F3 !important;
+}
+.scroll-to-fixed-fixed #subnavlistcontainer{
+    background-color: #F3F3F3;
+    background-image: linear-gradient(#FAFAFA, #EAEAEA)!important;
+}
+.scroll-to-fixed-fixed div#topnavlistcontainer{
+    background-color: #F3F3F3;
+    background-image: linear-gradient(#FAFAFA, #EAEAEA)!important;
 }
 #sm_content{
     display:none;
@@ -476,9 +488,13 @@ li.top-tool {
     float:right;
     clear:right;
 }
-.message_link a{
+a.message_link {
     margin-right:1em;
     margin-left:1em;
+    float:right;
+}
+#message ul{
+    width:90%;
 }
 #copyright{
 width:25em;
@@ -616,6 +632,7 @@ Responsive elements
         clear:left;        
         border:0;
     }
+
      div#subnavlist {
     }  
     #subnavlist_i{
@@ -625,6 +642,7 @@ Responsive elements
         margin-bottom:.6em;
         height:auto;
     }
+
     ul#topnavlist_sm li{
         border:0;
         float:left;
