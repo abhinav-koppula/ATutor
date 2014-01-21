@@ -1206,7 +1206,7 @@ div#container {
 div.column {
 /*	border: 1px solid #e0e0e0;*/
 	float: left;
-	width: 30%;
+	width: 40%;
 	margin: 5px;
 	padding: 0px;
 	min-width: 170px;
@@ -1323,7 +1323,7 @@ dl#public-profile dd {
 }
 
 #contentcolumn {
-	padding-left: 5px;
+	padding-left: 2em;
     overflow: auto;
 }
 
@@ -1342,6 +1342,8 @@ dl#public-profile dd {
 	width: 100%;
 	text-align: center;
 	padding: 4px 0px;
+	font-size:.8em;
+	left:0 !important;
 }
 
 .imggoback{
@@ -1359,18 +1361,18 @@ div#topnavlistcontainer {
     border-collapse: collapse;
     border-bottom: 1px solid #8CACBB;
     padding: 0.5em 0em 0em 2em;
-    font-size:0.85em;
     clear:left;
     width:100%;
-    margin-left:-1em;
+    margin-left:-2em;
 }
 ul#topnavlist {
 	padding: 0px;
-	margin-right: auto;
-	margin-left: auto;
 	margin-bottom: 3px;
 	margin-top: 0px;
 	margin-bottom:0px;
+	white-space:nowrap;
+    overflow-y:scroll;
+    height:2em;
 }
 
 ul#topnavlist li {
@@ -1378,7 +1380,7 @@ ul#topnavlist li {
 	list-style: none;
 	display: inline-block;
 	height:auto;
-	margin-top:.1em;
+	margin-top:.2em;
 	clear:both;
 
 }
@@ -1930,7 +1932,9 @@ div.bypass{
 
 div#subnavlistcontainer {
 	width:95%;
-	margin:auto;
+	margin-left:auto;
+	margin-right:auto;
+	margin-top:3em;
 	height:auto;
 	border-bottom: 1px solid #f0f0f0 !important;
 }
@@ -1953,8 +1957,8 @@ div.toolcontainer{
 ul#subnavlist {
 	padding-top: 4px;
 	margin-top: 0px;
+	text-transform: lowercase;
 	font-family: Verdana,Helvetica,Arial,serif;
-	font-size:.8em;
     border-bottom:0 !important
 
 }
@@ -1989,7 +1993,7 @@ ul#subnavlist li a {
 fieldset.group_form{
 	width:97%;
 	border:1px #70A1CA solid;
-   	min-height: 190px;
+   	min-height: 200px;
 	padding:.5em;
 	margin-right:1em;
 
@@ -2478,7 +2482,7 @@ Changes/additions to the default/styles.css to upgrade from 2.1 to 2.2 file to a
 */
 #leftcolumn{
 float:left;
-clear:left
+clear:left;
 width:20em;
 }
 
@@ -2499,7 +2503,7 @@ ul#subnavlist_i {
 	font-family: Verdana,Helvetica,Arial,serif;
     float:right;
     margin-top: -2.1em;
-    margin-right:2em;
+    margin-right:5em;
    /* background-image:url("images/wand.png");*/
     background-position: 1em .3em;
     background-repeat:no-repeat;
@@ -2754,6 +2758,7 @@ table.etabbed-table	{
 #lrg_topnav{
     padding-top:0em;
     padding-bottom:0em;
+    margin-bottom:.1em;
     display:inline;
     width:100%;
     height:auto;
@@ -2761,7 +2766,7 @@ table.etabbed-table	{
 }  
 #lrg_subnav{
     background:0 !important;
-    padding-top:1em;
+    margin-top:1em;
 }
 .scroll-to-fixed-fixed{
     background:0 !important;
@@ -2769,13 +2774,17 @@ table.etabbed-table	{
     background-color:#DEE7EC !important;
 }
 .scroll-to-fixed-fixed #subnavlistcontainer{
-    margin-top:.3em;
-	  background-color: #DEE7EC !important;        
-      background-image: linear-gradient(#DEE7EC, #AFCADB) !important;
+    margin-top:.7em;
+	  background-color: #DEE7EC;        
+      background-image: linear-gradient(#DEE7EC, #AFCADB)!important;
 }
 .scroll-to-fixed-fixed div#topnavlistcontainer{
 	  background-color: #DEE7EC !important;        
       background-image: linear-gradient(#DEE7EC, #AFCADB) !important;
+}
+.scroll-to-fixed-fixed div#topnavlistcontainer ul{
+    white-space:nowrap;
+    overflow:scroll;
 }
 .scroll-to-fixed-fixed div#topnavlistcontainer li a{
 	  background-color: #FFFFFF !important;        
@@ -2994,7 +3003,7 @@ a.message_link {
     width:90%;
 }
 #copyright{
-width:25em;
+width:35em;
 margin-left:auto;
 margin-right: auto;
 }
@@ -3006,9 +3015,8 @@ margin-right: auto;
       border-bottom:1px solid #F4F0CB; 
       height:1.5em;
       text-align:right;
-      padding-right:1em;
       padding-top:.7em;
-      padding-bottom:-.7em;
+      padding-right:1em;
       clear:both;
 }
 .pref_wiz_launcher img{
