@@ -1688,9 +1688,7 @@ div#topnavlistcontainer {
 	float:left;
 
 }
-.scroll-to-fixed-fixed div#topnavlistcontainer{
-    background-color:#F6F4DA !important;
-}
+
 ul#topnavlist {
     margin: 0; 
     padding: 0; 
@@ -1706,17 +1704,17 @@ ul#topnavlist {
 	font-family: 'Varela Round', Arial, Helvetica, sans-serif; 
 	height:2.9em;
     white-space:nowrap;
-    overflow-y:scroll;
-    overflow-y:hidden;
+    overflow-x:scroll;
+
  }
 
 ul#topnavlist li {
-	float:left;
+	display:inline;
 	list-style: none;
-	display: block; 
 	height:2.6em;
     padding: .7em .1em .7em .1em;
 	margin-bottom:-.5em;
+	white-space:nowrap;
 }
 
 ul#topnavlist li a:hover, ul#topnavlist li a:focus{
@@ -1742,7 +1740,7 @@ ul#topnavlist li a {
 	font-weight:400;
 	text-decoration:none;
 	background-color:transparent;
-    padding: .5em .4em .5em .4em;	
+    padding: 1.8em .4em .8em .4em;	
 }
 ul#topnavlist li a.selected {
     /* The selected tab. There's only one of these */
@@ -2688,7 +2686,8 @@ font-size:100%;
 }
 
 .fl-force-right{
-float:right;	
+float:right;
+padding:.1em;	
 	
 }
 img.fl-col{
@@ -3185,13 +3184,14 @@ li.likert-question {
     float:right;
 }
 
-/* a hack added to fix admin switch off invisible in ATutorspaces theme */
+/* a hack added to fix admin switch off, invisible in ATutorspaces theme */
 a.ui-switch-off{
     float: right;
-    margin-top: -1.6em !important;
-    border:thin solid black;
+    margin-top: -1.5em !important;
     margin-right:1.5em;
-    padding-right:1.5em;
+    margin-left:-.5em;
+    padding-right:2.5em;
+    text-align:left;
 }
 a.ui-switch-on{
     float: left;
@@ -3235,7 +3235,7 @@ ul#subnavlist_i li {
 	border-radius: .3em .3em 0em 0em;
 	-moz-border-radius: .3em .3em 0em 0em;
 	padding: .4em .5em .2em .5em ;
-	border-bottom: 3px solid blue;
+	border-bottom: 3px solid #555555;
 }
 
 ul#subnavlist li a:hover, ul#subnavlist li a:focus,  ul#subnavlist li a:hover,
@@ -3268,10 +3268,6 @@ ul#subnavlist span#showsubnav{
     width:2em;
     cursor:pointer;
     display:none;
-}
-
-.scroll-to-fixed-fixed #subnavlistcontainer{
-    background-color:#F6F4DA !important;
 }
 
 .site-name{
@@ -3336,7 +3332,6 @@ div#topnavlistcontainer {
 	/*background-image: url('images/pencil_bottom_ds.png'); */
 	height:1.8em;
 	padding-top:1em;
-	margin-left:1em;
 	clear:both;
 	float:left;
 }
@@ -3354,7 +3349,11 @@ width:15em;
 margin-left:0em;
 margin-top:-4.2em;
 }
-
+#gototop img{
+height:1.5em;
+width:1.5em;
+margin-right:1.5em;
+}
 /** forum stuff **/
 .forum-thread li { border-bottom: 1px solid #F7F3ED; float:left; width: 97%; list-style: none; }
 .forum-thread li.even { background-color: #F5F9FC; border-top: none;}
@@ -3488,6 +3487,17 @@ table.etabbed-table	{
     background-image:0 !important;
     background-color:#575656 !important;
 }
+.scroll-to-fixed-fixed div#topnavlistcontainer{
+    background-color:#F6F4DA !important;
+}
+.scroll-to-fixed-fixed div#topnavlistcontainer > ul{
+    white-space:nowrap;
+    overflow:scroll;
+} 
+.scroll-to-fixed-fixed #subnavlistcontainer{
+    background-color:#F6F4DA !important;
+}
+
 #sm_content{
     display:none;
 }
