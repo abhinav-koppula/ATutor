@@ -122,29 +122,12 @@ global $system_courses, $_custom_css, $db;
 	<a href="<?php echo htmlspecialchars($_SERVER['REQUEST_URI'], ENT_QUOTES); ?>#menu<?php if(isset($_REQUEST['cid'])){echo htmlentities_utf8($_REQUEST['cid']);}  ?>"  accesskey="m" title="<?php echo _AT('goto_menu'); ?> Alt-m"><?php echo _AT('goto_menu'); ?></a>
 </div>	
 
+	<?php if (isset($_SESSION['valid_user']) && $_SESSION['valid_user']): 
+		echo '<div class="site-name">'.stripslashes(SITE_NAME).'</div>'; 
+	else:
+		echo '<div class="site-name">&nbsp;</div>';	
+	endif; ?>
 
-
-<div class="logoutbar">
-	<div id="userlinks">
-		<?php if (isset($_SESSION['valid_user']) && $_SESSION['valid_user']): ?>
-		<?php $path_parts = explode("/", $this->current_top_level_page); 
-		      $last_path_part = $path_parts[sizeof($path_parts) - 1];
-               if (!admin_authenticate(AT_ADMIN_PRIV_ADMIN, AT_PRIV_RETURN) && $last_path_part != 'preferences.php') {?>
-		    <a href="#" class="pref_wiz_launcher"><img alt="<?php echo _AT('preferences').' - '._AT('new_window'); ?>" title="<?php echo _AT('preferences').' - '._AT('new_window'); ?>"  src="<?php echo $this->img; ?>wand.png" class="img1616" style="margin-bottom:-.5em;"/></a> |
-		    <?php } ?> 
-			<strong><?php echo get_display_name($_SESSION['member_id']); ?></strong> | 
-			<a href="<?php echo $this->base_path; ?>logout.php"><?php echo _AT('logout'); ?></a>
-		<?php else: ?>
-			 <a href="<?php echo $this->base_path; ?>login.php?course=<?php echo $this->course_id; ?>"><?php echo _AT('login'); ?></a> | <a href="<?php echo $this->base_path; ?>registration.php"><?php echo _AT('register'); ?></a>
-		<?php endif; ?>
-	</div>
-</div>
-
-</div>
-
-<div class="page_wrapper">
-
-<div id="header">
 	<div id="top-links"  role="navigation"> 
 	<!-- top help/search/login links -->
 		<?php if (isset($_SESSION['member_id']) && $_SESSION['member_id']): ?>
@@ -194,11 +177,24 @@ global $system_courses, $_custom_css, $db;
 		<a href="<?php echo $this->base_path; ?>help/index.php"><?php echo _AT('help'); ?></a>	
 		</div>
 	</div>
-	<?php if (isset($_SESSION['valid_user']) && $_SESSION['valid_user']): 
-		echo '<div class="site-name">'.stripslashes(SITE_NAME).'</div>'; 
-	else:
-		echo '<div class="site-name">&nbsp;</div>';	
-	endif; ?>
+</div>
+<div class="page_wrapper">
+
+<div id="header">
+
+
+	<?php
+	// If there is a custom course banner in the file manager called banner.html, display it here
+	@readfile(AT_CONTENT_DIR . $this->course_id.'/banner.html'); 
+
+	/*
+	and example banner.html file might look like:
+	<div style="width: 760px; height: 42px; background: white;"><img src="http://[mysite]/atutor15rc3/banners/kart-camb.jpg"></div>
+	*/
+
+	?>
+	<!-- section title -->
+
 	<!-- Course Title -->
 	<div id="course_title_container" <?php if(empty($this->icon)){echo ' style="left:1em;"';}   ?> role="banner">
 	<?php if(isset($_SESSION['valid_user'])):?>
@@ -213,20 +209,43 @@ global $system_courses, $_custom_css, $db;
 	</h1>
 	<?php endif; ?>
 	</div>
-	<?php
-	// If there is a custom course banner in the file manager called banner.html, display it here
-	@readfile(AT_CONTENT_DIR . $this->course_id.'/banner.html'); 
-
-	/*
-	and example banner.html file might look like:
-	<div style="width: 760px; height: 42px; background: white;"><img src="http://[mysite]/atutor15rc3/banners/kart-camb.jpg"></div>
-	*/
-
-	?>
-	<!-- section title -->
-
+</div>
+<!-- the main navigation. in our case, tabs -->
+<div id="lrg_topnav">
+    <div id="topnavlistcontainer" role="navigation">
+        <a name="main-nav"></a>
+        <ul id="topnavlist">
+            <?php $accesscounter = 0; //initialize ?>
+            <?php foreach ($this->top_level_pages as $page): ?>
+                <?php ++$accesscounter; $accesscounter = ($accesscounter == 10 ? 0 : $accesscounter); ?>
+                <?php $accesskey_text = ($accesscounter < 10 ? 'accesskey="'.$accesscounter.'"' : ''); ?>
+                <?php $accesskey_title = ($accesscounter < 10 ? ' Alt+'.$accesscounter : ''); ?>
+                <?php if ($page['url'] == $this->current_top_level_page): ?>
+                    <li><a href="<?php echo $page['url']; ?>" <?php echo $accesskey_text; ?> title="<?php echo $page['title'] . $accesskey_title; ?>" class="active"><?php echo $page['title']; ?></a></li>
+                <?php else: ?>
+                    <li><a href="<?php echo $page['url']; ?>" <?php echo $accesskey_text; ?> title="<?php echo $page['title'] . $accesskey_title; ?>"><?php echo $page['title']; ?></a></li>
+                <?php endif; ?>
+                <?php $accesscounter = ($accesscounter == 0 ? 11 : $accesscounter); ?>
+            <?php endforeach; ?>
+        </ul>
+    </div> 
 </div>
 
+<div class="logoutbar">
+	<div id="userlinks">
+		<?php if (isset($_SESSION['valid_user']) && $_SESSION['valid_user']): ?>
+		<?php $path_parts = explode("/", $this->current_top_level_page); 
+		      $last_path_part = $path_parts[sizeof($path_parts) - 1];
+               if (!admin_authenticate(AT_ADMIN_PRIV_ADMIN, AT_PRIV_RETURN) && $last_path_part != 'preferences.php') {?>
+		    <a href="" class="pref_wiz_launcher"><img alt="<?php echo _AT('preferences').' - '._AT('new_window'); ?>" title="<?php echo _AT('preferences').' - '._AT('new_window'); ?>"  src="<?php echo $this->img; ?>wand.png" class="img1616" style="margin-bottom:-.5em;"/></a> |
+		    <?php } ?> 
+			<strong><?php echo get_display_name($_SESSION['member_id']); ?></strong> | 
+			<a href="<?php echo $this->base_path; ?>logout.php"><?php echo _AT('logout'); ?></a>
+		<?php else: ?>
+			 <a href="<?php echo $this->base_path; ?>login.php?course=<?php echo $this->course_id; ?>"><?php echo _AT('login'); ?></a> | <a href="<?php echo $this->base_path; ?>registration.php"><?php echo _AT('register'); ?></a>
+		<?php endif; ?>
+	</div>
+</div>
 
 <div id="sm_topnav">
     <?php if ($this->current_sub_level_page): ?>
@@ -258,27 +277,6 @@ global $system_courses, $_custom_css, $db;
     </div>
 
 </div>	
-
-<!-- the main navigation. in our case, tabs -->
-<div id="lrg_topnav">
-    <div id="topnavlistcontainer" role="navigation">
-        <a id="main-nav"></a>
-        <ul id="topnavlist">
-            <?php $accesscounter = 0; //initialize ?>
-            <?php foreach ($this->top_level_pages as $page): ?>
-                <?php ++$accesscounter; $accesscounter = ($accesscounter == 10 ? 0 : $accesscounter); ?>
-                <?php $accesskey_text = ($accesscounter < 10 ? 'accesskey="'.$accesscounter.'"' : ''); ?>
-                <?php $accesskey_title = ($accesscounter < 10 ? ' Alt+'.$accesscounter : ''); ?>
-                <?php if ($page['url'] == $this->current_top_level_page): ?>
-                    <li><a href="<?php echo $page['url']; ?>" <?php echo $accesskey_text; ?> title="<?php echo $page['title'] . $accesskey_title; ?>" class="active"><?php echo $page['title']; ?></a></li>
-                <?php else: ?>
-                    <li><a href="<?php echo $page['url']; ?>" <?php echo $accesskey_text; ?> title="<?php echo $page['title'] . $accesskey_title; ?>"><?php echo $page['title']; ?></a></li>
-                <?php endif; ?>
-                <?php $accesscounter = ($accesscounter == 0 ? 11 : $accesscounter); ?>
-            <?php endforeach; ?>
-        </ul>
-    </div> 
-</div>
   <?php if (isset($_SESSION["prefs"]["PREF_SHOW_BREAD_CRUMBS"]) && $_SESSION["prefs"]["PREF_SHOW_BREAD_CRUMBS"]) { ?>
 		  <!-- the bread crumbs -->
 		<div class="crumbcontainer" role="navigation">
@@ -288,7 +286,7 @@ global $system_courses, $_custom_css, $db;
 			  <?php endforeach; ?> <?php echo $this->page_title; ?>
 		  </div>
 	  <?php } else { ?>
-	   <div class="crumbcontainer">
+	   <div class="crumbcontainer" style="padding-bottom:1.2em;">
 	  <?php } ?>
 		  <?php if (isset($this->guide) && isset($_SESSION["course_id"]) && $this->guide && ($_SESSION["prefs"]["PREF_SHOW_GUIDE"] || $_SESSION["course_id"] == "-1")) : ?>
       <div id="guide_box">
@@ -337,12 +335,12 @@ global $system_courses, $_custom_css, $db;
 
 	
 	<div id="contentcolumn"  role="main">
-		<?php  admin_switch(); ?>
 		<?php if (isset($this->course_id) && $this->course_id > 0 && $system_courses[$this->course_id]['side_menu']): ?>
 		<div id="menutoggle">
 		   <a href="javascript:void(0)" accesskey="n"><img src="" title="" alt="" class="img1616"/></a>
 		</div>
 		<br />
+		<?php  admin_switch(); ?>
 		<div class="sequence-links">
 		<?php if ($_SESSION["prefs"]["PREF_SHOW_NEXT_PREVIOUS_BUTTONS"]) { ?>
 			<?php if ($this->sequence_links['resume']): ?>
@@ -361,7 +359,7 @@ global $system_courses, $_custom_css, $db;
 		<?php endif; ?>
 
 	<!-- the page title -->
-	<a id="content"  title="<?php echo _AT('content'); ?>"></a>
+	<a id="content" name="content" title="<?php echo _AT('content'); ?>"></a>
 	<h2 class="page-title"><?php echo $this->page_title; ?></h2>
 	
 	<div id="message">
@@ -372,7 +370,7 @@ global $system_courses, $_custom_css, $db;
 	<?php  if (count($this->sub_level_pages) > 1 || $this->sub_level_pages_i > 0): ?>
 	<div id="lrg_subnav">
 		<div id="subnavlistcontainer" role="navigation">
-		<a id="admin_tools" title="<?php echo _AT("course_admin_tools"); ?>"></a>
+		<a name="admin_tools" id="admin_tools" title="<?php echo _AT("course_admin_tools"); ?>"></a>
 			<div id="subnavbacktopage">
 			<?php if (isset($this->back_to_page)): ?>
 				<a href="<?php echo $this->back_to_page['url']; ?>">
@@ -418,9 +416,9 @@ global $system_courses, $_custom_css, $db;
 			 
 			 ?>
             <span id="manage_off" title="<?php echo _AT('manage_tools_off'); ?>" aria-live="polite"></span>
-            <span id="manage_on" title="<?php echo _AT('manage_tools_on'); ?>" aria-live="polite"></span>
+            <a name="admin_tools"></a>
 			<ul id="subnavlist_i" role="navigation"  aria-label="<?php echo _AT('manage_navigation_bar'); ?>">
-            
+            <span id="manage_on" title="<?php echo _AT('manage_tools_on'); ?>" aria-live="polite"></span>
 			<?php for ($i=0; $i<$num_pages_i; $i++): 
 			?>
 

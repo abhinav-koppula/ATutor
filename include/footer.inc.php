@@ -16,10 +16,63 @@ global $next_prev_links;
 global $_base_path, $_my_uri;
 global $_stacks, $db;
 global $system_courses;
+global $_config_defaults;
+global $_config;
 
 $side_menu = array();
 $stack_files = array();
 
+function get_custom_logo() {
+    global $_config;
+    $path_gif = AT_CONTENT_DIR.'logos/custom_logo.gif';
+    $path_jpg = AT_CONTENT_DIR.'logos/custom_logo.jpg';
+    $path_png = AT_CONTENT_DIR.'logos/custom_logo.png';
+    
+    if(file_exists($path_gif))
+        $ext = 'gif';
+    else if(file_exists($path_jpg))
+        $ext = 'jpg';
+    else if(file_exists($path_png))
+        $ext = 'png';
+    
+    if($_config['custom_logo_enabled'] && isset($ext) && ($ext=='gif' || $ext=='jpg' || $ext=='png')) {
+        if (defined('AT_FORCE_GET_FILE')) {
+            if(isset($_REQUEST['cid']) && $_REQUEST['cid']>0) {
+                $file = 'custom_logo.'.$ext;
+            } else if(!isset($_REQUEST['cid']) && isset($_SESSION['course_id']) && $_SESSION['course_id']>0) {
+                $file = 'get.php/custom_logo.'.$ext;
+            } else {
+                $file = 'get_custom_logo.php';
+            }
+        } else {
+            $dir = 'content/logos/custom_logo.';
+            $file = $dir.$ext;
+        }
+        $path_to_logo = $file;
+        
+    } else {
+        if($_SESSION['prefs']['PREF_THEME']=='atspaces') {
+            $path_to_logo = AT_BASE_HREF."themes/atspaces/images/atspaces_logo49.jpg";
+        } else {
+            $path_to_logo = AT_BASE_HREF."images/AT_Logo_1_sm.png";
+        }
+    }
+        
+    return $path_to_logo;
+}
+ 
+$custom_logo_url = $_config_defaults['custom_logo_url'];
+$custom_logo_alt_text = $_config_defaults['custom_logo_alt_text'];
+if($_SESSION['prefs']['PREF_THEME'] == 'atspaces') {
+    $custom_logo_alt_text = 'ATutorSpaces Logo';
+}
+if($_config['custom_logo_enabled']) {
+    $custom_logo_url = $_config['custom_logo_url'];
+    $custom_logo_alt_text = $_config['custom_logo_alt_text'];
+}
+
+$savant->assign('custom_logo_url', $custom_logo_url);
+$savant->assign('custom_logo_alt_text', $custom_logo_alt_text);
 
 if (isset($_SESSION['course_id']) && $_SESSION['course_id'] > 0) {
 	$savant->assign('my_uri', $_my_uri);
