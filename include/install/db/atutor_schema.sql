@@ -813,6 +813,8 @@ CREATE TABLE `tests` (
   `failfeedback` TEXT,
   `show_guest_form` TINYINT(1) UNSIGNED NOT NULL default '0',
   `remedial_content` tinyint(1) unsigned DEFAULT '0',
+  `timed_test` TINYINT(1) NOT NULL DEFAULT '0',
+  `timed_test_duration` INT(11) NOT NULL DEFAULT '0',
   PRIMARY KEY  (`test_id`)
 ) ENGINE = MyISAM;
 
@@ -921,6 +923,7 @@ CREATE TABLE `tests_results` (
   `status` TINYINT NOT NULL DEFAULT '0',
   `end_time` TIMESTAMP NOT NULL ,
   `max_pos` TINYINT UNSIGNED NOT NULL DEFAULT '0',
+  `test_timer` INT(11) NOT NULL DEFAULT '0', 
   PRIMARY KEY  (`result_id`),
   KEY `test_id` (`test_id`)
 ) ENGINE = MyISAM;

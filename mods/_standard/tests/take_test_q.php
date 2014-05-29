@@ -32,6 +32,23 @@ else
 $sql		= "SELECT *, UNIX_TIMESTAMP(start_date) AS start_date, UNIX_TIMESTAMP(end_date) AS end_date FROM %stests WHERE test_id=%d AND course_id=%d";
 $test_row = queryDB($sql, array(TABLE_PREFIX, $tid, $_SESSION['course_id']), TRUE);
 
+$timed_test = $test_row['timed_test'];
+$timed_test_duration = $test_row['timed_test_duration'];
+
+if(isset($_POST['test_timer_hidden'])) {
+    $timer = $_POST['test_timer_hidden'];
+} else {
+    
+    $sql = "SELECT result_id, test_timer FROM %stests_results WHERE member_id=%d AND test_id=%d AND status=0";
+    $row  = queryDB($sql, array(TABLE_PREFIX, $mid, $tid), TRUE);
+    if(count($row) == 0)
+    {
+        $timer = $timed_test_duration;
+    } else {
+        $timer = $row['test_timer'];
+    }
+}
+
 /* check to make sure we can access this test: */
 if (!$test_row['guests'] && ($_SESSION['enroll'] == AT_ENROLL_NO || $_SESSION['enroll'] == AT_ENROLL_ALUMNUS)) {
 	require(AT_INCLUDE_PATH.'header.inc.php');
@@ -80,6 +97,12 @@ if (!isset($_GET['pos'])) {
 
 $max_pos = 0;
 
+if(!isset($_GET['test_timeout'])) {
+    $test_timeout = 0;
+} else {
+    $test_timeout = 1;
+}
+
 // get and check for a valid result_id. if there is none then get all the questions and insert them as in progress.
 // note: for guests without guest information, the result_id is stored in session, but no need to really know that here;
 //       for guests with guest information, always start a new test.
@@ -111,7 +134,7 @@ if ($result_id == 0) {
 	// basically, shouldn't be able to post to this page if there isn't a valid result_id first (how can someone post an answer
 	// to a question they haven't viewed? [unless they're trying to 'hack' something])
 
-	$result_id = init_test_result_questions($tid, (bool) $test_row['random'], $test_row['num_questions'], $mid);
+	$result_id = init_test_result_questions($tid, (bool) $test_row['random'], $test_row['num_questions'], $mid, $timer);
 
 	if (!$_SESSION['member_id']) {
 		// this is a guest, so we store the result_id in SESSION
@@ -128,7 +151,11 @@ if ($result_id == 0) {
 
 	// assuming only one question is displayed	
 	$question_id = intval(key($_POST['answers']));
-
+    
+    //update the test timer field in results table, if test is not timed, timer would have 0 value
+    $sql = "UPDATE %stests_results SET test_timer=%d WHERE result_id=%d";
+    queryDB($sql, array(TABLE_PREFIX, $timer, $result_id));
+    
 	// get the old score (incase this question is being re-answered)
 	$sql = "SELECT score FROM %stests_answers WHERE result_id=%d AND question_id=%d";
 	$row= queryDB($sql, array(TABLE_PREFIX, $result_id, $question_id), TRUE);
@@ -147,7 +174,7 @@ if ($result_id == 0) {
 
 			$sql	= "UPDATE %stests_answers SET answer='%s', score='%s' WHERE result_id=%d AND question_id=%d";
 			queryDB($sql, array(TABLE_PREFIX, $_POST['answers'][$row['question_id']], $score, $result_id, $row['question_id']));			
-
+            
 			if (is_null($score) && $test_row['result_release']==AT_RELEASE_MARKED)
 				$_REQUEST['efs'] = 1; // set final score to empty if there's any unmarked question and release option is "once quiz submitted and all questions are marked"
 		}
@@ -183,7 +210,7 @@ if ($result_id == 0) {
 		}
 	}
 
-	if ($pos >= $test_row['num_questions']) {
+	if (($pos >= $test_row['num_questions']) || ($test_timeout == 1)) {
 		// end of the test.
 		$sql	= "UPDATE %stests_results SET status=1, date_taken=date_taken, end_time=NOW() WHERE result_id=%d";
 		$result	= queryDB($sql, array(TABLE_PREFIX, $result_id));
@@ -242,13 +269,17 @@ if (count($question_row)==0) {
 }
 
 ?>
-<form method="post" action="<?php echo $_SERVER['PHP_SELF']; ?>?pos=<?php echo $pos; ?>">
+<form method="post" id="test_form" action="<?php echo $_SERVER['PHP_SELF']; ?>?pos=<?php echo $pos; ?>">
 <input type="hidden" name="tid" value="<?php echo $tid; ?>" />
 <?php if (isset($_REQUEST['cid'])) {?> <input type="hidden" name="cid" value="<?php echo $cid; ?>" /> <?php }?>
 
 <div class="input-form" style="width:95%">
 
 	<fieldset class="group_form"><legend class="group_form"><?php echo $title ?> (<?php echo _AT('question').' '. ($pos+1).'/'.$test_row['num_questions']; ?>)</legend>
+        <div id ="test_timer">
+        </div>
+        <input type="hidden" name="test_timer_hidden" id="test_timer_hidden" value="0" />
+        <input type="hidden" name="test_type" id="test_type" value="single_question_page" />
 	<?php if ($_REQUEST['efs']){?>
 	<input type="hidden" name="efs" value=<?php echo $_REQUEST['efs']; ?> />
 	<?php }?>
@@ -268,13 +299,46 @@ if (count($question_row)==0) {
 			<input type="submit" name="previous" value="<?php echo _AT('previous'); ?>" />
 		<?php endif; ?>
 		<?php if (($pos+1) == $test_row['num_questions']): ?>
-			<input type="submit" name="next" value="<?php echo _AT('submit'); ?>" accesskey="s" onclick="confirmSubmit(this, '<?php echo $addslashes(_AT("test_confirm_submit")); ?>'); return false;"/>
+			<input type="submit" name="next" value="<?php echo _AT('submit'); ?>" id="submit_test" accesskey="s" onclick="confirmSubmit(this, '<?php echo $addslashes(_AT("test_confirm_submit")); ?>'); return false;"/>
 		<?php else: ?>
-			<input type="submit" name="next" value="<?php echo _AT('next'); ?>" accesskey="s" />
+			<input type="submit" name="next" value="<?php echo _AT('next'); ?>" id="submit_test" accesskey="s" />
 		<?php endif; ?>
 	</div>
 	</fieldset>
 </div>
 </form>
+<script type="text/javascript"> 
+    $(window).bind('beforeunload', function() {
+        $.post("<?php echo AT_BASE_HREF."mods/_standard/tests/";?>save_answers_ajax.php", 
+            $("#test_form").serialize(),
+            function(data)
+            {
+                console.log(data);
+            }
+        );
+        return "You haven't submitted the assessment.";
+    });
+    
+    $(document).ready(function(){
+        <?php
+        if($timed_test == 1)
+        {
+        ?>
+            CreateTimer("test_timer", "test_timer_hidden", <?php echo $timer;?>);
+        <?php
+        }
+        ?>
+        TestTimeout({
+            title                   : "Time Up!",
+            message                 : "Time Up. Your answers will be submitted.",
+            buttons                 : { "Ok": function() { $(this).dialog("close"); 
+            }}
+        });
+        
+        $('#test_form').submit(function() {
+            $(window).unbind('beforeunload');
+        });
+    });
+</script>
 <script type="text/javascript" src="<?php echo $_base_href;?>/mods/_standard/tests/lib/take_test.js">
 <?php require(AT_INCLUDE_PATH.'footer.inc.php'); ?>

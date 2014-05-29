@@ -38,10 +38,10 @@ function get_test_result_id($test_id, &$max_pos) {
     return 0;
 }
 
-function init_test_result_questions($test_id, $is_random, $num_questions, $mid) {
+function init_test_result_questions($test_id, $is_random, $num_questions, $mid, $test_timer) {
 
-    $sql    = "INSERT INTO %stests_results VALUES (NULL, %d, '%s', NOW(), '', 0, NOW(), 0)";
-    $result = queryDB($sql, array(TABLE_PREFIX, $test_id, $mid));
+    $sql    = "INSERT INTO %stests_results VALUES (NULL, %d, '%s', NOW(), '', 0, NOW(), 0, %d)";
+    $result = queryDB($sql, array(TABLE_PREFIX, $test_id, $mid, $test_timer));
     $result_id = at_insert_id();
     
     if ($is_random) {

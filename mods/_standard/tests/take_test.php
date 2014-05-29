@@ -64,6 +64,8 @@ if ( (($test_row['start_date'] > time()) || ($test_row['end_date'] < time())) ||
 
 if (isset($_POST['submit'])) {
     $post_gid = $_POST['gid'];
+    $test_completion_time = $_POST['test_timer_hidden'];
+    
     // insert
     if (!isset($post_gid)) {
 
@@ -73,8 +75,8 @@ if (isset($_POST['submit'])) {
 
     } else {
 
-        $sql = 'INSERT INTO %stests_results VALUES (NULL, %d, %d, NOW(), "", 0, NOW(), 0)';
-        $result = queryDB($sql, array(TABLE_PREFIX, $tid, $post_gid));
+        $sql = 'INSERT INTO %stests_results VALUES (NULL, %d, %d, NOW(), "", 0, NOW(), 0, %d)';
+        $result = queryDB($sql, array(TABLE_PREFIX, $tid, $post_gid, $test_completion_time));
         $result_id = at_insert_id();
     }
 
@@ -113,8 +115,8 @@ if (isset($_POST['submit'])) {
     // update the final score
     // update status to complate to fix refresh test issue.
 
-    $sql = 'UPDATE %stests_results SET final_score=%s, date_taken=date_taken, status=1, end_time=NOW() WHERE result_id=%d';
-    $result    = queryDB($sql, array(TABLE_PREFIX, ($set_empty_final_score) ? 'NULL' : $final_score, $result_id));
+    $sql = 'UPDATE %stests_results SET final_score=%s, date_taken=date_taken, status=1, end_time=NOW(), test_timer=%d WHERE result_id=%d';
+    $result    = queryDB($sql, array(TABLE_PREFIX, ($set_empty_final_score) ? 'NULL' : $final_score, $test_completion_time, $result_id));
 
     $msg->addFeedback('ACTION_COMPLETED_SUCCESSFULLY');
     if ((!$enroll && !isset($cid)) || $test_row['result_release']==AT_RELEASE_IMMEDIATE) {
@@ -137,6 +139,8 @@ $content_id = $test_row['content_id'];
 $anonymous = $test_row['anonymous'];
 $instructions = $test_row['instructions'];
 $title = $test_row['title'];
+$timed_test = $test_row['timed_test'];
+$timed_test_duration = $test_row['timed_test_duration'];
 
 $_letters = array(_AT('A'), _AT('B'), _AT('C'), _AT('D'), _AT('E'), _AT('F'), _AT('G'), _AT('H'), _AT('I'), _AT('J'));
 
@@ -144,8 +148,15 @@ $_letters = array(_AT('A'), _AT('B'), _AT('C'), _AT('D'), _AT('E'), _AT('F'), _A
 // this is the only place in the code that makes sure there is only ONE 'in progress' test going on.
 $in_progress = false;
 
-$sql = "SELECT result_id FROM %stests_results WHERE member_id=%d AND test_id=%d AND status=0";
+$sql = "SELECT result_id, test_timer FROM %stests_results WHERE member_id=%d AND test_id=%d AND status=0";
 $row  = queryDB($sql, array(TABLE_PREFIX, $member_id, $tid), TRUE);
+
+if(count($row) == 0)
+{
+    $timer = $timed_test_duration;
+} else {
+    $timer = $row['test_timer'];
+}
 
 if(count($row) > 0){
 
@@ -210,13 +221,13 @@ if (count($rows_questions) == 0 || !$questions) {
 // save $questions with no response, and set status to 'in progress' in test_results <---
 if (!$gid && !$in_progress) {
 
-    $sql = 'INSERT INTO %stests_results VALUES (NULL, %d, %d, NOW(), "", 0, NOW(), 0)';
-    $result = queryDB($sql, array(TABLE_PREFIX, $tid, $member_id));
+    $sql = 'INSERT INTO %stests_results VALUES (NULL, %d, %d, NOW(), "", 0, NOW(), 0, %d)';
+    $result = queryDB($sql, array(TABLE_PREFIX, $tid, $member_id, $timer));
     $result_id = at_insert_id();
 
 }
 ?>
-<form method="post" action="<?php echo $_SERVER['PHP_SELF']; ?>">
+<form id="test_form" method="post" action="<?php echo $_SERVER['PHP_SELF']; ?>">
 <input type="hidden" name="tid" value="<?php echo $tid; ?>" />
 
 <?php
@@ -231,7 +242,10 @@ if (!$gid && !$in_progress) {
 <div class="input-form" style="width:95%">
     <fieldset class="group_form"><legend class="group_form"><?php echo $title ?></legend>
 
-
+        <div id ="test_timer">
+        </div>
+        <input type="hidden" name="test_timer_hidden" id="test_timer_hidden" value="0" />
+        <input type="hidden" name="test_type" id="test_type" value="all_question_page" />
     <?php if ($instructions!=''): ?>
         <div class="test_instruction">
             <strong><?php echo _AT('instructions'); ?></strong>
@@ -246,23 +260,62 @@ if (!$gid && !$in_progress) {
     <?php
     foreach ($questions as $row) {
         if (!isset($post_gid) && !$in_progress) {
-
+            
             $sql    = "INSERT INTO %stests_answers VALUES (%d, %d, %d, '', '', '')";
             queryDB($sql, array(TABLE_PREFIX, $result_id, $row[question_id], $member_id));
         }
-
+        
+        // retrieve the answer to re-populate the form (so we can edit our answer)
+        $sql = "SELECT answer FROM %stests_answers WHERE result_id=%d AND question_id=%d";
+        $row_answer = queryDB($sql, array(TABLE_PREFIX, $result_id, $row['question_id']), TRUE);
+        
         $obj = TestQuestions::getQuestion($row['type']);
-        $obj->display($row);
+        $obj->display($row, $row['answer']);
     }
     ?>
     <div class="test_instruction">
         <strong><?php echo _AT('done'); ?>!</strong>
     </div>
     <div class="row buttons">
-        <input type="submit" name="submit" value="<?php echo _AT('submit'); ?>" accesskey="s" onclick="confirmSubmit(this, '<?php echo $addslashes(_AT("test_confirm_submit")); ?>'); return false;"/>
+        <input type="submit" id="submit_test" name="submit" value="<?php echo _AT('submit'); ?>" accesskey="s" onclick="confirmSubmit(this, '<?php echo $addslashes(_AT("test_confirm_submit")); ?>'); return false;"/>
     </div>
     </fieldset>
 </div>
 </form>
 <script type="text/javascript" src="<?php echo $_base_href;?>/mods/_standard/tests/lib/take_test.js"></script>
+<script type="text/javascript">
+        
+    $(window).bind('beforeunload', function() {
+        $.post("<?php echo AT_BASE_HREF."mods/_standard/tests/";?>save_answers_ajax.php", 
+            $("#test_form").serialize(),
+            function(data)
+            {
+                console.log(data);
+            }
+        );
+        return "You haven't submitted the assessment.";
+    });
+    
+    $(document).ready(function(){
+        <?php
+        if($timed_test == 1)
+        {
+        ?>
+            CreateTimer("test_timer", "test_timer_hidden", <?php echo $timer;?>);
+        <?php
+        }
+        ?>
+        TestTimeout({
+            title                   : "Time Up!",
+            message                 : "Time Up. Your answers will be submitted.",
+            buttons                 : { "Ok": function() { $(this).dialog("close"); 
+            }}
+        });
+        
+        $('#test_form').submit(function() {
+            $(window).unbind('beforeunload');
+        });
+    });
+    
+</script>
 <?php require(AT_INCLUDE_PATH.'footer.inc.php'); ?>
