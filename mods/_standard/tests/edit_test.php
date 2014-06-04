@@ -49,6 +49,8 @@ if (isset($_POST['cancel'])) {
     $_POST['result_release']    = intval($_POST['result_release']);
     $_POST['remedial_content']    = intval($_POST['remedial_content']);
 */
+    $_POST['timed_test'] = intval($_POST['timed_test']);
+    
     /* this doesn't actually get used: */
     $_POST['difficulty'] = intval($_POST['difficulty']);
     if ($_POST['difficulty'] == '') {
@@ -70,7 +72,14 @@ if (isset($_POST['cancel'])) {
     if ($_POST['random'] && !$_POST['num_questions']) {
         $missing_fields[] = _AT('num_questions_per_test');
     }
-
+    
+    if($_POST['timed_test']) {
+        if(!$_POST['timed_test_hours'] && !$_POST['timed_test_minutes'] && !$_POST['timed_test_seconds'])
+        $missing_fields[] = _AT('timed_test_duration_zero');
+        if($_POST['timed_test_hours'] < 0 || $_POST['timed_test_minutes'] < 0 || $_POST['timed_test_seconds'] < 0 )
+        $missing_fields[] = _AT('timed_test_duration_negative');
+    }
+        
     if ($_POST['pass_score']==1 && !$_POST['passpercent']) {
         $missing_fields[] = _AT('percentage_score');
     }
@@ -163,6 +172,13 @@ if (isset($_POST['cancel'])) {
             } else {
                 $total_weight = get_total_weight($tid);
             }
+            
+            if ($_POST['timed_test']) {
+                $timed_test_duration = intval($_POST['timed_test_hours']) * 3600 + intval($_POST['timed_test_minutes']) * 60 + intval($_POST['timed_test_seconds']);
+            } else {
+                $timed_test_duration = 0;
+            }
+            
             //If title exceeded database defined length, truncate it.
             $_POST['title'] = validate_length($_POST['title'], 100);
 
@@ -189,7 +205,9 @@ if (isset($_POST['cancel'])) {
                         show_guest_form=%d,
                         out_of=%d, 
                         display=%d,
-                        remedial_content=%d
+                        remedial_content=%d,
+                        timed_test=%d,
+                        timed_test_duration=%d
                     WHERE test_id=%d 
                     AND course_id=%d";
                     
@@ -218,6 +236,8 @@ if (isset($_POST['cancel'])) {
                         $total_weight,
                         $_POST['display'],
                         $_POST['remedial_content'],
+                        $_POST['timed_test'],
+                        $timed_test_duration,
                         $tid,
                         $_SESSION['course_id']));
                 
@@ -410,7 +430,36 @@ $msg->printErrors();
         ?>
         <input type="radio" name="random" id="random" value="0" checked="checked" onfocus="ATutor.mods.tests.disable_elements('num_questions', true);" onclick="this.onfocus();" /><label for="random"><?php echo _AT('no'); ?></label>. <input type="radio" name="random" value="1" id="ry" onfocus="ATutor.mods.tests.disable_elements('num_questions', false);" onclick="this.onfocus();" <?php echo $y; ?> /><label for="ry"><?php echo _AT('yes'); ?></label>, <input type="text" name="num_questions" id="num_questions" size="2" value="<?php echo $_POST['num_questions']; ?>" <?php echo $disabled . $n; ?> /> <label for="num_questions"><?php echo _AT('num_questions_per_test'); ?></label>
     </div>
-
+    
+    <div class="row">
+        <?php echo _AT('timed_test'); ?><br/>
+        <?php 
+            if ($_POST['timed_test'] == 1) {
+                $y = 'checked="checked"';
+                $n = $disabled = '';
+            } else {
+                $y = '';
+                $n = 'checked="checked"';
+                $disabled = 'disabled="disabled" ';
+            }
+            $timed_test_duration = $_POST['timed_test_duration'];
+            $timed_test_hours = (int)($timed_test_duration/3600);
+            $timed_test_minutes = (int)(($timed_test_duration % 3600)/60);
+            $timed_test_seconds = ($timed_test_duration)%60;
+        ?>
+        <input type="radio" name="timed_test" id="timed_test_no" value="0" checked="checked" onfocus="ATutor.mods.tests.disable_elements('timed_test_duration', true);" onclick="this.onfocus();" />
+        <label for="timed_test_no"><?php echo _AT('no'); ?></label>. 
+        <input type="radio" name="timed_test" value="1" id="timed_test_yes" onfocus="ATutor.mods.tests.disable_elements('timed_test_duration', false);" onclick="this.onfocus();" <?php echo $y; ?> />
+        <label for="timed_test_yes"><?php echo _AT('yes'); ?></label>, 
+        
+        <input type="text" name="timed_test_hours" id="timed_test_hours" size="2" value="<?php echo $timed_test_hours; ?>" <?php echo $disabled . $n; ?> /> 
+        <label for="timed_test_hours"><?php echo _AT('hours'); ?></label>
+        <input type="text" name="timed_test_minutes" id="timed_test_minutes" size="2" value="<?php echo $timed_test_minutes; ?>" <?php echo $disabled . $n; ?> /> 
+        <label for="timed_test_minutes"><?php echo _AT('in_minutes'); ?></label>
+        <input type="text" name="timed_test_seconds" id="timed_test_seconds" size="2" value="<?php echo $timed_test_seconds; ?>" <?php echo $disabled . $n; ?> /> 
+        <label for="timed_test_seconds"><?php echo _AT('seconds'); ?></label>
+    </div>
+        
     <div class="row">
         <?php echo _AT('start_date'); ?><br />
         <?php

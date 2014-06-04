@@ -21,6 +21,7 @@ ATutor.mods.tests = ATutor.mods.tests || {};
         var passpercent = $("#passpercent"),
             passscore = $("#passscore"),
             num_questions = $("#num_questions"),
+            timed_test_duration = [$("#timed_test_hours"), $("#timed_test_minutes"), $("#timed_test_seconds")],
             show_guest_form = $("#show_guest_form");
         
         // Disable/Enable elements based on what user clicked
@@ -39,6 +40,11 @@ ATutor.mods.tests = ATutor.mods.tests || {};
             passscore.val(0);
         } else if (name === "num_questions") {
             num_questions[(disableFlag) ? "attr" : "removeAttr"]("disabled", "");
+        } else if (name === "timed_test_duration") {
+            $(timed_test_duration).each(function(id){
+                var elem = timed_test_duration[id]
+                elem[(disableFlag) ? "attr" : "removeAttr"]("disabled", "");
+            });
         } else if (name === "show_guest_form") {
             show_guest_form[(disableFlag) ? "attr" : "removeAttr"]("disabled", "");
             if (disableFlag) {
