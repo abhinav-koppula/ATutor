@@ -832,6 +832,18 @@ CREATE TABLE `tests_answers` (
 ) ENGINE = MyISAM;
 
 # --------------------------------------------------------
+# Table structure for table `tests_custom_duration`
+
+CREATE TABLE `tests_custom_duration` (
+  `id` mediumint(8) unsigned NOT NULL auto_increment,
+  `test_id` mediumint(8) unsigned NOT NULL,
+  `type` enum('group','student') NOT NULL default 'group',
+  `type_id` mediumint(8) unsigned NOT NULL default '0',
+  `custom_duration` INT(11) NOT NULL DEFAULT '-1',
+  PRIMARY KEY  (`id`,`type`,`type_id`)
+) ENGINE = MyISAM;
+
+# --------------------------------------------------------
 # Table structure for table `tests_groups`
 
 CREATE TABLE `tests_groups` (

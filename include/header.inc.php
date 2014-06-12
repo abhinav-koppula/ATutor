@@ -106,9 +106,9 @@ if(isset($_SESSION['valid_user'])){
     $session_warning = 300 * 1000;                      // 5 minutes
     
     $custom_head .= '
-        <link rel="stylesheet"  type="text/css" href="'.AT_print($_base_path, 'url.base').'jscripts/lib/jquery-ui.css" />
-        <script type="text/javascript" src="'.AT_print($_base_path, 'url.base').'jscripts/infusion/lib/jquery/core/js/jquery.js"></script>
-        <script type="text/javascript" src="'.AT_print($_base_path, 'url.base').'jscripts/lib/jquery-ui.min.js"></script>
+        <link rel="stylesheet"  type="text/css" href="'.AT_print($_base_path, 'url.base').'jscripts/lib/jquery-ui2.css" />
+        <script type="text/javascript" src="'.AT_print($_base_path, 'url.base').'jscripts/infusion/lib/jquery/core/js/jquery.min2.js"></script>
+        <script type="text/javascript" src="'.AT_print($_base_path, 'url.base').'jscripts/lib/jquery-ui.min2.js"></script>
         <script type="text/javascript" src="'.AT_print($_base_path, 'url.base').'jscripts/ATutorAutoLogout.js"></script>
         <script type="text/javascript" src="'.AT_print($_base_path, 'url.base').'jscripts/lib/jquery.cookie.js"></script>
         <script type="text/javascript" src="'.AT_print($_base_path, 'url.base').'jscripts/lib/jquery-scrolltofixed-min.js"></script>

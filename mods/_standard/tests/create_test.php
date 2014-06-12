@@ -17,6 +17,79 @@ require(AT_INCLUDE_PATH.'vitals.inc.php');
 require(AT_INCLUDE_PATH.'../mods/_standard/tests/lib/test_result_functions.inc.php');
 $_custom_head .= '<script type="text/javascript" src="'.AT_BASE_HREF.'mods/_standard/tests/js/tests.js"></script>';
 
+function get_all_students()
+{
+    global $system_courses;
+    $course_id = $_SESSION['course_id'];
+    $instructor_id = $system_courses[$course_id]['member_id'];
+    //show students enrolled
+    $sql = "SELECT CE.member_id, CE.privileges, CE.approved, M.login, M.first_name, M.second_name, M.last_name, M.email 
+            FROM ".TABLE_PREFIX."course_enrollment CE INNER JOIN ".TABLE_PREFIX."members M USING (member_id)
+            WHERE CE.course_id=$course_id AND approved='y' AND M.member_id<>$instructor_id AND CE.privileges=0  
+            ORDER BY M.first_name ASC, M.last_name ASC";
+    $students = queryDB($sql, array(TABLE_PREFIX, TABLE_PREFIX, $course_id, $instructor_id));
+    
+    return $students;
+}
+function get_student_options() {
+    $students = get_all_students();
+    $options = "";
+    if(count($students) > 0) {
+        foreach($students as $student) {
+            $options.="<option value='".$student['member_id']."' name='".$student['member_id']."' >".$student['first_name']."&nbsp".$student['last_name']." </option>";
+        }
+    } else {
+        $options.="<optgroup label='"._AT('none_found')."'></optgroup>";
+    }
+    return $options;
+}
+function get_group_options()
+{
+    //show groups
+            $sql    = "SELECT * FROM %sgroups_types WHERE course_id=%d ORDER BY title";
+            $rows_groups = queryDB($sql, array(TABLE_PREFIX, $_SESSION['course_id']));
+            $options = "";
+            if(count($rows_groups) > 0){
+                foreach($rows_groups as $row){
+                    //$options.="<optgroup label = '".$row['title']."'>";
+                    
+                    $sql    = "SELECT * FROM %sgroups WHERE type_id=%d ORDER BY title";
+                    $g_result = queryDB($sql, array(TABLE_PREFIX, $row['type_id']));
+                    
+                    foreach($g_result as $grow){
+                        $options.="<option value='".$grow['group_id']."' name='groups[".$grow['group_id']."]' >".$grow['title']."</option>";
+                    }
+                }
+            } 
+            return $options;
+}
+
+function validate_type($type, $type_id)
+{
+    if($type == 'group') {
+        $sql    = "SELECT * FROM %sgroups_types WHERE course_id=%d ORDER BY title";
+        $rows_groups = queryDB($sql, array(TABLE_PREFIX, $_SESSION['course_id']));
+        foreach($rows_groups as $row)
+        {
+            $sql    = "SELECT * FROM %sgroups WHERE type_id=%d";
+            $g_result = queryDB($sql, array(TABLE_PREFIX, $row['type_id']));
+            foreach($g_result as $grow) {
+                if($grow['group_id'] == $type_id) {
+                    return true;
+                }
+            }
+        }
+    } else if($type == 'student') {
+        $students = get_all_students();
+        foreach($students as $student)
+        {
+            if($student['member_id'] == $type_id) {
+                return true;
+            }
+        }
+    }
+    return false;
+}
 authenticate(AT_PRIV_TESTS);
 tool_origin();
 $test_type = 'normal';
@@ -204,6 +277,32 @@ if (isset($_POST['cancel'])) {
                     $timed_test_duration));
         $tid = at_insert_id();
         
+        foreach($_POST as $key => $value)
+        {
+            if(substr($key, 0, strlen($key)-1) == "custom_duration_type_") {
+                $id = substr($key, -1);
+                $type = $_POST["custom_duration_type_".$id];
+                $type_id = $_POST["custom_duration_options_".$id];
+                $custom_duration_hours = $_POST["custom_duration_hours_".$id];
+                $custom_duration_minutes = $_POST["custom_duration_minutes_".$id];
+                $custom_duration_seconds = $_POST["custom_duration_seconds_".$id];
+                $custom_duration = intval($custom_duration_hours) * 3600 + intval($custom_duration_minutes) * 60 + intval($custom_duration_seconds);
+                
+                $sql =  "INSERT INTO %stests_custom_duration ".
+                        "(id,
+                          test_id,
+                          type,
+                          type_id,
+                          custom_duration)".
+                        "VALUES (NULL, %d, '%s', %d, %d)";
+                if($tid && $type != -1 && $type_id!=-1 && validate_type($type, $type_id)) { 
+                    $result = queryDB($sql, array(TABLE_PREFIX, $tid, $type, $type_id, $custom_duration));
+                }
+                //echo $id." ".$type." ".$type_id." ".$custom_duration."\n";
+                 
+            }
+        }
+        
         if (isset($_POST['groups']) && $tid) {
 
             $sql = "INSERT INTO %stests_groups VALUES ";
@@ -378,10 +477,10 @@ $msg->printErrors();
                 $n = 'checked="checked"';
                 $disabled = 'disabled="disabled" ';
             }
-            $timed_test_duration = $_POST['timed_test_duration'];
-            $timed_test_hours = (int)($timed_test_duration/3600);
-            $timed_test_minutes = (int)(($timed_test_duration % 3600)/60);
-            $timed_test_seconds = ($timed_test_duration)%60;
+            
+            $timed_test_hours = (int)($_POST['timed_test_hours']);
+            $timed_test_minutes = (int)($_POST['timed_test_minutes']);
+            $timed_test_seconds = (int)($_POST['timed_test_seconds']);
         ?>
         <input type="radio" name="timed_test" id="timed_test_no" value="0" checked="checked" onfocus="ATutor.mods.tests.disable_elements('timed_test_duration', true);" onclick="this.onfocus();" />
         <label for="timed_test_no"><?php echo _AT('no'); ?></label>. 
@@ -394,7 +493,31 @@ $msg->printErrors();
         <label for="timed_test_minutes"><?php echo _AT('in_minutes'); ?></label>
         <input type="text" name="timed_test_seconds" id="timed_test_seconds" size="2" value="<?php echo $timed_test_seconds; ?>" <?php echo $disabled . $n; ?> /> 
         <label for="timed_test_seconds"><?php echo _AT('seconds'); ?></label>
-    </div>    
+    </div>   
+        
+    <div class="row">
+        <?php $id = 0; ?>
+        <table class="data" summary="" id="custom_duration">
+            <thead>
+                <tr>
+                    <th scope="col"></th>
+                    <th scope="col"><?php echo _AT('type'); ?></th>
+                    <th scope="col"><?php echo _AT('name'); ?></th>
+                    <th scope="col"><?php echo _AT('custom_duration'); ?></th>
+                </tr>   
+            </thead>
+            <tfoot>
+                <tr>
+                    <td colspan="4">
+                        <input type="button" name="add" value="<?php echo _AT('add'); ?>" id="add_custom_duration_row" /> 
+                        <input type="button" name="delete" value="<?php echo _AT('delete'); ?>" id="delete_custom_duration_row" />
+                    </td>
+                </tr>
+            </tfoot>
+            <tbody>
+            </tbody>
+        </table>
+    </div>
 
     <div class="row">
         <?php echo _AT('start_date');  ?><br />
@@ -481,5 +604,211 @@ $msg->printErrors();
     </fieldset>
 </div>
 </form>
+<script type="text/javascript">
+    var custom_duration_row_id=0;
 
+    function get_options(type)
+    {
+        if(type == 'group')
+        {
+            options = "<?php echo get_group_options(); ?>";
+        } else if(type == 'student') {
+            options = "<?php echo get_student_options(); ?>";
+        }
+        return options;
+    }
+    function change_options(ele, id)
+    {
+        val = ele.value;
+        $("#custom_duration_options_"+id+" option").remove();
+        $('#custom_duration_options_'+id).append(get_options(val))
+    }
+    function add_custom_duration_row(id)
+    {
+        data="";
+        data+="<tr id='custom_duration_row_"+id+"' >";
+        data+="<td><input type='checkbox' name='custom_duration_checkbox_"+id+"' id='custom_duration_checkbox_"+id+"' onclick='javascript:selectRow("+id+");' /><label for='' ></label></td>"
+        data+="<td>\
+                <select name='custom_duration_type_"+id+"' id='custom_duration_type_"+id+"' onchange='javascript:change_options(this, "+id+");' >\
+                    <option value='-1'>select type</option>\
+                    <option selected='selected' value='group'>Group</option>\
+                    <option value='student'>Student</option>\
+                </select>\
+               </td>";
+        data+="<td>";
+   
+            
+        data+="<div class='ui-widget'>\
+                <select name='custom_duration_options_"+id+"' id='custom_duration_options_"+id+"' class='combobox' >\
+                <option selected='selected' value='-1'>select group/student</option>"+get_options('group')+"\
+               </select></div>";
+        data+="</td>";
+        data+="<td>";
+        data+="<input type='text' name='custom_duration_hours_"+id+"' id='custom_duration_hours_"+id+"' size='2' value='0' />\
+                <label for='custom_duration_hours_"+id+"' ><?php echo _AT('hours'); ?></label>\
+                <input type='text' name='custom_duration_minutes_"+id+"' id='custom_duration_minutes_"+id+"' size='2' value='0' /> \
+                <label for='custom_duration_minutes_"+id+"'><?php echo _AT('in_minutes'); ?></label> \
+                <input type='text' name='custom_duration_seconds_"+id+"' id='custom_duration_seconds_"+id+"' size='2' value='0' /> \
+                <label for='custom_duration_seconds_"+id+"' ><?php echo _AT('seconds'); ?></label>\
+                </td>\
+                </tr>";
+        $('#custom_duration tbody').append(data);
+        $( ".combobox" ).combobox();
+    }
+    function selectRow(id)
+    {   
+        checkbox_check = ($('#custom_duration_checkbox_'+id).prop('checked'));
+        if(checkbox_check == true)
+        {
+            
+            //$('#custom_duration_checkbox_'+id).removeAttr('checked');
+            $('#custom_duration_row_'+id).addClass('selected');
+        } else {
+            //$('#custom_duration_checkbox_'+id).attr('checked', 'checked');
+            $('#custom_duration_row_'+id).removeClass('selected');
+        }
+    }
+    
+    (function( $ ) {
+        $.widget( "custom.combobox", {
+            _create: function() {
+                this.wrapper = $( "<span>" )
+                .addClass( "custom-combobox" )
+                .insertAfter( this.element );
+ 
+                this.element.hide();
+                this._createAutocomplete();
+                this._createShowAllButton();
+            },
+ 
+            _createAutocomplete: function() {
+                var selected = this.element.children( ":selected" ),
+                value = selected.val() ? selected.text() : "";
+ 
+                this.input = $( "<input>" )
+                .appendTo( this.wrapper )
+                .val( value )
+                .attr( "title", "" )
+                .addClass( "custom-combobox-input ui-widget ui-widget-content ui-state-default ui-corner-left" )
+                .autocomplete({
+                    delay: 0,
+                    minLength: 0,
+                    source: $.proxy( this, "_source" )
+                })
+                .tooltip({
+                    tooltipClass: "ui-state-highlight"
+                });
+ 
+                this._on( this.input, {
+                    autocompleteselect: function( event, ui ) {
+                        ui.item.option.selected = true;
+                        this._trigger( "select", event, {
+                            item: ui.item.option
+                        });
+                        },
+ 
+                    autocompletechange: "_removeIfInvalid"
+                });
+            },
+ 
+            _createShowAllButton: function() {
+                var input = this.input,
+                wasOpen = false;
+ 
+                $( "<a>" )
+                .attr( "tabIndex", -1 )
+                .attr( "title", "Show All Items" )
+                .tooltip()
+                .appendTo( this.wrapper )
+                .button({
+                    icons: {
+                        primary: "ui-icon-triangle-1-s"
+                    },
+                    text: false
+                })
+                .removeClass( "ui-corner-all" )
+                .addClass( "custom-combobox-toggle ui-corner-right" )
+                .mousedown(function() {
+                    wasOpen = input.autocomplete( "widget" ).is( ":visible" );
+                })
+                .click(function() {
+                    input.focus();
+ 
+                    // Close if already visible
+                    if ( wasOpen ) {
+                        return;
+                    }
+ 
+                    // Pass empty string as value to search for, displaying all results
+                    input.autocomplete( "search", "" );
+                });
+            },
+ 
+            _source: function( request, response ) {
+                var matcher = new RegExp( $.ui.autocomplete.escapeRegex(request.term), "i" );
+                response( this.element.children( "option" ).map(function() {
+                    var text = $( this ).text();
+                    if ( this.value && ( !request.term || matcher.test(text) ) )
+                    return {
+                        label: text,
+                        value: text,
+                        option: this
+                    };
+                }) );
+            },
+ 
+            _removeIfInvalid: function( event, ui ) {
+ 
+                // Selected an item, nothing to do
+                if ( ui.item ) {
+                    return;
+                }
+ 
+                // Search for a match (case-insensitive)
+                var value = this.input.val(),
+                valueLowerCase = value.toLowerCase(),
+                valid = false;
+                this.element.children( "option" ).each(function() {
+                    if ( $( this ).text().toLowerCase() === valueLowerCase ) {
+                        this.selected = valid = true;
+                        return false;
+                    }
+                });
+ 
+                // Found a match, nothing to do
+                if ( valid ) {
+                    return;
+                }
+ 
+                // Remove invalid value
+                this.input
+                .val( "" )
+                .attr( "title", value + " didn't match any item" )
+                .tooltip( "open" );
+                this.element.val( "" );
+                this._delay(function() {
+                    this.input.tooltip( "close" ).attr( "title", "" );
+                }, 2500 );
+                this.input.data( "ui-autocomplete" ).term = "";
+            },
+ 
+            _destroy: function() {
+                this.wrapper.remove();
+                this.element.show();
+            }
+        });
+    })( jQuery );
+ 
+    $(document).ready(function(){
+        $('#delete_custom_duration_row').click(function(){
+            $('#custom_duration').find('.selected').remove();
+        });
+        $('#add_custom_duration_row').click(function(){ 
+            add_custom_duration_row(custom_duration_row_id++);
+        });
+        
+        add_custom_duration_row(custom_duration_row_id++);
+        
+    });
+</script>
 <?php require (AT_INCLUDE_PATH.'footer.inc.php'); ?>
