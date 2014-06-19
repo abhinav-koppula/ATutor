@@ -80,12 +80,13 @@ $cols=6;
 </form>
 
 <div id="testDuplicate-dialog" title="Duplicate Test">
-  <form>
-  <fieldset>
-    <label for="title">Title</label>
-    <input type="text" name="title" id="title" class="text ui-widget-content ui-corner-all">
-  </fieldset>
-  </form>
+    <form>
+        <fieldset>
+            <label for="duplicate_test_title">Title</label>
+            <input type="text" name="duplicate_test_title" id="duplicate_test_title" class="text ui-widget-content ui-corner-all">
+        </fieldset>
+    </form>
+    <div id="test_duplicate_message"></div>
 </div>
 
 <form name="form" method="get" action="<?php echo $_SERVER['PHP_SELF']; ?>">
@@ -202,7 +203,17 @@ $cols=6;
         closeOnEscape: true,
         
         buttons: {
-            "Duplicate": function() { $(this).dialog("close"); }
+            "Duplicate": function() {
+                tid = ($('input[name=id]:checked').val());
+                duplicate_test_title = $('#duplicate_test_title').val();
+                $.post("<?php echo AT_BASE_HREF."mods/_standard/tests/";?>duplicate_test_ajax.php", 
+                    {'duplicate_tid': tid, 'duplicate_test_title': duplicate_test_title},
+                    function(data)
+                    {
+                        $('#test_duplicate_message').text(data);
+                    }
+                );
+            }
         }
     });
     };
