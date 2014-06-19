@@ -1,6 +1,6 @@
 /**
  * @author Alexey Novak
- * @copyright Copyright © 2013, ATutor, All rights reserved.
+ * @copyright Copyright Â© 2013, ATutor, All rights reserved.
  */
 
 /*global jQuery*/

@@ -79,6 +79,15 @@ $cols=6;
 </div>
 </form>
 
+<div id="testDuplicate-dialog" title="Duplicate Test">
+  <form>
+  <fieldset>
+    <label for="title">Title</label>
+    <input type="text" name="title" id="title" class="text ui-widget-content ui-corner-all">
+  </fieldset>
+  </form>
+</div>
+
 <form name="form" method="get" action="<?php echo $_SERVER['PHP_SELF']; ?>">
 <table class="data" summary="">
 <thead>
@@ -99,6 +108,7 @@ $cols=6;
 	<tr>
 		<td colspan="7">
 			<input type="submit" name="edit" value="<?php echo _AT('edit'); ?>" />
+            <input type="button" name="duplicate" style="border-radius:0.3em;" value="<?php echo _AT('duplicate'); ?>"
 			<input type="submit" name="preview" value="<?php echo _AT('preview'); ?>" />
 			<input type="submit" name="questions" value="<?php echo _AT('questions'); ?>" />
 		</td>
@@ -182,5 +192,31 @@ $cols=6;
 </tbody>
 </table>
 </form>
-
+<script type="text/javascript">
+    TestDuplicate = function(options) {
+    
+    TestDuplicateDialog = $("#testDuplicate-dialog").dialog({
+        autoOpen: false,
+        width: 400,
+        modal: true,
+        closeOnEscape: true,
+        
+        buttons: {
+            "Duplicate": function() { $(this).dialog("close"); }
+        }
+    });
+    };
+    $(document).ready(function() {
+        $('input[name="duplicate"]').click(function(){
+            tid = ($('input[name=id]:checked').val());
+            if(tid) {
+                $( "#testDuplicate-dialog" ).dialog( "open" );
+            } else {
+                alert("<?php echo _AT('NO_ITEM_SELECTED'); ?>")
+            }
+        });
+        
+        TestDuplicate();
+    });
+</script>
 <?php require(AT_INCLUDE_PATH.'footer.inc.php'); ?>

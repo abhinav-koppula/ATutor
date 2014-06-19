@@ -1,98 +1,28 @@
 <?php
-/************************************************************************/
-/* ATutor                                                               */
-/************************************************************************/
-/* Copyright (c) 2002-2010                                              */
-/* Inclusive Design Institute                                           */
-/* http://atutor.ca                                                     */
-/* This program is free software. You can redistribute it and/or        */
-/* modify it under the terms of the GNU General Public License          */
-/* as published by the Free Software Foundation.                        */
-/************************************************************************/
+/****************************************************************/
+/* ATutor                                                       */
+/****************************************************************/
+/* Copyright (c) 2002-2014                                      */
+/* Inclusive Design Institute                                   */
+/* http://atutor.ca                                             */
+/*                                                              */
+/* This program is free software. You can redistribute it and/or*/
+/* modify it under the terms of the GNU General Public License  */
+/* as published by the Free Software Foundation.                */
+/****************************************************************/
 // $Id$
 
 $page = 'tests';
 define('AT_INCLUDE_PATH', '../../../include/');
 require(AT_INCLUDE_PATH.'vitals.inc.php');
 require(AT_INCLUDE_PATH.'../mods/_standard/tests/lib/test_result_functions.inc.php');
+require(AT_INCLUDE_PATH.'../mods/_standard/tests/lib/test_custom_duration_functions.inc.php');
 $_custom_head .= '<script type="text/javascript" src="'.AT_BASE_HREF.'mods/_standard/tests/js/tests.js"></script>';
 
-function get_all_students()
-{
-    global $system_courses;
-    $course_id = $_SESSION['course_id'];
-    $instructor_id = $system_courses[$course_id]['member_id'];
-    //show students enrolled
-    $sql = "SELECT CE.member_id, CE.privileges, CE.approved, M.login, M.first_name, M.second_name, M.last_name, M.email 
-            FROM ".TABLE_PREFIX."course_enrollment CE INNER JOIN ".TABLE_PREFIX."members M USING (member_id)
-            WHERE CE.course_id=$course_id AND approved='y' AND M.member_id<>$instructor_id AND CE.privileges=0  
-            ORDER BY M.first_name ASC, M.last_name ASC";
-    $students = queryDB($sql, array(TABLE_PREFIX, TABLE_PREFIX, $course_id, $instructor_id));
-    
-    return $students;
-}
-function get_student_options() {
-    $students = get_all_students();
-    $options = "";
-    if(count($students) > 0) {
-        foreach($students as $student) {
-            $options.="<option value='".$student['member_id']."' name='".$student['member_id']."' >".$student['first_name']."&nbsp".$student['last_name']." </option>";
-        }
-    } else {
-        $options.="<optgroup label='"._AT('none_found')."'></optgroup>";
-    }
-    return $options;
-}
-function get_group_options()
-{
-    //show groups
-            $sql    = "SELECT * FROM %sgroups_types WHERE course_id=%d ORDER BY title";
-            $rows_groups = queryDB($sql, array(TABLE_PREFIX, $_SESSION['course_id']));
-            $options = "";
-            if(count($rows_groups) > 0){
-                foreach($rows_groups as $row){
-                    //$options.="<optgroup label = '".$row['title']."'>";
-                    
-                    $sql    = "SELECT * FROM %sgroups WHERE type_id=%d ORDER BY title";
-                    $g_result = queryDB($sql, array(TABLE_PREFIX, $row['type_id']));
-                    
-                    foreach($g_result as $grow){
-                        $options.="<option value='".$grow['group_id']."' name='groups[".$grow['group_id']."]' >".$grow['title']."</option>";
-                    }
-                }
-            } 
-            return $options;
-}
-
-function validate_type($type, $type_id)
-{
-    if($type == 'group') {
-        $sql    = "SELECT * FROM %sgroups_types WHERE course_id=%d ORDER BY title";
-        $rows_groups = queryDB($sql, array(TABLE_PREFIX, $_SESSION['course_id']));
-        foreach($rows_groups as $row)
-        {
-            $sql    = "SELECT * FROM %sgroups WHERE type_id=%d";
-            $g_result = queryDB($sql, array(TABLE_PREFIX, $row['type_id']));
-            foreach($g_result as $grow) {
-                if($grow['group_id'] == $type_id) {
-                    return true;
-                }
-            }
-        }
-    } else if($type == 'student') {
-        $students = get_all_students();
-        foreach($students as $student)
-        {
-            if($student['member_id'] == $type_id) {
-                return true;
-            }
-        }
-    }
-    return false;
-}
 authenticate(AT_PRIV_TESTS);
 tool_origin();
-$test_type = 'normal';
+
+$tid = intval($_REQUEST['tid']);
 
 if (isset($_POST['cancel'])) {
     $msg->addFeedback('CANCELLED');
@@ -103,27 +33,27 @@ if (isset($_POST['cancel'])) {
 } else if (isset($_POST['submit'])) {
     $missing_fields                = array();
     $_POST['title']                = trim($_POST['title']);
-    $_POST['description']        = trim($_POST['description']);
+    $_POST['description']          = trim($_POST['description']);
+	$_POST['passfeedback']         = trim($_POST['passfeedback']);
+    $_POST['failfeedback']         = trim($_POST['failfeedback']);
     $_POST['num_questions']        = intval($_POST['num_questions']);
     $_POST['num_takes']            = intval($_POST['num_takes']);
-    $_POST['content_id']        = intval($_POST['content_id']);
-    $_POST['passpercent']        = intval($_POST['passpercent']);
+    $_POST['content_id']           = intval($_POST['content_id']);
+    $_POST['passpercent']          = intval($_POST['passpercent']);
     $_POST['passscore']            = intval($_POST['passscore']);
-    $_POST['passfeedback']        = trim($_POST['passfeedback']);
-    $_POST['failfeedback']        = trim($_POST['failfeedback']);
-    $_POST['num_takes']            = intval($_POST['num_takes']);
     $_POST['anonymous']            = intval($_POST['anonymous']);
-    $_POST['allow_guests']        = $_POST['allow_guests'] ? 1 : 0;
-    $_POST['show_guest_form']    = $_POST['show_guest_form'] ? 1 : 0;
-    $_POST['instructions']        = $_POST['instructions'];
-    $_POST['display']            = intval($_POST['display']);
-    $_POST['remedial_content']    = intval($_POST['remedial_content']);
+    $_POST['allow_guests']         = $_POST['allow_guests'] ? 1 : 0;
+    $_POST['show_guest_form']      = $_POST['show_guest_form'] ? 1 : 0;
+    $_POST['instructions']         = $addslashes(trim($_POST['instructions']));
+    $_POST['display']              = intval($_POST['display']);
+    $_POST['remedial_content']     = intval($_POST['remedial_content']);
+	$_POST['timed_test']           = intval($_POST['timed_test']);
 
     // currently these options are ignored for tests:
-    $_POST['result_release'] = intval($_POST['result_release']); 
-    $_POST['format']       = intval($_POST['format']);
-    $_POST['order']           = 1;  //intval($_POST['order']);
-    $_POST['difficulty']   = 0;  //intval($_POST['difficulty']);     /* avman */
+    $_POST['result_release']       = intval($_POST['result_release']); 
+    $_POST['format']               = intval($_POST['format']);
+    $_POST['order']                = 1;  //intval($_POST['order']);
+    $_POST['difficulty']           = 0;  //intval($_POST['difficulty']);     /* avman */
         
     if ($_POST['title'] == '') {
         $missing_fields[] = _AT('title');
@@ -140,6 +70,41 @@ if (isset($_POST['cancel'])) {
         $missing_fields[] = _AT('timed_test_duration_negative');
     }
     
+    $custom_student_array = array();
+    $custom_group_array = array();
+    foreach($_POST as $key => $value)
+    {
+        if(substr($key, 0, strlen($key)-1) == "custom_duration_type_") {
+            $id = substr($key, -1);
+            $type = $_POST["custom_duration_type_".$id];
+            $type_id = $_POST["custom_duration_options_".$id];
+            $custom_duration_hours = $_POST["custom_duration_hours_".$id];
+            $custom_duration_minutes = $_POST["custom_duration_minutes_".$id];
+            $custom_duration_seconds = $_POST["custom_duration_seconds_".$id];
+            $custom_duration = intval($custom_duration_hours) * 3600 + intval($custom_duration_minutes) * 60 + intval($custom_duration_seconds);
+            
+            if($type == 'group') {
+                $sql = "SELECT member_id FROM %sgroups_members WHERE group_id = %d";
+                $member_rows = queryDB($sql, array(TABLE_PREFIX, $type_id));
+                foreach($member_rows as $member_row) {
+                    array_push($custom_group_array, $member_row['member_id']);
+                }
+            } else if($type == 'student') {
+                array_push($custom_student_array, $type_id);
+            }
+            
+            if(!$custom_duration_hours  && !$custom_duration_minutes && !$custom_duration_seconds )
+            $missing_fields[] = _AT('test_custom_duration_zero');
+            
+            if($custom_duration_hours < 0  || $custom_duration_minutes < 0 || $custom_duration_seconds < 0 )
+            $missing_fields[] = _AT('test_custom_duration_negative');
+        }
+    }
+    $common_students = array_intersect($custom_group_array, $custom_student_array);
+    if(count($common_students) > 0) {
+        $missing_fields[] = _AT('duplicate_custom_duration');
+    }
+    
     if ($_POST['pass_score']==1 && !$_POST['passpercent']) {
         $missing_fields[] = _AT('percentage_score');
     }
@@ -147,23 +112,37 @@ if (isset($_POST['cancel'])) {
     if ($_POST['pass_score']==2 && !$_POST['passscore']) {
         $missing_fields[] = _AT('points_score');
     }
+    
+    /* 
+     * If test is anonymous and have submissions, then we don't permit changes.
+     * This addresses the following issue: http://www.atutor.ca/atutor/mantis/view.php?id=3268
+     * TODO:    Add an extra column in test_results to remember the state of anonymous submissions.
+     *            make changes accordingly on line 255 as well.
+     */
+    $sql = "SELECT t.test_id, anonymous FROM %stests_results r NATURAL JOIN %stests t WHERE r.test_id = t.test_id AND r.test_id=%d";
+    $row_anonymous    = queryDB($sql, array(TABLE_PREFIX, TABLE_PREFIX, $tid));
 
+    if(count($row_anonymous) > 0){
+        //If there are submission(s) for this test, anonymous field will not be altered.
+        $_POST['anonymous'] = $row_anonymous[0]['anonymous'];
+    }
+    
     if ($missing_fields) {
         $missing_fields = implode(', ', $missing_fields);
         $msg->addError(array('EMPTY_FIELDS', $missing_fields));
     }
 
     $day_start    = intval($_POST['day_start']);
-    $month_start= intval($_POST['month_start']);
-    $year_start    = intval($_POST['year_start']);
-    $hour_start    = intval($_POST['hour_start']);
+    $month_start  = intval($_POST['month_start']);
+    $year_start   = intval($_POST['year_start']);
+    $hour_start   = intval($_POST['hour_start']);
     $min_start    = intval($_POST['min_start']);
 
-    $day_end    = intval($_POST['day_end']);
+    $day_end      = intval($_POST['day_end']);
     $month_end    = intval($_POST['month_end']);
-    $year_end    = intval($_POST['year_end']);
-    $hour_end    = intval($_POST['hour_end']);
-    $min_end    = intval($_POST['min_end']);
+    $year_end     = intval($_POST['year_end']);
+    $hour_end     = intval($_POST['hour_end']);
+    $min_end      = intval($_POST['min_end']);
 
     if (!checkdate($month_start, $day_start, $year_start)) {
         $msg->addError('START_DATE_INVALID');
@@ -179,8 +158,9 @@ if (isset($_POST['cancel'])) {
     }
 
     if (!$msg->containsErrors()) {
+                    
         if ($_POST['timed_test']) {
-            $timed_test_duration = intval($_POST['timed_test_hours']) * 3600 + intval($_POST['timed_test_minutes']) * 60 + intval($_POST['timed_test_seconds']);
+            $timed_test_duration = convert_hhmmss_to_duration($_POST['timed_test_hours'], $_POST['timed_test_minutes'], $_POST['timed_test_seconds']);
         } else {
             $timed_test_duration = 0;
         }
@@ -197,7 +177,6 @@ if (isset($_POST['cancel'])) {
         if (strlen($min_start) == 1){
             $min_start = "0$min_start";
         }
-
         if (strlen($month_end) == 1){
             $month_end = "0$month_end";
         }
@@ -216,39 +195,41 @@ if (isset($_POST['cancel'])) {
 
         //If title exceeded database defined length, truncate it.
         $_POST['title'] = validate_length($_POST['title'], 100);
-
-        $sql = "INSERT INTO %stests " .
-               "(test_id,
-             course_id,
-             title,
-             description,
-             format,
-             start_date,
-             end_date,
-             randomize_order,
-             num_questions,
-             instructions,
-             content_id,
-             passscore,
-             passpercent,
-             passfeedback,
-             failfeedback,
-             result_release,
-             random,
-             difficulty,
-             num_takes,
-             anonymous,
-             out_of,
-             guests,
-             display,
-             show_guest_form,
-             remedial_content,
-             timed_test,
-             timed_test_duration)" .
-        "VALUES 
-            (NULL, %d, '%s', '%s', %d, '%s', '%s', %d, %d, '%s', %d, %d, %d, '%s', '%s', %d, %d, %d, %d, %d, '', %d, %d, %d, %d, %d, %d)";
-
-        $result = queryDB($sql, array(
+        
+        //create test page
+        if($tid == 0) {
+            $sql = "INSERT INTO %stests " .
+                    "(test_id,
+                    course_id,
+                    title,
+                    description,
+                    format,
+                    start_date,
+                    end_date,
+                    randomize_order,
+                    num_questions,
+                    instructions,
+                    content_id,
+                    passscore,
+                    passpercent,
+                    passfeedback,
+                    failfeedback,
+                    result_release,
+                    random,
+                    difficulty,
+                    num_takes,
+                    anonymous,
+                    out_of,
+                    guests,
+                    display,
+                    show_guest_form,
+                    remedial_content,
+                    timed_test,
+                    timed_test_duration)" .
+                    "VALUES 
+                    (NULL, %d, '%s', '%s', %d, '%s', '%s', %d, %d, '%s', %d, %d, %d, '%s', '%s', %d, %d, %d, %d, %d, '', %d, %d, %d, %d, %d, %d)";
+            
+            $result = queryDB($sql, array(
                     TABLE_PREFIX,
                     $_SESSION[course_id],
                     $_POST['title'],
@@ -275,50 +256,163 @@ if (isset($_POST['cancel'])) {
                     $_POST['remedial_content'],
                     $_POST['timed_test'],
                     $timed_test_duration));
-        $tid = at_insert_id();
+            $tid = at_insert_id();
         
-        foreach($_POST as $key => $value)
-        {
-            if(substr($key, 0, strlen($key)-1) == "custom_duration_type_") {
-                $id = substr($key, -1);
-                $type = $_POST["custom_duration_type_".$id];
-                $type_id = $_POST["custom_duration_options_".$id];
-                $custom_duration_hours = $_POST["custom_duration_hours_".$id];
-                $custom_duration_minutes = $_POST["custom_duration_minutes_".$id];
-                $custom_duration_seconds = $_POST["custom_duration_seconds_".$id];
-                $custom_duration = intval($custom_duration_hours) * 3600 + intval($custom_duration_minutes) * 60 + intval($custom_duration_seconds);
+            foreach($_POST as $key => $value)
+            {
+                if(substr($key, 0, strlen($key)-1) == "custom_duration_type_") {
+                    $id = substr($key, -1);
+                    $type = $_POST["custom_duration_type_".$id];
+                    $type_id = $_POST["custom_duration_options_".$id];
+                    $custom_duration_hours = $_POST["custom_duration_hours_".$id];
+                    $custom_duration_minutes = $_POST["custom_duration_minutes_".$id];
+                    $custom_duration_seconds = $_POST["custom_duration_seconds_".$id];
+                    $custom_duration = intval($custom_duration_hours) * 3600 + intval($custom_duration_minutes) * 60 + intval($custom_duration_seconds);
                 
-                $sql =  "INSERT INTO %stests_custom_duration ".
-                        "(id,
-                          test_id,
-                          type,
-                          type_id,
-                          custom_duration)".
-                        "VALUES (NULL, %d, '%s', %d, %d)";
-                if($tid && $type != -1 && $type_id!=-1 && validate_type($type, $type_id)) { 
-                    $result = queryDB($sql, array(TABLE_PREFIX, $tid, $type, $type_id, $custom_duration));
+                    $sql =  "INSERT INTO %stests_custom_duration ".
+                            "(id,
+                              test_id,
+                            type,
+                            type_id,
+                            custom_duration)".
+                            "VALUES (NULL, %d, '%s', %d, %d)";
+                    if($tid && $type != -1 && $type_id!=-1 && validate_type($type, $type_id)) { 
+                        $result = queryDB($sql, array(TABLE_PREFIX, $tid, $type, $type_id, $custom_duration));
+                    }
                 }
-                //echo $id." ".$type." ".$type_id." ".$custom_duration."\n";
-                 
             }
-        }
         
-        if (isset($_POST['groups']) && $tid) {
+            if (isset($_POST['groups']) && $tid) {
 
-            $sql = "INSERT INTO %stests_groups VALUES ";
+                $sql = "INSERT INTO %stests_groups VALUES ";
             
-            foreach ($_POST['groups'] as $group) {
-                $group = intval($group);
-                $sql .= "($tid, $group),";
+                foreach ($_POST['groups'] as $group) {
+                    $group = intval($group);
+                    $sql .= "($tid, $group),";
+                }
+                $sql = substr($sql, 0, -1);
+
+                $result = queryDB($sql, array(TABLE_PREFIX));
             }
-            $sql = substr($sql, 0, -1);
 
-            $result = queryDB($sql, array(TABLE_PREFIX));
+            $msg->addFeedback('ACTION_COMPLETED_SUCCESSFULLY');
+            header('Location: index.php');
+            exit;
+        } else { //edit test page
+            // just to make sure we own this test:
+            $sql    = "SELECT * FROM %stests WHERE test_id=%d AND course_id=%d";
+            $row_tests    = queryDB($sql, array(TABLE_PREFIX, $tid, $_SESSION['course_id']), TRUE);
+            if(count($row_tests) > 0){
+                if ($_POST['random']) {
+                    $total_weight = get_total_weight($tid, $_POST['num_questions']);
+                } else {
+                    $total_weight = get_total_weight($tid);
+                }
+            }
+            $sql = "UPDATE %stests " . 
+                   "SET title='%s', 
+                        description='%s', 
+                        format=%d, 
+                        start_date='%s', 
+                        end_date='%s', 
+                        randomize_order=%d, 
+                        num_questions=%d, 
+                        instructions='%s', 
+                        content_id=%d,  
+                        passscore=%d, 
+                        passpercent=%d, 
+                        passfeedback='%s', 
+                        failfeedback='%s', 
+                        result_release=%d, 
+                        random=%d, 
+                        difficulty=%d, 
+                        num_takes=%d, 
+                        anonymous=%d, 
+                        guests=%d, 
+                        show_guest_form=%d,
+                        out_of=%d, 
+                        display=%d,
+                        remedial_content=%d,
+                        timed_test=%d,
+                        timed_test_duration=%d
+                    WHERE test_id=%d 
+                    AND course_id=%d";
+            
+            $result = queryDB($sql, array(
+                        TABLE_PREFIX,
+                        $_POST['title'],
+                        $_POST['description'],
+                        $_POST['format'],
+                        $start_date,
+                        $end_date,
+                        $_POST['randomize_order'],
+                        $_POST['num_questions'],
+                        $_POST['instructions'],
+                        $_POST['content_id'],
+                        $_POST['passscore'],
+                        $_POST['passpercent'],
+                        $_POST['passfeedback'],
+                        $_POST['failfeedback'],
+                        $_POST['result_release'],
+                        $_POST['random'],
+                        $_POST['difficulty'],
+                        $_POST['num_takes'],
+                        $_POST['anonymous'],
+                        $_POST['allow_guests'],
+                        $_POST['show_guest_form'],
+                        $total_weight,
+                        $_POST['display'],
+                        $_POST['remedial_content'],
+                        $_POST['timed_test'],
+                        $timed_test_duration,
+                        $tid,
+                        $_SESSION['course_id']));
+            
+            $sql = "DELETE FROM %stests_custom_duration WHERE test_id=%d";
+            $result = queryDB($sql, array(TABLE_PREFIX, $tid));
+            
+            foreach($_POST as $key => $value)
+            {
+                if(substr($key, 0, strlen($key)-1) == "custom_duration_type_") {
+                    $id = substr($key, -1);
+                    $type = $_POST["custom_duration_type_".$id];
+                    $type_id = $_POST["custom_duration_options_".$id];
+                    $custom_duration_hours = $_POST["custom_duration_hours_".$id];
+                    $custom_duration_minutes = $_POST["custom_duration_minutes_".$id];
+                    $custom_duration_seconds = $_POST["custom_duration_seconds_".$id];
+                    $custom_duration = intval($custom_duration_hours) * 3600 + intval($custom_duration_minutes) * 60 + intval($custom_duration_seconds);
+                
+                    $sql =  "INSERT INTO %stests_custom_duration ".
+                            "(id,
+                              test_id,
+                            type,
+                            type_id,
+                            custom_duration)".
+                            "VALUES (NULL, %d, '%s', %d, %d)";
+                    if($tid && $type != -1 && $type_id!=-1 && validate_type($type, $type_id)) { 
+                        $result = queryDB($sql, array(TABLE_PREFIX, $tid, $type, $type_id, $custom_duration));
+                    }
+                }
+            }
+            
+            $sql = "DELETE FROM %stests_groups WHERE test_id=%d";
+            $result = queryDB($sql, array(TABLE_PREFIX, $tid));
+            
+            if (isset($_POST['groups'])) {
+                $sql = "INSERT INTO %stests_groups VALUES ";
+                foreach ($_POST['groups'] as $group) {
+                    $group = intval($group);
+                    $sql .= "($tid, $group),";
+                }
+                $sql = substr($sql, 0, -1);
+                $result = queryDB($sql, array(TABLE_PREFIX));
+            }
+            
+            $msg->addFeedback('ACTION_COMPLETED_SUCCESSFULLY');
+
+            header('Location: index.php');
+            exit;
         }
-
-        $msg->addFeedback('ACTION_COMPLETED_SUCCESSFULLY');
-		header('Location: index.php');
-		exit;
     }
 }
 
@@ -330,14 +424,55 @@ $onload = 'document.form.title.focus();';
 
 require(AT_INCLUDE_PATH.'header.inc.php');
 
+if ($tid>0 && !isset($_POST['submit'])) {
+    $sql    = "SELECT *, DATE_FORMAT(start_date, '%%Y-%%m-%%d %%H:%%i:00') AS start_date, DATE_FORMAT(end_date, '%%Y-%%m-%%d %%H:%%i:00') AS end_date FROM %stests WHERE test_id=%d AND course_id=%d";
+    $row    = queryDB($sql, array(TABLE_PREFIX, $tid, $_SESSION['course_id']), TRUE);
+    
+    if(count($row) == 0){
+        $msg->printErrors('ITEM_NOT_FOUND');
+        require (AT_INCLUDE_PATH.'footer.inc.php');
+        exit;
+    }
+
+    $_POST    = $row;
+    $_POST['allow_guests'] = $row['guests'];
+    convert_duration_to_hhmmss($row['timed_test_duration'], $_POST['timed_test_hours'], $_POST['timed_test_minutes'], $_POST['timed_test_seconds']);
+    
+    $sql = "SELECT * FROM %stests_custom_duration WHERE test_id=%d";
+    $rows = queryDB($sql, array(TABLE_PREFIX, $tid));
+    if(count($rows) > 0) {
+        $id = 0;
+        foreach($rows as $row) {
+            $_POST['custom_duration_type_'.$id] = $row['type'];
+            $_POST['custom_duration_options_'.$id] = $row['type_id'];
+            $hours = 0; $mins = 0; $secs = 0;
+            convert_duration_to_hhmmss($row['custom_duration'], $hours, $mins, $secs);
+            $_POST['custom_duration_hours_'.$id] = $hours;
+            $_POST['custom_duration_minutes_'.$id] = $mins;
+            $_POST['custom_duration_seconds_'.$id] = $secs;
+            $id++;
+        }
+    }
+} else {
+    $_POST['start_date'] = $start_date;
+    $_POST['end_date']     = $end_date;
+}
+
 $msg->printErrors();
 
 ?>
 
 <form action="<?php echo $_SERVER['PHP_SELF']; ?>" method="post" name="form">
-<input type="hidden" name="test_type" value="<?php echo $test_type; ?>" />
+    <?php if($tid > 0): ?>
+    <input type="hidden" name="tid" value="<?php echo $tid; ?>" />
+    <?php endif; ?>        
 <div class="input-form">
-    <fieldset class="group_form"><legend class="group_form"><?php echo _AT('create_test'); ?></legend>
+    <fieldset class="group_form">
+    <?php if($tid > 0): ?>
+    <legend class="group_form"><?php echo _AT('edit_test'); ?></legend>
+    <?php else: ?>
+    <legend class="group_form"><?php echo _AT('create_test'); ?></legend>
+    <?php endif; ?>
     <div class="row">
         <span class="required" title="<?php echo _AT('required_field'); ?>">*</span><label for="title"><?php echo _AT('title'); ?></label><br />
         <input type="text" name="title" id="title" size="30" value="<?php echo $_POST['title']; ?>" />
@@ -372,10 +507,22 @@ $msg->printErrors();
                                                     'radio_label_N' => _AT('no'),
                                                     'radio_label_Y' => _AT('yes')));
 
+        // This addresses the following issue: http://www.atutor.ca/atutor/mantis/view.php?id=3268
+        // Ref: line 64
+        $sql = "SELECT t.test_id, anonymous FROM %stests_results r NATURAL JOIN %stests t WHERE r.test_id = t.test_id AND r.test_id=%d";
+        $row_anon    = queryDB($sql, array(TABLE_PREFIX, TABLE_PREFIX, $tid));
+
+        $anonymous_disabled = FALSE;
+        if(count($row_anon) > 0){
+            //If there are submission(s) for this test, anonymous field will not be altered.
+            $anonymous_disabled = TRUE;
+        }
+        
         echo generate_radio_button_options(array(    'section_name' => 'anonymous_test',
                                                     'radio_name' => 'anonymous',
                                                     'radio_label_N' => _AT('no'),
-                                                    'radio_label_Y' => _AT('yes')));
+                                                    'radio_label_Y' => _AT('yes'),
+                                                    'disabled' => $anonymous_disabled));
 
         $allow_guests = generate_radio_button_options(array(    'radio_name' => 'allow_guests',
                                                                 'radio_label_N' => _AT('no'),
@@ -436,7 +583,7 @@ $msg->printErrors();
             if ($_POST['result_release'] == AT_RELEASE_IMMEDIATE) {
                 $check_marked = $check_never = '';
                 $check_immediate = 'checked="checked"';
-        
+
             } else if ($_POST['result_release'] == AT_RELEASE_MARKED) {
                 $check_immediate = $check_never = '';
                 $check_marked = 'checked="checked"';
@@ -493,10 +640,30 @@ $msg->printErrors();
         <label for="timed_test_minutes"><?php echo _AT('in_minutes'); ?></label>
         <input type="text" name="timed_test_seconds" id="timed_test_seconds" size="2" value="<?php echo $timed_test_seconds; ?>" <?php echo $disabled . $n; ?> /> 
         <label for="timed_test_seconds"><?php echo _AT('seconds'); ?></label>
-    </div>   
+    </div>
         
     <div class="row">
-        <?php $id = 0; ?>
+        <?php
+        foreach($_POST as $key => $value)
+        {
+            if(substr($key, 0, strlen($key)-1) == "custom_duration_type_") {
+                $id = substr($key, -1);
+                $type = $_POST["custom_duration_type_".$id];
+                $type_id = $_POST["custom_duration_options_".$id];
+                $custom_duration_hours = $_POST["custom_duration_hours_".$id];
+                $custom_duration_minutes = $_POST["custom_duration_minutes_".$id];
+                $custom_duration_seconds = $_POST["custom_duration_seconds_".$id];
+                $custom_duration = intval($custom_duration_hours) * 3600 + intval($custom_duration_minutes) * 60 + intval($custom_duration_seconds);
+                echo '
+                    <script type="text/javascript">
+                    $(document).ready(function() {
+                        edit_custom_duration_row("'.$type.'", '.$type_id.', '.$custom_duration.');
+                    });
+                    </script>
+                    ';
+            }
+        }
+        ?>
         <table class="data" summary="" id="custom_duration">
             <thead>
                 <tr>
@@ -568,6 +735,17 @@ $msg->printErrors();
         <?php echo _AT('limit_to_group'); ?><br />
         <?php
             //show groups
+            //get groups currently allowed
+            $current_groups = array();
+
+            $sql    = "SELECT group_id FROM %stests_groups WHERE test_id=%d";
+            $rows_tgroups    = queryDB($sql, array(TABLE_PREFIX, $tid));
+            
+            foreach($rows_tgroups as $row){
+                $current_groups[] = $row['group_id'];
+            }
+
+            //show groups
             $sql    = "SELECT * FROM %sgroups_types WHERE course_id=%d ORDER BY title";
             $rows_groups = queryDB($sql, array(TABLE_PREFIX, $_SESSION['course_id']));
             
@@ -623,16 +801,36 @@ $msg->printErrors();
         $("#custom_duration_options_"+id+" option").remove();
         $('#custom_duration_options_'+id).append(get_options(val))
     }
-    function add_custom_duration_row(id)
+    function add_custom_duration_row(id, type, type_id, hours, mins, secs)
     {
+        type = typeof type !== 'undefined' ? type : 'group';
+        type_id = typeof type_id !== 'undefined' ? type_id : -1;
+        hours = typeof hours !== 'undefined' ? hours : 0;
+        mins = typeof mins !== 'undefined' ? mins : 0;
+        secs = typeof secs !== 'undefined' ? secs : 0;
+        
+        if(type =='group') {
+            type_selected_none    = "";
+            type_selected_group   = " selected = 'selected'";
+            type_selected_student = "";
+        } else if(type == 'student') {
+            type_selected_none    = "";
+            type_selected_group   = "";
+            type_selected_student = " selected = 'selected'";
+        } else {
+            type_selected_none    = " selected = 'selected'";
+            type_selected_group   = "";
+            type_selected_student = "";
+        }
+        
         data="";
         data+="<tr id='custom_duration_row_"+id+"' >";
         data+="<td><input type='checkbox' name='custom_duration_checkbox_"+id+"' id='custom_duration_checkbox_"+id+"' onclick='javascript:selectRow("+id+");' /><label for='' ></label></td>"
         data+="<td>\
                 <select name='custom_duration_type_"+id+"' id='custom_duration_type_"+id+"' onchange='javascript:change_options(this, "+id+");' >\
-                    <option value='-1'>select type</option>\
-                    <option selected='selected' value='group'>Group</option>\
-                    <option value='student'>Student</option>\
+                    <option value='-1'"+ type_selected_none +">select type</option>\
+                    <option value='group'"+ type_selected_group +">Group</option>\
+                    <option value='student'"+ type_selected_student +">Student</option>\
                 </select>\
                </td>";
         data+="<td>";
@@ -640,20 +838,28 @@ $msg->printErrors();
             
         data+="<div class='ui-widget'>\
                 <select name='custom_duration_options_"+id+"' id='custom_duration_options_"+id+"' class='combobox' >\
-                <option selected='selected' value='-1'>select group/student</option>"+get_options('group')+"\
+                <option value='-1'>select group/student</option>"+get_options(type)+"\
                </select></div>";
         data+="</td>";
         data+="<td>";
-        data+="<input type='text' name='custom_duration_hours_"+id+"' id='custom_duration_hours_"+id+"' size='2' value='0' />\
+        data+="<input type='text' name='custom_duration_hours_"+id+"' id='custom_duration_hours_"+id+"' size='2' value='"+ hours +"' />\
                 <label for='custom_duration_hours_"+id+"' ><?php echo _AT('hours'); ?></label>\
-                <input type='text' name='custom_duration_minutes_"+id+"' id='custom_duration_minutes_"+id+"' size='2' value='0' /> \
+                <input type='text' name='custom_duration_minutes_"+id+"' id='custom_duration_minutes_"+id+"' size='2' value='"+ mins +"' /> \
                 <label for='custom_duration_minutes_"+id+"'><?php echo _AT('in_minutes'); ?></label> \
-                <input type='text' name='custom_duration_seconds_"+id+"' id='custom_duration_seconds_"+id+"' size='2' value='0' /> \
+                <input type='text' name='custom_duration_seconds_"+id+"' id='custom_duration_seconds_"+id+"' size='2' value='"+ secs +"' /> \
                 <label for='custom_duration_seconds_"+id+"' ><?php echo _AT('seconds'); ?></label>\
                 </td>\
                 </tr>";
         $('#custom_duration tbody').append(data);
+        $('#custom_duration_options_'+id+' option[value="'+type_id+'"]').attr('selected', 'selected');
         $( ".combobox" ).combobox();
+    }
+    function edit_custom_duration_row(type, type_id, custom_duration)
+    {
+        hours = (parseInt)(custom_duration/3600);
+        mins = (parseInt)((custom_duration % 3600)/60);
+        secs = (parseInt)(custom_duration % 60);
+        add_custom_duration_row(custom_duration_row_id++, type, type_id, hours, mins, secs);
     }
     function selectRow(id)
     {   
