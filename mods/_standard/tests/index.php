@@ -123,7 +123,7 @@ $cols=6;
 		</td>
 	</tr>
 	</tfoot>
-	<tbody>
+	<tbody id ='list_of_tests'>
 
 	<?php 
 	foreach($rows_tests as $row){ ?>
@@ -203,23 +203,30 @@ $cols=6;
         closeOnEscape: true,
         
         buttons: {
-            "Duplicate": function() {
-                tid = ($('input[name=id]:checked').val());
-                duplicate_test_title = $('#duplicate_test_title').val();
+            "Duplicate" : function() {
+                var tid = ($('input[name=id]:checked').val());
+                var duplicate_test_title = $('#duplicate_test_title').val();
                 $.post("<?php echo AT_BASE_HREF."mods/_standard/tests/";?>duplicate_test_ajax.php", 
                     {'duplicate_tid': tid, 'duplicate_test_title': duplicate_test_title},
                     function(data)
                     {
-                        $('#test_duplicate_message').text(data);
+                        var result = $.parseJSON(data);
+                        $('#test_duplicate_message').text(result.message);
+                        if(result.result == 'success') {
+                            $('#list_of_tests').append(result.htmlelement);
+                        }
                     }
                 );
-            }
+            },
+            "Cancel"    : function() {
+                $( "#testDuplicate-dialog" ).dialog( "close" );
+            }, 
         }
     });
     };
     $(document).ready(function() {
         $('input[name="duplicate"]').click(function(){
-            tid = ($('input[name=id]:checked').val());
+            var tid = ($('input[name=id]:checked').val());
             if(tid) {
                 $( "#testDuplicate-dialog" ).dialog( "open" );
             } else {

@@ -3,8 +3,8 @@
 /****************************************************************/
 /* ATutor                                                       */
 /****************************************************************/
-/* Copyright (c) 2002-2010                                      */
-/* Inclusive Design Institute                                   */
+/* Copyright (c) 2002-2014                                      */
+/* Abhinav Koppula                                              */
 /* http://atutor.ca                                             */
 /*                                                              */
 /* This program is free software. You can redistribute it and/or*/

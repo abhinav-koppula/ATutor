@@ -93,10 +93,10 @@ if (isset($_POST['cancel'])) {
                 array_push($custom_student_array, $type_id);
             }
             
-            if(!$custom_duration_hours  && !$custom_duration_minutes && !$custom_duration_seconds )
+            if($type != -1 && $type_id != -1 && ($custom_duration_hours == 0  && $custom_duration_minutes == 0 && $custom_duration_seconds == 0) )
             $missing_fields[] = _AT('test_custom_duration_zero');
             
-            if($custom_duration_hours < 0  || $custom_duration_minutes < 0 || $custom_duration_seconds < 0 )
+            if($type != -1 && $type_id != -1 && ($custom_duration_hours < 0  || $custom_duration_minutes < 0 || $custom_duration_seconds < 0) )
             $missing_fields[] = _AT('test_custom_duration_negative');
         }
     }
@@ -689,20 +689,27 @@ $msg->printErrors();
     <div class="row">
         <?php echo _AT('start_date');  ?><br />
         <?php
-            if (!isset($_POST['submit'])) {
-                $today_day  = date('d');
-                $today_mon  = date('m');
-                $today_year = date('Y');
-                $today_hour = date('H');
-                $today_min  = 0;
-            } else {
+            if(isset($_POST['submit'])) {
                 $today_day  = intval($day_start);
                 $today_mon  = intval($month_start);
                 $today_year = intval($year_start);
                 $today_hour = intval($hour_start);
                 $today_min  = intval($min_start);
+            } else {
+                if($tid > 0) {
+                    $today_day   = substr($_POST['start_date'], 8, 2);
+                    $today_mon   = substr($_POST['start_date'], 5, 2);
+                    $today_year  = substr($_POST['start_date'], 0, 4);
+                    $today_hour  = substr($_POST['start_date'], 11, 2);
+                    $today_min   = substr($_POST['start_date'], 14, 2);
+                } else {
+                    $today_day  = date('d');
+                    $today_mon  = date('m');
+                    $today_year = date('Y');
+                    $today_hour = date('H');
+                    $today_min  = 0;
+                }
             }
-
             $name = '_start';
             require(AT_INCLUDE_PATH.'html/release_date.inc.php');
 
@@ -712,18 +719,26 @@ $msg->printErrors();
     <div class="row">
         <?php echo _AT('end_date');  ?><br />
         <?php
-            if (!isset($_POST['submit'])) {
-                $today_day  = date('d');
-                $today_mon  = date('m');
-                $today_year = date('Y');
-                $today_hour = date('H');
-                $today_min  = 0;
-            } else {
+            if(isset($_POST['submit'])) {
                 $today_day  = intval($day_end);
                 $today_mon  = intval($month_end);
                 $today_year = intval($year_end);
                 $today_hour = intval($hour_end);
                 $today_min  = intval($min_end);
+            } else {
+                if($tid > 0) {
+                    $today_day   = substr($_POST['end_date'], 8, 2);
+                    $today_mon   = substr($_POST['end_date'], 5, 2);
+                    $today_year  = substr($_POST['end_date'], 0, 4);
+                    $today_hour  = substr($_POST['end_date'], 11, 2);
+                    $today_min   = substr($_POST['end_date'], 14, 2);
+                } else {
+                    $today_day  = date('d');
+                    $today_mon  = date('m');
+                    $today_year = date('Y');
+                    $today_hour = date('H');
+                    $today_min  = 0;
+                }
             }
                     
             $name = '_end';

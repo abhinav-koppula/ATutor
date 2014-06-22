@@ -142,6 +142,27 @@ $title = $test_row['title'];
 $timed_test = $test_row['timed_test'];
 $timed_test_duration = $test_row['timed_test_duration'];
 
+$sql = "SELECT * FROM %stests_custom_duration WHERE test_id = %d";
+$custom_duration_rows = queryDB($sql, array(TABLE_PREFIX, $tid));
+
+foreach($custom_duration_rows as $row) {
+    if($row['type'] == 'student') {
+        if($row['type_id'] == $member_id) {
+            $timed_test_duration = $row['custom_duration'];
+            break;
+        }
+    } else if($row['type'] == 'group') {
+        $sql = "SELECT member_id FROM %sgroups_members WHERE group_id = %d";
+        $members = queryDB($sql, array(TABLE_PREFIX, $row['type_id']));
+        foreach($members as $member) {
+            if($member['member_id'] == $member_id) {
+                $timed_test_duration = $row['custom_duration'];
+                break;
+            }
+        }
+    }
+}
+
 $_letters = array(_AT('A'), _AT('B'), _AT('C'), _AT('D'), _AT('E'), _AT('F'), _AT('G'), _AT('H'), _AT('I'), _AT('J'));
 
 // first check if there's an 'in progress' test.

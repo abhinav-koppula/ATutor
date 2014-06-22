@@ -17,6 +17,7 @@ require(AT_INCLUDE_PATH.'../mods/_standard/tests/lib/test_result_functions.inc.p
 require(AT_INCLUDE_PATH.'../mods/_standard/tests/classes/testQuestions.class.php');
 
 $tid = intval($_REQUEST['tid']);
+
 if (isset($_REQUEST['cid']))
 {
 	$cid = intval($_REQUEST['cid']);
@@ -34,6 +35,27 @@ $test_row = queryDB($sql, array(TABLE_PREFIX, $tid, $_SESSION['course_id']), TRU
 
 $timed_test = $test_row['timed_test'];
 $timed_test_duration = $test_row['timed_test_duration'];
+
+$sql = "SELECT * FROM %stests_custom_duration WHERE test_id = %d";
+$custom_duration_rows = queryDB($sql, array(TABLE_PREFIX, $tid));
+
+foreach($custom_duration_rows as $row) {
+    if($row['type'] == 'student') {
+        if($row['type_id'] == $mid) {
+            $timed_test_duration = $row['custom_duration'];
+            break;
+        }
+    } else if($row['type'] == 'group') {
+        $sql = "SELECT member_id FROM %sgroups_members WHERE group_id = %d";
+        $members = queryDB($sql, array(TABLE_PREFIX, $row['type_id']));
+        foreach($members as $member) {
+            if($member['member_id'] == $mid) {
+                $timed_test_duration = $row['custom_duration'];
+                break;
+            }
+        }
+    }
+}
 
 if(isset($_POST['test_timer_hidden'])) {
     $timer = $_POST['test_timer_hidden'];
