@@ -265,6 +265,10 @@ if (!$gid && !$in_progress) {
 
         <div id ="test_timer">
         </div>
+        <div id ="test_timer_aria"  class="region" role="timer" aria-labelledby="live1Label" aria-live="assertive" aria-atomic="false" aria-relevant="additions" style="
+    opacity: 0;" >
+            00:00:00
+        </div>
         <input type="hidden" name="test_timer_hidden" id="test_timer_hidden" value="0" />
         <input type="hidden" name="test_type" id="test_type" value="all_question_page" />
     <?php if ($instructions!=''): ?>
@@ -323,6 +327,14 @@ if (!$gid && !$in_progress) {
         {
         ?>
             CreateTimer("test_timer", "test_timer_hidden", <?php echo $timer;?>);
+            $(document).keypress(function(e) {
+                var code = e.keyCode || e.which;
+                var convertedObj = {hours:0, mins:0, secs:0};
+                if(code == 116) {
+                    convert_duration_to_hhmmss($("#test_timer_hidden").val(), convertedObj);
+                    $("#test_timer_aria").text(convertedObj.hours + " hours " + convertedObj.mins + " minutes " + convertedObj.secs + " seconds remaining");
+                }
+            });
         <?php
         }
         ?>

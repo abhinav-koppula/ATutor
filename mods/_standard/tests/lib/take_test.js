@@ -89,6 +89,16 @@ function LeadingZero(Time) {
     return (Time < 10) ? "0" + Time : + Time;
 }
 
+function convert_duration_to_hhmmss(duration, convertedObj)
+{
+    hours = Math.floor(duration/3600);
+    mins = Math.floor((duration % 3600)/60);
+    secs = Math.floor((duration)%60);
+    convertedObj.hours = hours;
+    convertedObj.mins = mins;
+    convertedObj.secs = secs;
+}
+
 TestTimeout = function(options) {
     $("body").append("<div title='"+ options.title +"' id='testTimeout-dialog'>"+ options.message +"</div>");
     TestTimeoutDialog = $("#testTimeout-dialog").dialog({

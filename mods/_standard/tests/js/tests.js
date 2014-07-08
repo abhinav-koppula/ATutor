@@ -9,6 +9,7 @@
 ATutor = ATutor || {};
 ATutor.mods = ATutor.mods || {};
 ATutor.mods.tests = ATutor.mods.tests || {};
+ATutor.mods.tests.create_test = ATutor.mods.tests.create_test || {};
 
 (function () {
     "use strict";
@@ -77,6 +78,87 @@ ATutor.mods.tests = ATutor.mods.tests || {};
         ATutor.mods.tests.jumpTo("a[name=content]");
         $(".row.buttons input[name=submit]").focus();
     };
+
+    ATutor.mods.tests.create_test.change_options = function(ele, id) {
+        var val = ele.value;
+        $("#custom_duration_options_"+ id +" option").remove();
+        $('#custom_duration_options_'+ id).append(ATutor.mods.tests.create_test.get_options(val))
+    }
+    
+    ATutor.mods.tests.create_test.add_custom_duration_row = function(id, type, type_id, hours, mins, secs) {
+        type = typeof type !== 'undefined' ? type : 'group';
+        type_id = typeof type_id !== 'undefined' ? type_id : -1;
+        hours = typeof hours !== 'undefined' ? hours : 0;
+        mins = typeof mins !== 'undefined' ? mins : 0;
+        secs = typeof secs !== 'undefined' ? secs : 0;
+        
+        var type_selected_none = "";
+        var type_selected_group = "";
+        var type_selected_student = "";
+        
+        if(type =='group') {
+            type_selected_none    = "";
+            type_selected_group   = " selected = 'selected'";
+            type_selected_student = "";
+        } else if(type == 'student') {
+            type_selected_none    = "";
+            type_selected_group   = "";
+            type_selected_student = " selected = 'selected'";
+        } else {
+            type_selected_none    = " selected = 'selected'";
+            type_selected_group   = "";
+            type_selected_student = "";
+        }
+        
+        var data="";
+        data+="<tr id='custom_duration_row_"+id+"' >";
+        data+="<td><input type='checkbox' name='custom_duration_checkbox_"+id+"' id='custom_duration_checkbox_"+id+"' onclick='javascript:ATutor.mods.tests.create_test.selectRow("+id+");' /><label for='' ></label></td>"
+        data+="<td>\
+                <select name='custom_duration_type_"+id+"' id='custom_duration_type_"+id+"' onchange='javascript:ATutor.mods.tests.create_test.change_options(this, "+id+");' >\
+                    <option value='-1'"+ type_selected_none +">select type</option>\
+                    <option value='group'"+ type_selected_group +">Group</option>\
+                    <option value='student'"+ type_selected_student +">Student</option>\
+                </select>\
+               </td>";
+        data+="<td>";
+   
+            
+        data+="<div class='ui-widget'>\
+                <select name='custom_duration_options_"+id+"' id='custom_duration_options_"+id+"' class='combobox' >\
+                <option value='-1'>select group/student</option>"+ATutor.mods.tests.create_test.get_options(type)+"\
+               </select></div>";
+        data+="</td>";
+        data+="<td>";
+        data+="<input type='text' name='custom_duration_hours_"+id+"' id='custom_duration_hours_"+id+"' size='2' value='"+ hours +"' />\
+                <label for='custom_duration_hours_"+id+"' ><?php echo _AT('hours'); ?></label>\
+                <input type='text' name='custom_duration_minutes_"+id+"' id='custom_duration_minutes_"+id+"' size='2' value='"+ mins +"' /> \
+                <label for='custom_duration_minutes_"+id+"'><?php echo _AT('in_minutes'); ?></label> \
+                <input type='text' name='custom_duration_seconds_"+id+"' id='custom_duration_seconds_"+id+"' size='2' value='"+ secs +"' /> \
+                <label for='custom_duration_seconds_"+id+"' ><?php echo _AT('seconds'); ?></label>\
+                </td>\
+                </tr>";
+        $('#custom_duration tbody').append(data);
+        $('#custom_duration_options_'+id+' option[value="'+type_id+'"]').attr('selected', 'selected');
+        $( ".combobox" ).combobox();
+    }
+    
+    ATutor.mods.tests.create_test.edit_custom_duration_row = function(type, type_id, custom_duration) {
+        var hours = (parseInt)(custom_duration/3600);
+        var mins = (parseInt)((custom_duration % 3600)/60);
+        var secs = (parseInt)(custom_duration % 60);
+        ATutor.mods.tests.create_test.add_custom_duration_row(ATutor.mods.tests.create_test.custom_duration_row_id++, type, type_id, hours, mins, secs);
+    }
+    
+    ATutor.mods.tests.create_test.selectRow = function(id) {
+        var checkbox_check = ($('#custom_duration_checkbox_'+id).prop('checked'));
+        if(checkbox_check == true) {
+            $('#custom_duration_row_'+id).addClass('selected');
+        } else {
+            $('#custom_duration_row_'+id).removeClass('selected');
+        }
+    }
+    
+    
     /**
     * Function to activate Slide All link for the Remedial Content divs
     * @author    Alexey Novak
