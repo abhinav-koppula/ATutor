@@ -169,7 +169,11 @@ select:focus{
 	text-align: right; 
 	font-weight: bold;
 }
-
+.test_timer {
+    float: right; 
+    font-size: 18px; 
+    font-weight: bold;
+}
 @media screen and (max-device-width: 640px) {
     input{
         font-size:1.2em !important;

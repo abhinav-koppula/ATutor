@@ -7,7 +7,7 @@ function iframeSetHeight(id, height) {
  * @param	DOM input element	The input submit button.
  * @param	String				The message that confirms submission
  */
-function confirmSubmit(input, confirmMsg){
+function confirmSubmit(input, confirmMsg) {
 	input_button = jQuery(input);
 	submit_row = input_button.parent();
 	//jquery submit button alternation
@@ -25,18 +25,23 @@ function confirmSubmit(input, confirmMsg){
 var Timer;
 var TotalSeconds;
 var TimerHidden;
+var NormalMode;
+var IntermediateMode;
+var EmergencyMode;
 
-function CreateTimer(TimerID, TimerHiddenID, Time) {
+function CreateTimer(TimerID, TimerHiddenID, Time, normalMode, intermediateMode, emergencyMode) {
     Timer = document.getElementById(TimerID);
     TimerHidden = document.getElementById(TimerHiddenID);
     TotalSeconds = Time;
+    NormalMode = normalMode;
+    IntermediateMode = intermediateMode;
+    EmergencyMode = emergencyMode;
     
     UpdateTimer();
     window.setTimeout("Tick()", 1000);
 }
 
-function autoSubmitTest()
-{
+function autoSubmitTest() {
     test_type = $('#test_type').val();
     input_button = jQuery("#submit_test");
     if(test_type == 'single_question_page')
@@ -64,6 +69,7 @@ function Tick() {
     UpdateTimer()
     window.setTimeout("Tick()", 1000);
 }
+
 function UpdateTimer() {
     var Seconds = TotalSeconds;
         
@@ -78,25 +84,73 @@ function UpdateTimer() {
 
 
     var TimeStr = ((Days > 0) ? Days + " days " : "") + LeadingZero(Hours) + ":" + LeadingZero(Minutes) + ":" + LeadingZero(Seconds)
-
-
-    Timer.innerHTML = TimeStr;
+    var TimeInWords = convertToWords(Days, Hours, Minutes, Seconds);
+    
+    changeMode();
+    Timer.innerHTML = TimeInWords;
     TimerHidden.value = TotalSeconds;
 }
 
+function changeMode() {
+    var seconds = TotalSeconds;
+    var convertedObj = {hours:0, mins:0, secs:0};
+    
+    if(seconds > NormalMode) {
+        Timer.style.color = "#008000";
+    } else if(seconds == NormalMode) {
+        updateLiveRegion(seconds, convertedObj, "#test_timer_aria");
+    } else if(seconds > IntermediateMode) {
+        Timer.style.color = "#E89C0C";
+    } else if(seconds == IntermediateMode) {
+        updateLiveRegion(seconds, convertedObj, "#test_timer_aria");
+    } else {
+        Timer.style.color = "#FF0000";
+    }
+}
+
+function toggleTimerSize() {
+    var timerSizes = [18,23,26];
+    
+    var fontSize = parseInt(Timer.style.fontSize);
+    if(isNaN(fontSize) || fontSize == timerSizes[0]) {   //isNaN check included because js fontSize property is initially undefined until set explicitly
+        Timer.style.fontSize = timerSizes[1]+"px";
+    } else if(fontSize == timerSizes[1]) {
+        Timer.style.fontSize = timerSizes[2]+"px";
+    } else {
+        Timer.style.fontSize = timerSizes[0]+"px";
+    }
+}
+
+function convertToWords(Days, Hours, Minutes, Seconds) {
+    var convertedString = "";
+    if(Days > 0) {
+        convertedString = Days + " days " + LeadingZero(Hours) + " hours remaining";
+    } else if(Hours > 0) {
+        convertedString = Hours + " hours " + LeadingZero(Minutes) + " minutes remaining";
+    } else if(Minutes > 0) {
+        convertedString = Minutes + " minutes " + LeadingZero(Seconds) + " seconds remaining";
+    } else {
+        convertedString = Seconds + " seconds remaining";
+    }
+    return convertedString;
+}
 
 function LeadingZero(Time) {
     return (Time < 10) ? "0" + Time : + Time;
 }
 
-function convert_duration_to_hhmmss(duration, convertedObj)
-{
+function convert_duration_to_hhmmss(duration, convertedObj) {
     hours = Math.floor(duration/3600);
     mins = Math.floor((duration % 3600)/60);
     secs = Math.floor((duration)%60);
     convertedObj.hours = hours;
     convertedObj.mins = mins;
     convertedObj.secs = secs;
+}
+
+function updateLiveRegion(duration, convertedObj, liveRegionId) {
+    convert_duration_to_hhmmss(duration, convertedObj);
+    $(liveRegionId).text(convertedObj.hours + " hours " + convertedObj.mins + " minutes " + convertedObj.secs + " seconds remaining");
 }
 
 TestTimeout = function(options) {

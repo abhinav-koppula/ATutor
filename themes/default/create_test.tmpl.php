@@ -23,17 +23,7 @@
         <label for="num_t"><?php echo _AT('num_takes_test'); ?></label><br />
         <select name="num_takes" id="num_t">
             <option value="<?php echo AT_TESTS_TAKE_UNLIMITED; ?>" <?php if ($_POST['num_takes'] == AT_TESTS_TAKE_UNLIMITED) { echo ''; } ?>><?php echo _AT('unlimited'); ?></option>
-            <?php 
-            foreach(array(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 20) as $e) {
-                $selected = ($_POST['num_takes'] == $e) ? ' selected="selected"' : '';
-                // Set to 1 attempt by default
-                if(!isset($_POST['num_takes']) && $e == 1){
-                    echo sprintf('<option value="%d" selected="selected">%d</option>', $e, $e);
-                }else{
-                    echo sprintf('<option value="%d" %s>%d</option>', $e, $selected, $e);
-                }
-            }
-            ?>
+            <?php echo $this->num_takes_options; ?>
         </select>
     </div>
 
@@ -177,7 +167,17 @@
         <input type="text" name="timed_test_seconds" id="timed_test_seconds" size="2" value="<?php echo $timed_test_seconds; ?>" <?php echo $disabled . $n; ?> /> 
         <label for="timed_test_seconds"><?php echo _AT('seconds'); ?></label>
     </div>
-        
+    
+    <div class="row">
+        <?php echo _AT('timed_test_modes'); ?><br/>
+        <input type="text" name="timed_test_normal_mode" id="timed_test_normal_mode" size="2" value="<?php echo $_POST['timed_test_normal_mode'] ? $_POST['timed_test_normal_mode'] : 60; ?>" <?php echo $disabled . $n; ?> /> 
+        <label for="timed_test_normal_mode"><?php echo _AT('timed_test_normal_mode'); ?></label>
+        <input type="text" name="timed_test_intermediate_mode" id="timed_test_intermediate_mode" size="2" value="<?php echo $_POST['timed_test_intermediate_mode'] ? $_POST['timed_test_intermediate_mode'] : 30; ?>" <?php echo $disabled . $n; ?> /> 
+        <label for="timed_test_intermediate_mode"><?php echo _AT('timed_test_intermediate_mode'); ?></label>
+        <input type="text" name="timed_test_emergency_mode" id="timed_test_emergency_mode" size="2" value="<?php echo $_POST['timed_test_emergency_mode'] ? $_POST['timed_test_emergency_mode'] : 10; ?>" <?php echo $disabled . $n; ?> /> 
+        <label for="timed_test_emergency_mode"><?php echo _AT('timed_test_emergency_mode'); ?></label>
+    </div>
+    
     <div class="row">
         <?php
         foreach($_POST as $key => $value)
@@ -193,7 +193,7 @@
                 echo '
                     <script type="text/javascript">
                     $(document).ready(function() {
-                        edit_custom_duration_row("'.$type.'", '.$type_id.', '.$custom_duration.');
+                        ATutor.mods.tests.create_test.edit_custom_duration_row("'.$type.'", '.$type_id.', '.$custom_duration.');
                     });
                     </script>
                     ';

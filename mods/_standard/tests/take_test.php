@@ -141,6 +141,12 @@ $instructions = $test_row['instructions'];
 $title = $test_row['title'];
 $timed_test = $test_row['timed_test'];
 $timed_test_duration = $test_row['timed_test_duration'];
+$normal_mode = $timed_test ? $test_row['timed_test_normal_mode'] : 0;
+$intermediate_mode = $timed_test ? $test_row['timed_test_intermediate_mode']: 0;
+$emergency_mode = $timed_test ? $test_row['timed_test_emergency_mode'] : 0;
+$normal_mode_seconds = intval($timed_test_duration - (($normal_mode/100) * ($timed_test_duration)));
+$intermediate_mode_seconds = intval($normal_mode_seconds - (($intermediate_mode/100) * ($timed_test_duration)));
+$emergency_mode_seconds = intval($intermediate_mode_seconds - (($emergency_mode/100) * ($timed_test_duration)));
 
 $sql = "SELECT * FROM %stests_custom_duration WHERE test_id = %d";
 $custom_duration_rows = queryDB($sql, array(TABLE_PREFIX, $tid));
@@ -263,7 +269,7 @@ if (!$gid && !$in_progress) {
 <div class="input-form" style="width:95%">
     <fieldset class="group_form"><legend class="group_form"><?php echo $title ?></legend>
 
-        <div id ="test_timer">
+        <div id ="test_timer" class="test_timer">
         </div>
         <div id ="test_timer_aria"  class="region" role="timer" aria-labelledby="live1Label" aria-live="assertive" aria-atomic="false" aria-relevant="additions" style="
     opacity: 0;" >
@@ -326,13 +332,15 @@ if (!$gid && !$in_progress) {
         if($timed_test == 1)
         {
         ?>
-            CreateTimer("test_timer", "test_timer_hidden", <?php echo $timer;?>);
-            $(document).keypress(function(e) {
-                var code = e.keyCode || e.which;
+            CreateTimer("test_timer", "test_timer_hidden", <?php echo $timer;?>, <?php echo $normal_mode_seconds;?>, <?php echo $intermediate_mode_seconds;?>, <?php echo $emergency_mode_seconds;?>);
+            $("#test_timer").scrollToFixed({ marginTop: 22 });
+            
+            $(document).keydown(function(e) {
                 var convertedObj = {hours:0, mins:0, secs:0};
-                if(code == 116) {
-                    convert_duration_to_hhmmss($("#test_timer_hidden").val(), convertedObj);
-                    $("#test_timer_aria").text(convertedObj.hours + " hours " + convertedObj.mins + " minutes " + convertedObj.secs + " seconds remaining");
+                if(e.altKey && e.keyCode == 84){ //Alt+t
+                    updateLiveRegion($("#test_timer_hidden").val(), convertedObj, "#test_timer_aria");
+                } else if(e.altKey && e.keyCode == 73) { //Alt+i
+                    toggleTimerSize();
                 }
             });
         <?php

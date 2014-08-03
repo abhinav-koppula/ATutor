@@ -23,6 +23,7 @@ ATutor.mods.tests.create_test = ATutor.mods.tests.create_test || {};
             passscore = $("#passscore"),
             num_questions = $("#num_questions"),
             timed_test_duration = [$("#timed_test_hours"), $("#timed_test_minutes"), $("#timed_test_seconds")],
+            timed_test_modes = [$("#timed_test_normal_mode"), $("#timed_test_intermediate_mode"), $("#timed_test_emergency_mode")],
             show_guest_form = $("#show_guest_form");
         
         // Disable/Enable elements based on what user clicked
@@ -42,8 +43,12 @@ ATutor.mods.tests.create_test = ATutor.mods.tests.create_test || {};
         } else if (name === "num_questions") {
             num_questions[(disableFlag) ? "attr" : "removeAttr"]("disabled", "");
         } else if (name === "timed_test_duration") {
-            $(timed_test_duration).each(function(id){
+            $(timed_test_duration).each(function(id) {
                 var elem = timed_test_duration[id]
+                elem[(disableFlag) ? "attr" : "removeAttr"]("disabled", "");
+            });
+            $(timed_test_modes).each(function(id) {
+                var elem = timed_test_modes[id]
                 elem[(disableFlag) ? "attr" : "removeAttr"]("disabled", "");
             });
         } else if (name === "show_guest_form") {
@@ -78,11 +83,22 @@ ATutor.mods.tests.create_test = ATutor.mods.tests.create_test || {};
         ATutor.mods.tests.jumpTo("a[name=content]");
         $(".row.buttons input[name=submit]").focus();
     };
-
+    
+    ATutor.mods.tests.create_test.custom_duration_row_id = 0;
+    
+    
     ATutor.mods.tests.create_test.change_options = function(ele, id) {
         var val = ele.value;
         $("#custom_duration_options_"+ id +" option").remove();
         $('#custom_duration_options_'+ id).append(ATutor.mods.tests.create_test.get_options(val))
+    }
+    
+    ATutor.mods.tests.create_test.select_row = function(ele, id) {
+        if(ele.checked) {
+            $('#custom_duration_row_'+id).addClass('selected');
+        } else {
+            $('#custom_duration_row_'+id).removeClass('selected');
+        }
     }
     
     ATutor.mods.tests.create_test.add_custom_duration_row = function(id, type, type_id, hours, mins, secs) {
@@ -112,7 +128,7 @@ ATutor.mods.tests.create_test = ATutor.mods.tests.create_test || {};
         
         var data="";
         data+="<tr id='custom_duration_row_"+id+"' >";
-        data+="<td><input type='checkbox' name='custom_duration_checkbox_"+id+"' id='custom_duration_checkbox_"+id+"' onclick='javascript:ATutor.mods.tests.create_test.selectRow("+id+");' /><label for='' ></label></td>"
+        data+="<td><input type='checkbox' name='custom_duration_checkbox_"+id+"' id='custom_duration_checkbox_"+id+"' onclick='javascript:ATutor.mods.tests.create_test.select_row(this, "+id+");' /><label for='' ></label></td>"
         data+="<td>\
                 <select name='custom_duration_type_"+id+"' id='custom_duration_type_"+id+"' onchange='javascript:ATutor.mods.tests.create_test.change_options(this, "+id+");' >\
                     <option value='-1'"+ type_selected_none +">select type</option>\
@@ -139,7 +155,7 @@ ATutor.mods.tests.create_test = ATutor.mods.tests.create_test || {};
                 </tr>";
         $('#custom_duration tbody').append(data);
         $('#custom_duration_options_'+id+' option[value="'+type_id+'"]').attr('selected', 'selected');
-        $( ".combobox" ).combobox();
+        $(".combobox" ).combobox();
     }
     
     ATutor.mods.tests.create_test.edit_custom_duration_row = function(type, type_id, custom_duration) {
@@ -148,16 +164,6 @@ ATutor.mods.tests.create_test = ATutor.mods.tests.create_test || {};
         var secs = (parseInt)(custom_duration % 60);
         ATutor.mods.tests.create_test.add_custom_duration_row(ATutor.mods.tests.create_test.custom_duration_row_id++, type, type_id, hours, mins, secs);
     }
-    
-    ATutor.mods.tests.create_test.selectRow = function(id) {
-        var checkbox_check = ($('#custom_duration_checkbox_'+id).prop('checked'));
-        if(checkbox_check == true) {
-            $('#custom_duration_row_'+id).addClass('selected');
-        } else {
-            $('#custom_duration_row_'+id).removeClass('selected');
-        }
-    }
-    
     
     /**
     * Function to activate Slide All link for the Remedial Content divs
