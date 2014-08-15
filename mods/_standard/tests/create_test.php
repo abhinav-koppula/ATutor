@@ -17,6 +17,7 @@ define('AT_INCLUDE_PATH', '../../../include/');
 require(AT_INCLUDE_PATH.'vitals.inc.php');
 require(AT_INCLUDE_PATH.'../mods/_standard/tests/lib/test_result_functions.inc.php');
 require(AT_INCLUDE_PATH.'../mods/_standard/tests/lib/test_custom_duration_functions.inc.php');
+require(AT_INCLUDE_PATH.'../mods/_standard/tests/lib/test_helper_functions.inc.php');
 $_custom_head .= '<script type="text/javascript" src="'.AT_BASE_HREF.'mods/_standard/tests/js/tests.js"></script>';
 
 authenticate(AT_PRIV_TESTS);
@@ -26,10 +27,10 @@ $tid = intval($_REQUEST['tid']);
 
 if (isset($_POST['cancel'])) {
     $msg->addFeedback('CANCELLED');
-        $return_url = $_SESSION['tool_origin']['url'];
-        tool_origin('off');
-		header('Location: '.$return_url);
-		exit;
+    $return_url = $_SESSION['tool_origin']['url'];
+    tool_origin('off');
+	header('Location: '.$return_url);
+    exit;
 } else if (isset($_POST['submit'])) {
     $missing_fields                         = array();
     $_POST['title']                         = trim($_POST['title']);
@@ -57,27 +58,7 @@ if (isset($_POST['cancel'])) {
     $_POST['format']               = intval($_POST['format']);
     $_POST['order']                = 1;  //intval($_POST['order']);
     $_POST['difficulty']           = 0;  //intval($_POST['difficulty']);     /* avman */
-        
-    if ($_POST['title'] == '') {
-        $missing_fields[] = _AT('title');
-    }
 
-    if ($_POST['random'] && !$_POST['num_questions']) {
-        $missing_fields[] = _AT('num_questions_per_test');
-    }
-
-    if($_POST['timed_test']) {
-        if(!$_POST['timed_test_hours'] && !$_POST['timed_test_minutes'] && !$_POST['timed_test_seconds']) {
-            $missing_fields[] = _AT('timed_test_duration_zero');
-        }
-        
-        if($_POST['timed_test_hours'] < 0 || $_POST['timed_test_minutes'] < 0 || $_POST['timed_test_seconds'] < 0 ) {
-            $missing_fields[] = _AT('timed_test_duration_negative');
-        }
-        
-    }
-    
-    $custom_student_array = array();
     $custom_group_array = array();
     foreach($_POST as $key => $value)
     {
@@ -85,10 +66,6 @@ if (isset($_POST['cancel'])) {
             $id = substr($key, -1);
             $type = $_POST["custom_duration_type_".$id];
             $type_id = $_POST["custom_duration_options_".$id];
-            $custom_duration_hours = $_POST["custom_duration_hours_".$id];
-            $custom_duration_minutes = $_POST["custom_duration_minutes_".$id];
-            $custom_duration_seconds = $_POST["custom_duration_seconds_".$id];
-            $custom_duration = intval($custom_duration_hours) * 3600 + intval($custom_duration_minutes) * 60 + intval($custom_duration_seconds);
             
             if($type == 'group') {
                 $sql = "SELECT member_id FROM %sgroups_members WHERE group_id = %d";
@@ -96,29 +73,12 @@ if (isset($_POST['cancel'])) {
                 foreach($member_rows as $member_row) {
                     array_push($custom_group_array, $member_row['member_id']);
                 }
-            } else if($type == 'student') {
-                array_push($custom_student_array, $type_id);
             }
-            
-            if($type != -1 && $type_id != -1 && ($custom_duration_hours == 0  && $custom_duration_minutes == 0 && $custom_duration_seconds == 0) )
-            $missing_fields[] = _AT('test_custom_duration_zero');
-            
-            if($type != -1 && $type_id != -1 && ($custom_duration_hours < 0  || $custom_duration_minutes < 0 || $custom_duration_seconds < 0) )
-            $missing_fields[] = _AT('test_custom_duration_negative');
         }
     }
-    $common_students = array_intersect($custom_group_array, $custom_student_array);
-    if(count($common_students) > 0) {
-        $missing_fields[] = _AT('duplicate_custom_duration');
-    }
     
-    if ($_POST['pass_score']==1 && !$_POST['passpercent']) {
-        $missing_fields[] = _AT('percentage_score');
-    }
-
-    if ($_POST['pass_score']==2 && !$_POST['passscore']) {
-        $missing_fields[] = _AT('points_score');
-    }
+    $missing_fields = check_missing_fields($_POST, $custom_group_array);
+    $missing_fields = array_map('_AT', $missing_fields);
     
     /* 
      * If test is anonymous and have submissions, then we don't permit changes.
