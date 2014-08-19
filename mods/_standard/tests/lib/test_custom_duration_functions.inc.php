@@ -1,18 +1,17 @@
 <?php
-/************************************************************************/
+/* * ****************************************************************** */
 /* ATutor                                                               */
-/************************************************************************/
-/* Copyright (c) 2002-2014                                              */
+/* * ****************************************************************** */
+/* Copyright (c) 2014                                                   */
 /* Inclusive Design Institute                                           */
 /* http://atutor.ca                                                     */
 /* This program is free software. You can redistribute it and/or        */
 /* modify it under the terms of the GNU General Public License          */
 /* as published by the Free Software Foundation.                        */
-/************************************************************************/
-// $Id$
+/* * ****************************************************************** */
+// $Id$                                         Author: Abhinav Koppula */
 
-function get_all_students()
-{
+function get_all_students() {
     global $system_courses;
     $course_id = $_SESSION['course_id'];
     $instructor_id = $system_courses[$course_id]['member_id'];
@@ -39,29 +38,26 @@ function get_student_options() {
     return $options;
 }
 
-function get_group_options()
-{
+function get_group_options() {
     //show groups
-            $sql    = "SELECT * FROM %sgroups_types WHERE course_id=%d ORDER BY title";
-            $rows_groups = queryDB($sql, array(TABLE_PREFIX, $_SESSION['course_id']));
-            $options = "";
-            if(count($rows_groups) > 0){
-                foreach($rows_groups as $row){
-                    //$options.="<optgroup label = '".$row['title']."'>";
+    $sql    = "SELECT * FROM %sgroups_types WHERE course_id=%d ORDER BY title";
+    $rows_groups = queryDB($sql, array(TABLE_PREFIX, $_SESSION['course_id']));
+    $options = "";
+    if(count($rows_groups) > 0){
+        foreach($rows_groups as $row){
+            //$options.="<optgroup label = '".$row['title']."'>";       
+            $sql    = "SELECT * FROM %sgroups WHERE type_id=%d ORDER BY title";
+            $g_result = queryDB($sql, array(TABLE_PREFIX, $row['type_id']));
                     
-                    $sql    = "SELECT * FROM %sgroups WHERE type_id=%d ORDER BY title";
-                    $g_result = queryDB($sql, array(TABLE_PREFIX, $row['type_id']));
-                    
-                    foreach($g_result as $grow){
-                        $options.="<option value='".$grow['group_id']."' name='groups[".$grow['group_id']."]' >".$grow['title']."</option>";
-                    }
-                }
-            } 
-            return $options;
+            foreach($g_result as $grow){
+                $options.="<option value='".$grow['group_id']."' name='groups[".$grow['group_id']."]' >".$grow['title']."</option>";
+            }    
+        }
+    }
+    return $options;
 }
 
-function validate_type($type, $type_id)
-{
+function validate_type($type, $type_id) {
     if($type == 'group') {
         $sql    = "SELECT * FROM %sgroups_types WHERE course_id=%d ORDER BY title";
         $rows_groups = queryDB($sql, array(TABLE_PREFIX, $_SESSION['course_id']));
@@ -87,13 +83,11 @@ function validate_type($type, $type_id)
     return false;
 }
 
-function convert_hhmmss_to_duration($hours, $mins, $secs)
-{
+function convert_hhmmss_to_duration($hours, $mins, $secs) {
     return intval($hours) * 3600 + intval($mins) * 60 + intval($secs);
 }
 
-function convert_duration_to_hhmmss($duration, &$hours, &$mins, &$secs)
-{
+function convert_duration_to_hhmmss($duration, &$hours, &$mins, &$secs) {
     $hours = (int)($duration/3600);
     $mins = (int)(($duration % 3600)/60);
     $secs = ($duration)%60;

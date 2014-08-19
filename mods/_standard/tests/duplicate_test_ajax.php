@@ -1,17 +1,17 @@
 <?php
 
-/* * ************************************************************* */
-/* ATutor                                                       */
-/* * ************************************************************* */
-/* Copyright (c) 2002-2010                                      */
-/* Inclusive Design Institute                                   */
-/* http://atutor.ca                                             */
-/*                                                              */
-/* This program is free software. You can redistribute it and/or */
-/* modify it under the terms of the GNU General Public License  */
-/* as published by the Free Software Foundation.                */
-/* * ************************************************************* */
-// $Id$
+/* * ****************************************************************** */
+/* ATutor                                                               */
+/* * ****************************************************************** */
+/* Copyright (c) 2014                                                   */
+/* Inclusive Design Institute                                           */
+/* http://atutor.ca                                                     */
+/* This program is free software. You can redistribute it and/or        */
+/* modify it under the terms of the GNU General Public License          */
+/* as published by the Free Software Foundation.                        */
+/* * ****************************************************************** */
+// $Id$                                         Author: Abhinav Koppula */
+
 define('AT_INCLUDE_PATH', '../../../include/');
 require(AT_INCLUDE_PATH . 'vitals.inc.php');
 require(AT_INCLUDE_PATH . '../mods/_standard/tests/lib/test_result_functions.inc.php');

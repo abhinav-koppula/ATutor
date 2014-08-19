@@ -1,16 +1,15 @@
 <?php
-/************************************************************************/
+/* * ****************************************************************** */
 /* ATutor                                                               */
-/************************************************************************/
-/* Copyright (c) 2002-2014                                              */
+/* * ****************************************************************** */
+/* Copyright (c) 2014                                                   */
 /* Inclusive Design Institute                                           */
 /* http://atutor.ca                                                     */
 /* This program is free software. You can redistribute it and/or        */
 /* modify it under the terms of the GNU General Public License          */
 /* as published by the Free Software Foundation.                        */
-/************************************************************************/
-// $Id$
-
+/* * ****************************************************************** */
+// $Id$                                         Author: Abhinav Koppula */
 
 function check_missing_fields($post_array, $custom_group_array) {
     $missing_fields = array();

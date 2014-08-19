@@ -1,3 +1,16 @@
+<?php
+/* * ****************************************************************** */
+/* ATutor                                                               */
+/* * ****************************************************************** */
+/* Copyright (c) 2014                                                   */
+/* Inclusive Design Institute                                           */
+/* http://atutor.ca                                                     */
+/* This program is free software. You can redistribute it and/or        */
+/* modify it under the terms of the GNU General Public License          */
+/* as published by the Free Software Foundation.                        */
+/* * ****************************************************************** */
+// $Id$                                         Author: Abhinav Koppula */
+?>
 <form action="<?php echo $_SERVER['PHP_SELF']; ?>" method="post" name="form">
     <?php if($this->tid > 0): ?>
     <input type="hidden" name="tid" value="<?php echo $this->tid; ?>" />

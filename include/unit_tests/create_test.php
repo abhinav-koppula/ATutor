@@ -1,8 +1,19 @@
 <?php
+/* * ****************************************************************** */
+/* ATutor                                                               */
+/* * ****************************************************************** */
+/* Copyright (c) 2014                                                   */
+/* Inclusive Design Institute                                           */
+/* http://atutor.ca                                                     */
+/* This program is free software. You can redistribute it and/or        */
+/* modify it under the terms of the GNU General Public License          */
+/* as published by the Free Software Foundation.                        */
+/* * ****************************************************************** */
+// $Id$                                         Author: Abhinav Koppula */
+
 define('AT_INCLUDE_PATH' , '../../include/');
 require_once (AT_INCLUDE_PATH. '../mods/_standard/tests/lib/test_helper_functions.inc.php');
-require_once (AT_INCLUDE_PATH. 'lib/mysql_connect.inc.php');
-require_once (AT_INCLUDE_PATH. 'config.inc.php');
+
 class CreateTest extends PHPUnit_Framework_TestCase {
     
     protected $post_array;
@@ -41,6 +52,7 @@ class CreateTest extends PHPUnit_Framework_TestCase {
         $this->post_array['instructions'] = '';
         $this->post_array['submit'] = 'Save';
     }
+    
     public function test_check_missing_fields() {
         /* Functional Test to check all validations 
          * Missing Fields = title, timed test duration, negative timed test custom duration, duplicate custom duration, percentage score
@@ -73,12 +85,14 @@ class CreateTest extends PHPUnit_Framework_TestCase {
         $actual = check_missing_fields($this->post_array, $custom_group_array);
         $this->assertEquals($expected, $actual);
     }
+    
     public function test_push_if_not_empty() {
         $missing_fields = array();
         $expected = ['test for empty'];
         push_if_not_empty($missing_fields, 'test for empty');
         $this->assertEquals($expected, $missing_fields);
     }
+    
     public function test_check_missing_title() {
         $this->post_array['title'] = '';
         
@@ -86,6 +100,7 @@ class CreateTest extends PHPUnit_Framework_TestCase {
         $actual = check_missing_title($this->post_array);
         $this->assertEquals($expected, $actual);
     }
+    
     public function test_check_missing_num_questions() {
         $this->post_array['random'] = 1;
         $this->post_array['num_questions'] = '';
@@ -94,6 +109,7 @@ class CreateTest extends PHPUnit_Framework_TestCase {
         $actual = check_missing_num_questions($this->post_array);
         $this->assertEquals($expected, $actual);
     }
+    
     public function test_check_missing_timed_test_duration() {
         $this->post_array['timed_test'] = 1;
         $this->post_array['timed_test_hours'] = 0;
@@ -104,6 +120,7 @@ class CreateTest extends PHPUnit_Framework_TestCase {
         $actual = check_missing_timed_test_duration($this->post_array);
         $this->assertEquals($expected, $actual);
     }
+    
     public function test_check_negative_timed_test_duration() {
         $this->post_array['timed_test'] = 1;
         $this->post_array['timed_test_hours'] = -5;
@@ -114,6 +131,7 @@ class CreateTest extends PHPUnit_Framework_TestCase {
         $actual = check_negative_timed_test_duration($this->post_array);
         $this->assertEquals($expected, $actual);
     }
+    
     public function test_check_missing_custom_timed_test_duration() {
         $id = 0;
         $this->post_array['custom_duration_options_'.$id] = 'group';
@@ -122,6 +140,7 @@ class CreateTest extends PHPUnit_Framework_TestCase {
         $actual = check_missing_custom_timed_test_duration($this->post_array, $id);
         $this->assertEquals($expected, $actual);
     }
+    
     public function test_check_negative_custom_timed_test_duration() {
         $id = 0;
         $this->post_array['custom_duration_options_'.$id] = 'group';
@@ -133,6 +152,7 @@ class CreateTest extends PHPUnit_Framework_TestCase {
         $actual = check_negative_custom_timed_test_duration($this->post_array, $id);
         $this->assertEquals($expected, $actual);
     }
+    
     public function test_check_duplicate_custom_duration() {
         $custom_group_array = [1,2,3];
         $custom_student_array = [2,4,5];
@@ -141,6 +161,7 @@ class CreateTest extends PHPUnit_Framework_TestCase {
         $actual = check_duplicate_custom_duration($custom_group_array, $custom_student_array);
         $this->assertEquals($expected, $actual);
     }
+    
     public function test_check_percentage_score() {
         $this->post_array['pass_score'] = 1;
         $this->post_array['passpercent'] = 0;
@@ -149,6 +170,7 @@ class CreateTest extends PHPUnit_Framework_TestCase {
         $actual = check_percentage_score($this->post_array);
         $this->assertEquals($expected, $actual);
     }
+    
     public function test_check_points_score() {
         $this->post_array['pass_score'] = 2;
         $this->post_array['passscore'] = '';
