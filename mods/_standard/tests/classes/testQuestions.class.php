@@ -1478,6 +1478,7 @@ class MultianswerQuestion extends MultichoiceQuestion {
     /*protected */ var $sNameVar = 'test_ma';
 
     /*public */function mark($row) { 
+        $num_choices = count($_POST['answers'][$row['question_id']]);
         $num_correct = array_sum(array_slice($row, 3));
 
         if (is_array($_POST['answers'][$row['question_id']]) && count($_POST['answers'][$row['question_id']]) > 1) {
@@ -1497,8 +1498,13 @@ class MultianswerQuestion extends MultichoiceQuestion {
             }
             if ($num_answer_correct == $num_correct) {
                 $score = $row['weight'];
-            } else {
-                $score = 0;
+            } else if ($num_answer_correct > 0) {
+                $score = number_format($row['weight'] / $num_choices * $num_answer_correct, 2);
+                if ( (float) (int) $score == $score) {
+                    $score = (int) $score; // a whole number with decimals, eg. "2.00"
+                } else {
+                    $score = trim($score, '0'); // remove trailing zeros, if any
+                }
             }
             $_POST['answers'][$row['question_id']] = implode('|', $_POST['answers'][$row['question_id']]);
         } else {
