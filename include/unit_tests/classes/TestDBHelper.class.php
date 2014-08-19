@@ -13,13 +13,13 @@
 
 require_once (AT_INCLUDE_PATH. 'lib/mysql_connect.inc.php');
 require_once (AT_INCLUDE_PATH. 'config.inc.php');
-
+require_once (AT_INCLUDE_PATH. 'unit_tests/include/config.tests.inc.php');
 class DBHelper {
     
     public function setUp() {
         global $db;
-        $db = at_db_connect('localhost', '3306', 'root', '', 'atutor_test');
-        at_db_select('atutor_test', $db);
+        $db = at_db_connect(TEST_DB_HOST, TEST_DB_PORT, TEST_DB_USER, TEST_DB_PASSWORD, TEST_DB_NAME);
+        at_db_select(TEST_DB_NAME, $db);
         return $db;
     }
     
