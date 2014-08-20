@@ -817,7 +817,7 @@ CREATE TABLE `tests` (
   `timed_test_duration` INT(11) NOT NULL DEFAULT '0',
   `timed_test_normal_mode` INT(11) NOT NULL DEFAULT '60',
   `timed_test_intermediate_mode` INT(11) NOT NULL DEFAULT '30',
-  `timed_test_emergency_mode` INT(11) NOT NULL DEFAULT '10'
+  `timed_test_emergency_mode` INT(11) NOT NULL DEFAULT '10',
   PRIMARY KEY  (`test_id`)
 ) ENGINE = MyISAM;
 
