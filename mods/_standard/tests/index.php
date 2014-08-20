@@ -230,7 +230,7 @@ $cols=6;
             if(tid) {
                 $( "#testDuplicate-dialog" ).dialog( "open" );
             } else {
-                alert("<?php echo _AT('NO_ITEM_SELECTED'); ?>")
+                alert("<?php echo _AT('no_item_selected'); ?>")
             }
         });
         

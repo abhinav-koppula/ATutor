@@ -348,7 +348,7 @@ if (count($question_row)==0) {
                 console.log(data);
             }
         );
-        return "You haven't submitted the assessment.";
+        return "<?php echo _AT('not_submitted_assessment'); ?>";
     });
     
     $(document).ready(function(){
@@ -371,8 +371,8 @@ if (count($question_row)==0) {
         }
         ?>
         TestTimeout({
-            title                   : "Time Up!",
-            message                 : "Time Up. Your answers will be submitted.",
+            title                   : "<?php echo _AT('timeout_title'); ?>",
+            message                 : "<?php echo _AT('timeout_message'); ?>",
             buttons                 : { "Ok": function() { $(this).dialog("close"); 
             }}
         });
