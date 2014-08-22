@@ -17,238 +17,205 @@ require_once (AT_INCLUDE_PATH. '../mods/_standard/tests/lib/test_db_helper_funct
 
 class CreateTestDb extends PHPUnit_Framework_TestCase {
     protected $post_array, $db_helper;
+    
+    //Dummy post array is used in all edit functions to insert dummy data which is 
+    //edited/updated by the incoming $edited_post_array parameter
+    public static $dummy_post_array = array();
+    
     public function setUp() {
         
         $this->db_helper = new DBHelper();
         $this->db_helper->setUp();
         
-        $this->post_array = array();
-        $this->post_array['title'] = 'Test Title';
-        $this->post_array['description'] = 'Test Description';
-        $this->post_array['format'] = 0;
-        $this->post_array['day_start'] = 15;
-        $this->post_array['month_start'] = 8;
-        $this->post_array['year_start'] = 2014;
-        $this->post_array['hour_start'] = 12;
-        $this->post_array['min_start'] = 0;
-        $this->post_array['day_end'] = 15;
-        $this->post_array['month_end'] = 8;
-        $this->post_array['year_end'] = 2014;
-        $this->post_array['hour_end'] = 12;
-        $this->post_array['min_end'] = 0;
-        $this->post_array['order']  = 1;
-        $this->post_array['num_questions'] = '';
-        $this->post_array['instructions'] = 'Test Instructions';
-        $this->post_array['content_id'] = '';
-        $this->post_array['passscore'] = 0;
-        $this->post_array['passpercent'] = 0;
-        $this->post_array['passfeedback'] = 'Test Pass Feedback';
-        $this->post_array['failfeedback'] = 'Test Fail Feedback';
-        $this->post_array['result_release'] = 0;
-        $this->post_array['random'] = 0;
-        $this->post_array['difficulty']  = 0;
-        $this->post_array['num_takes'] = 0;
-        $this->post_array['anonymous'] = 0;
-        $this->post_array['allow_guests'] = 0;
-        $this->post_array['display'] = 0;
-        $this->post_array['show_guest_form'] = 0;
-        $this->post_array['remedial_content'] = 0;
-        
-        $this->post_array['timed_test'] = 1;
-        $this->post_array['timed_test_hours'] = 1;
-        $this->post_array['timed_test_minutes'] = 30;
-        $this->post_array['timed_test_seconds'] = 0;
-        
-        $this->post_array['timed_test_normal_mode'] = '60';
-        $this->post_array['timed_test_intermediate_mode'] = '30';
-        $this->post_array['timed_test_emergency_mode'] = '10';
-        
-        $this->post_array['submit'] = 'Save';
-        $this->post_array['pass_score'] = 0;
+        $path = AT_INCLUDE_PATH ."/unit_tests/data/create_test_db/";
+        $input_string = file_get_contents($path."dummy_post_array.json");
+        CreateTestDb::$dummy_post_array = json_decode($input_string,true);
     }
     
-    public function test_create_test() {
+    /**
+    * @param $post_array
+    * @param $expected_row
+    * 
+    * @dataProvider create_test_provider
+    */
+    public function test_create_test($post_array, $expected_row) {
+        $this->post_array = $post_array;
         $_SESSION['course_id'] = 1;
         $tables = array('tests');
         $insert_id = create_test($this->post_array);
         
         $sql = "SELECT * FROM %stests WHERE test_id=%d";
         $actual_row = queryDB($sql, array(TABLE_PREFIX, $insert_id));
-        $expected_row = array(
-                        'test_id' => '1', 
-                        'course_id' => '1', 
-                        'title' => 'Test Title', 
-                        'format' => '0', 
-                        'start_date' => '2014-08-15 12:00:00', 
-                        'end_date' => '2014-08-15 12:00:00',
-                        'randomize_order' => '1',
-                        'num_questions' => '0',
-                        'instructions' => 'Test Instructions',
-                        'content_id' => '0',
-                        'result_release' => '0',
-                        'random' => '0',
-                        'difficulty' => '0',
-                        'num_takes' => '0',
-                        'anonymous' => '0',
-                        'out_of' => '',
-                        'guests' => '0',
-                        'display' => '0',
-                        'description' => 'Test Description',
-                        'passscore' => '0',
-                        'passpercent' => '0',
-                        'passfeedback' => 'Test Pass Feedback',
-                        'failfeedback' => 'Test Fail Feedback',
-                        'show_guest_form' => '0',
-                        'remedial_content' => '0',
-                        'timed_test' => '1',
-                        'timed_test_duration' => '5400',
-                        'timed_test_normal_mode' => '60',
-                        'timed_test_intermediate_mode' => '30',
-                        'timed_test_emergency_mode' => '10',
-                        );
+        
         $this->assertEquals($expected_row, $actual_row[0]);
         $this->db_helper->truncate($tables);
     }
     
-    public  function test_insert_custom_duration_fields() {
+    /**
+    * @param $post_array
+    * @param $expected_row
+    *
+    * @dataProvider insert_custom_duration_fields_provider
+    */
+    public  function test_insert_custom_duration_fields($post_array, $expected_row) {
+        $this->post_array = $post_array;
         $_SESSION['course_id'] = 1;
-        $id = 0;
         $tid = 1;
         $table1 = array('tests_custom_duration');
-        $this->post_array['custom_duration_type_'.$id] = 'group';
-        $this->post_array['custom_duration_options_'.$id] = '1';
-        $this->post_array['custom_duration_hours_'.$id] = '1';
-        $this->post_array['custom_duration_minutes_'.$id] = '30';
-        $this->post_array['custom_duration_seconds_'.$id] = '20';
-        
         $table2 = $this->db_helper->seed_groups();
         $tables = array_merge($table1, $table2);
         
         insert_custom_duration_fields($this->post_array, $tid);
         $sql = "SELECT * FROM %stests_custom_duration WHERE test_id=%d";
         $actual_row = queryDB($sql, array(TABLE_PREFIX, $tid));
-        $expected_row = array(
-                        'id' => '1',
-                        'test_id' => $tid,
-                        'type' => 'group',
-                        'type_id' => '1',
-                        'custom_duration' => '5420'
-                        );
+        
         $this->assertEquals($expected_row, $actual_row[0]);
         $this->db_helper->truncate($tables);
     }
     
-    public function test_insert_test_for_groups() {
-        $this->post_array['groups'] = array('1','2');
+    /**
+    * @param $post_array
+    * @param $expected_row
+    *
+    * @dataProvider insert_test_for_groups_provider
+    */
+    public function test_insert_test_for_groups($post_array, $expected_row) {
+        $this->post_array = $post_array;
         $tid = 1;
         $tables = array('tests_groups');
         insert_test_for_groups($this->post_array, $tid);
         $sql = "SELECT * FROM %stests_groups WHERE test_id=%d";
         $actual_row = queryDB($sql, array(TABLE_PREFIX, $tid));
-        $expected_row = array(
-                        0=>array('test_id' => '1', 'group_id' => '1'),
-                        1=>array('test_id' => '1', 'group_id' => '2')
-                        );
+        
         $this->assertEquals($expected_row, $actual_row);
         $this->db_helper->truncate($tables);
     }
     
-    public function test_edit_test() {
+    /**
+    * @param $edited_post_array
+    * @param $expected_row
+    *
+    * @dataProvider edit_test_provider
+    */
+    public function test_edit_test($edited_post_array, $expected_row) {
         $_SESSION['course_id'] = 1;
+        $this->post_array = CreateTestDb::$dummy_post_array;
         $tid = create_test($this->post_array);
         $tables = array('tests');
-        //Setup parameters you want to modify
-        $this->post_array['title'] = 'Updated Title';
-        $this->post_array['description'] = 'Updated Description';
         
+        //Setup parameters you want to modify
+        $this->post_array = $edited_post_array;
         edit_test($this->post_array, $tid, 10);
+        
         $sql = "SELECT * FROM %stests WHERE test_id=%d";
         $actual_row = queryDB($sql, array(TABLE_PREFIX, $tid));
-        $expected_row = array(
-                        'test_id' => '1', 
-                        'course_id' => '1', 
-                        'title' => 'Updated Title', 
-                        'format' => '0', 
-                        'start_date' => '2014-08-15 12:00:00', 
-                        'end_date' => '2014-08-15 12:00:00',
-                        'randomize_order' => '1',
-                        'num_questions' => '0',
-                        'instructions' => 'Test Instructions',
-                        'content_id' => '0',
-                        'result_release' => '0',
-                        'random' => '0',
-                        'difficulty' => '0',
-                        'num_takes' => '0',
-                        'anonymous' => '0',
-                        'out_of' => '10',
-                        'guests' => '0',
-                        'display' => '0',
-                        'description' => 'Updated Description',
-                        'passscore' => '0',
-                        'passpercent' => '0',
-                        'passfeedback' => 'Test Pass Feedback',
-                        'failfeedback' => 'Test Fail Feedback',
-                        'show_guest_form' => '0',
-                        'remedial_content' => '0',
-                        'timed_test' => '1',
-                        'timed_test_duration' => '5400',
-                        'timed_test_normal_mode' => '60',
-                        'timed_test_intermediate_mode' => '30',
-                        'timed_test_emergency_mode' => '10',
-                        );
         $this->assertEquals($expected_row, $actual_row[0]);
         $this->db_helper->truncate($tables);
     }
     
-    public function test_edit_custom_duration_fields() {
+    /**
+    * @param $edited_post_array
+    * @param $expected_row
+    *
+    * @dataProvider edit_custom_duration_fields_provider
+    */
+    public function test_edit_custom_duration_fields($edited_post_array, $expected_row) {
         $_SESSION['course_id'] = 1;
-        $id = 0;
         $tid = 1;
         $table1 = array('tests_custom_duration');
-        $this->post_array['custom_duration_type_'.$id] = 'group';
-        $this->post_array['custom_duration_options_'.$id] = '1';
-        $this->post_array['custom_duration_hours_'.$id] = '1';
-        $this->post_array['custom_duration_minutes_'.$id] = '30';
-        $this->post_array['custom_duration_seconds_'.$id] = '20';
         $table2 = $this->db_helper->seed_groups();
         $tables = array_merge($table1, $table2);
-        insert_custom_duration_fields($this->post_array, $tid);
+        insert_custom_duration_fields(CreateTestDb::$dummy_post_array, $tid);
         
-        $this->post_array['custom_duration_type_'.$id] = 'group';
-        $this->post_array['custom_duration_options_'.$id] = '1';
-        $this->post_array['custom_duration_hours_'.$id] = '1';
-        $this->post_array['custom_duration_minutes_'.$id] = '10';
-        $this->post_array['custom_duration_seconds_'.$id] = '10';
+        $this->post_array = $edited_post_array;
         edit_custom_duration_fields($this->post_array, $tid);
         $sql = "SELECT * FROM %stests_custom_duration WHERE test_id=%d";
         $actual_row = queryDB($sql, array(TABLE_PREFIX, $tid));
-        $expected_row = array(
-                        'id' => '1',
-                        'test_id' => $tid,
-                        'type' => 'group',
-                        'type_id' => '1',
-                        'custom_duration' => '4210'
-                        );
+        
         //Unsetting 'id' as edit would do a delete followed by insert thus making id irrelevant
         unset($actual_row[0]['id']); unset($expected_row['id']);
         $this->assertEquals($expected_row, $actual_row[0]);
         $this->db_helper->truncate($tables);
     }
     
-    public function test_edit_test_for_groups() {
-        $this->post_array['groups'] = array('1','2');
+    /**
+    * @param $edited_post_array
+    * @param $expected_row
+    *
+    * @dataProvider edit_test_for_groups_provider
+    */
+    public function test_edit_test_for_groups($edited_post_array, $expected_row) {
         $tid = 1;
         $tables = array('tests_groups');
-        insert_test_for_groups($this->post_array, $tid);
-        $this->post_array['groups'] = array('3');
+        insert_test_for_groups(CreateTestDb::$dummy_post_array, $tid);
+        $this->post_array = $edited_post_array;
         edit_test_for_groups($this->post_array, $tid);
         $sql = "SELECT * FROM %stests_groups WHERE test_id=%d";
         $actual_row = queryDB($sql, array(TABLE_PREFIX, $tid));
-        $expected_row = array(
-                        0=>array('test_id' => '1', 'group_id' => '3')
-                        );
+        
         $this->assertEquals($expected_row, $actual_row);
         $this->db_helper->truncate($tables);
     }
+    
+    public static function provider_helper($p) {
+        $path = $p;
+        $input_dir = new DirectoryIterator($path."/input");
+        $expected_dir = new DirectoryIterator($path."/expected");
+        $expected = array();
+        $input = array();
+        
+        foreach ($input_dir as $fileinfo) {
+            if (!$fileinfo->isDot()) {
+                $file_name = $fileinfo->getFilename();
+                $input_string = file_get_contents($path."input/".$file_name);
+                $input[] = json_decode($input_string,true);
+            }
+        }
+        foreach ($expected_dir as $fileinfo) {
+            if (!$fileinfo->isDot()) {
+                $file_name = $fileinfo->getFilename();
+                $expected_string = file_get_contents($path."expected/".$file_name);
+                $expected[] = json_decode($expected_string,true);
+            }
+        }
+        
+        $return_array = array();
+        for($i=0; $i<count($input);$i++) {
+            $return_array[] = array($input[$i], $expected[$i]);
+        }
+        
+        return $return_array;
+    }
+    
+    public static function create_test_provider() {
+        $path = AT_INCLUDE_PATH ."/unit_tests/data/create_test_db/test1/";
+        return CreateTestDb::provider_helper($path);
+    }
+    
+    public static function insert_custom_duration_fields_provider() {
+        $path = AT_INCLUDE_PATH ."/unit_tests/data/create_test_db/test2/";
+        return CreateTestDb::provider_helper($path);
+    }
+    
+    public static function insert_test_for_groups_provider() {
+        $path = AT_INCLUDE_PATH ."/unit_tests/data/create_test_db/test3/";
+        return CreateTestDb::provider_helper($path);
+    }
+    
+    public static function edit_test_provider() {
+        $path = AT_INCLUDE_PATH ."/unit_tests/data/create_test_db/test4/";
+        return CreateTestDb::provider_helper($path);
+    }
+    
+    public static function edit_custom_duration_fields_provider() {
+        $path = AT_INCLUDE_PATH ."/unit_tests/data/create_test_db/test5/";
+        return CreateTestDb::provider_helper($path);
+    }
+    
+    public static function edit_test_for_groups_provider() {
+        $path = AT_INCLUDE_PATH ."/unit_tests/data/create_test_db/test6/";
+        return CreateTestDb::provider_helper($path);
+    }
+    
 }
 ?>
