@@ -18,72 +18,25 @@ class CreateTest extends PHPUnit_Framework_TestCase {
     
     protected $post_array;
     
+    //Dummy post array is used in all tests except the functional test(test_check_missing_fields)
+    public static $dummy_post_array = array();
     protected function setUp() {
-        $this->post_array = array();
-        $this->post_array['title'] = 'Test Title';
-        $this->post_array['description'] = 'Test Description';
-        $this->post_array['num_takes'] = 1;
-        $this->post_array['format'] = 0;
-        $this->post_array['anonymous'] = 0;
-        $this->post_array['allow_guests'] = 0;
-        $this->post_array['display'] = 0;
-        $this->post_array['remedial_content'] = 0;
-        $this->post_array['pass_score'] = 0;
-        $this->post_array['passfeedback'] = '';
-        $this->post_array['failfeedback'] = '';
-        $this->post_array['result_release'] = 0;
-        $this->post_array['random'] = 0; 
-        $this->post_array['timed_test'] = 0;
-        $this->post_array['custom_duration_type_0'] = 'group';
-        $this->post_array['custom_duration_options_0'] = -1;
-        $this->post_array['custom_duration_hours_0'] = 0;
-        $this->post_array['custom_duration_minutes_0'] = 0;
-        $this->post_array['custom_duration_seconds_0'] = 0;
-        $this->post_array['day_start'] = 15;
-        $this->post_array['month_start'] = 8;
-        $this->post_array['year_start'] = 2014;
-        $this->post_array['hour_start'] = 12;
-        $this->post_array['min_start'] = 0;
-        $this->post_array['day_end'] = 15;
-        $this->post_array['month_end'] = 8;
-        $this->post_array['year_end'] = 2014;
-        $this->post_array['hour_end'] = 12;
-        $this->post_array['min_end'] = 0;
-        $this->post_array['instructions'] = '';
-        $this->post_array['submit'] = 'Save';
+        $path = AT_INCLUDE_PATH ."/unit_tests/data/create_test/";
+        $input_string = file_get_contents($path."dummy_post_array.json");
+        CreateTest::$dummy_post_array = json_decode($input_string,true);
+        $this->post_array = CreateTest::$dummy_post_array;
     }
     
-    public function test_check_missing_fields() {
-        /* Functional Test to check all validations 
-         * Missing Fields = title, timed test duration, negative timed test custom duration, duplicate custom duration, percentage score
-         */
-        $this->post_array['title'] = '';
-        $this->post_array['timed_test'] = 1;
-        $this->post_array['timed_test_hours'] = 0;
-        $this->post_array['timed_test_minutes'] = 0;
-        $this->post_array['timed_test_seconds'] = 0;
-        $this->post_array['custom_duration_type_0'] = 'group';
-        $this->post_array['custom_duration_options_0'] = 1;
-        $this->post_array['custom_duration_hours_0'] = 1;
-        $this->post_array['custom_duration_minutes_0'] = 30;
-        $this->post_array['custom_duration_seconds_0'] = 0;
-        $this->post_array['custom_duration_type_1'] = 'student';
-        $this->post_array['custom_duration_options_1'] = 1;
-        $this->post_array['custom_duration_hours_1'] = 2;
-        $this->post_array['custom_duration_minutes_1'] = 0;
-        $this->post_array['custom_duration_seconds_1'] = 0;
-        $this->post_array['custom_duration_type_2'] = 'group';
-        $this->post_array['custom_duration_options_2'] = 3;
-        $this->post_array['custom_duration_hours_2'] = -1;
-        $this->post_array['custom_duration_minutes_2'] = -30;
-        $this->post_array['custom_duration_seconds_2'] = 0;
-        $this->post_array['pass_score'] = 1;
-        $this->post_array['passpercent'] = 0;
-        $custom_group_array = [1,2,3];
-        
-        $expected = ['title', 'timed_test_duration_zero', 'test_custom_duration_negative', 'duplicate_custom_duration', 'percentage_score'];
-        $actual = check_missing_fields($this->post_array, $custom_group_array);
-        $this->assertEquals($expected, $actual);
+    /**
+    * @param $post_array
+    * @param $custom_group_array
+    * @param $expected_missing_fields
+    *
+    * @dataProvider check_missing_fields_provider
+    */
+    public function test_check_missing_fields($post_array, $custom_group_array, $expected_missing_fields) {       
+        $actual_missing_fields = check_missing_fields($post_array, $custom_group_array);
+        $this->assertEquals($expected_missing_fields, $actual_missing_fields);
     }
     
     public function test_push_if_not_empty() {
@@ -178,6 +131,23 @@ class CreateTest extends PHPUnit_Framework_TestCase {
         $expected = 'points_score';
         $actual = check_points_score($this->post_array);
         $this->assertEquals($expected, $actual);
+    }
+    
+    public static function provider_helper($test_name) {
+        $path = AT_INCLUDE_PATH ."/unit_tests/data/create_test/";
+        $test_cases_string = file_get_contents($path.$test_name.".json");
+        $test_cases = json_decode($test_cases_string, TRUE);
+        
+        $return_array = array();
+        foreach($test_cases as $test_case) {
+            $return_array[] = array($test_case['input'], $test_case['custom_group_array'], $test_case['expected']);
+        }
+        
+        return $return_array;
+    }
+    
+    public static function check_missing_fields_provider() {
+        return CreateTest::provider_helper('check_missing_fields');
     }
 }
 ?>

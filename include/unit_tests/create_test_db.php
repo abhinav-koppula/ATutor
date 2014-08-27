@@ -157,9 +157,9 @@ class CreateTestDb extends PHPUnit_Framework_TestCase {
         $this->db_helper->truncate($tables);
     }
     
-    public static function provider_helper($p) {
-        $path = $p;
-        $test_cases_string = file_get_contents($path."test_cases.json");
+    public static function provider_helper($test_name) {
+        $path = AT_INCLUDE_PATH ."/unit_tests/data/create_test_db/";
+        $test_cases_string = file_get_contents($path.$test_name.".json");
         $test_cases = json_decode($test_cases_string, TRUE);
         
         $return_array = array();
@@ -171,33 +171,27 @@ class CreateTestDb extends PHPUnit_Framework_TestCase {
     }
     
     public static function create_test_provider() {
-        $path = AT_INCLUDE_PATH ."/unit_tests/data/create_test_db/create_test/";
-        return CreateTestDb::provider_helper($path);
+        return CreateTestDb::provider_helper('create_test');
     }
     
     public static function insert_custom_duration_fields_provider() {
-        $path = AT_INCLUDE_PATH ."/unit_tests/data/create_test_db/insert_custom_duration_fields/";
-        return CreateTestDb::provider_helper($path);
+        return CreateTestDb::provider_helper('insert_custom_duration_fields');
     }
     
     public static function insert_test_for_groups_provider() {
-        $path = AT_INCLUDE_PATH ."/unit_tests/data/create_test_db/insert_test_for_groups/";
-        return CreateTestDb::provider_helper($path);
+        return CreateTestDb::provider_helper('insert_test_for_groups');
     }
     
     public static function edit_test_provider() {
-        $path = AT_INCLUDE_PATH ."/unit_tests/data/create_test_db/edit_test/";
-        return CreateTestDb::provider_helper($path);
+        return CreateTestDb::provider_helper('edit_test');
     }
     
     public static function edit_custom_duration_fields_provider() {
-        $path = AT_INCLUDE_PATH ."/unit_tests/data/create_test_db/edit_custom_duration_fields/";
-        return CreateTestDb::provider_helper($path);
+        return CreateTestDb::provider_helper('edit_custom_duration_fields');
     }
     
     public static function edit_test_for_groups_provider() {
-        $path = AT_INCLUDE_PATH ."/unit_tests/data/create_test_db/edit_test_for_groups/";
-        return CreateTestDb::provider_helper($path);
+        return CreateTestDb::provider_helper('edit_test_for_groups');
     }
     
 }
