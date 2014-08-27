@@ -159,61 +159,44 @@ class CreateTestDb extends PHPUnit_Framework_TestCase {
     
     public static function provider_helper($p) {
         $path = $p;
-        $input_dir = new DirectoryIterator($path."/input");
-        $expected_dir = new DirectoryIterator($path."/expected");
-        $expected = array();
-        $input = array();
-        
-        foreach ($input_dir as $fileinfo) {
-            if (!$fileinfo->isDot()) {
-                $file_name = $fileinfo->getFilename();
-                $input_string = file_get_contents($path."input/".$file_name);
-                $input[] = json_decode($input_string,true);
-            }
-        }
-        foreach ($expected_dir as $fileinfo) {
-            if (!$fileinfo->isDot()) {
-                $file_name = $fileinfo->getFilename();
-                $expected_string = file_get_contents($path."expected/".$file_name);
-                $expected[] = json_decode($expected_string,true);
-            }
-        }
+        $test_cases_string = file_get_contents($path."test_cases.json");
+        $test_cases = json_decode($test_cases_string, TRUE);
         
         $return_array = array();
-        for($i=0; $i<count($input);$i++) {
-            $return_array[] = array($input[$i], $expected[$i]);
+        foreach($test_cases as $test_case) {
+            $return_array[] = array($test_case['input'], $test_case['expected']);
         }
         
         return $return_array;
     }
     
     public static function create_test_provider() {
-        $path = AT_INCLUDE_PATH ."/unit_tests/data/create_test_db/test1/";
+        $path = AT_INCLUDE_PATH ."/unit_tests/data/create_test_db/create_test/";
         return CreateTestDb::provider_helper($path);
     }
     
     public static function insert_custom_duration_fields_provider() {
-        $path = AT_INCLUDE_PATH ."/unit_tests/data/create_test_db/test2/";
+        $path = AT_INCLUDE_PATH ."/unit_tests/data/create_test_db/insert_custom_duration_fields/";
         return CreateTestDb::provider_helper($path);
     }
     
     public static function insert_test_for_groups_provider() {
-        $path = AT_INCLUDE_PATH ."/unit_tests/data/create_test_db/test3/";
+        $path = AT_INCLUDE_PATH ."/unit_tests/data/create_test_db/insert_test_for_groups/";
         return CreateTestDb::provider_helper($path);
     }
     
     public static function edit_test_provider() {
-        $path = AT_INCLUDE_PATH ."/unit_tests/data/create_test_db/test4/";
+        $path = AT_INCLUDE_PATH ."/unit_tests/data/create_test_db/edit_test/";
         return CreateTestDb::provider_helper($path);
     }
     
     public static function edit_custom_duration_fields_provider() {
-        $path = AT_INCLUDE_PATH ."/unit_tests/data/create_test_db/test5/";
+        $path = AT_INCLUDE_PATH ."/unit_tests/data/create_test_db/edit_custom_duration_fields/";
         return CreateTestDb::provider_helper($path);
     }
     
     public static function edit_test_for_groups_provider() {
-        $path = AT_INCLUDE_PATH ."/unit_tests/data/create_test_db/test6/";
+        $path = AT_INCLUDE_PATH ."/unit_tests/data/create_test_db/edit_test_for_groups/";
         return CreateTestDb::provider_helper($path);
     }
     
