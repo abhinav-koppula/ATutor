@@ -1634,7 +1634,7 @@ INSERT INTO `config` (`name`,`value`) VALUES ('transformable_oauth_expire','9360
 
 ########
 # Set the default Home URL to atutorspaces.com
-INSERT INTO `config` (`name`,`value`) VALUES ('home_url','http://www.atutorspaces.com');
+INSERT INTO `config` (`name`,`value`) VALUES ('home_url','https://www.atutorspaces.com');
 
 ########
 # Set the the intial state of the fixed footer to fixed

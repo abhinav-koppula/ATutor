@@ -236,6 +236,7 @@ function validate_filename() {
 </script>
 
 <?php 
+
 // Create a list of install modules
 $installed_mods = array();
 $sql = "SELECT dir_name FROM %smodules";
@@ -243,8 +244,37 @@ $rows_installed_mods = queryDB($sql, array(TABLE_PREFIX));
 	foreach($rows_installed_mods as $installed){
 	    array_push($installed_mods, $installed['dir_name']);
 	}
+	
+    // Sort the data with atutor_version descending
+	foreach ($module_list_array as $key => $row) {
+                $version[$key]  = $row['atutor_version'];
+        }
+        $sort_versions = array_unique($version, SORT_REGULAR);
+        rsort($sort_versions);
 
+    // Add $module_list_array as the last parameter, to sort by the common key
+    // Sorts by original $module_list_array by reference, then returns true|false
+    $sort_by_version = array_multisort($version, SORT_DESC, $module_list_array);
 
+// Create menu for filter ATutor versions
+function select_atversion(){ 
+    global $sort_versions;
+    $menu = '<form action="'.$_SERVER['PHP_SELF'].'" method="post">'; 
+    $menu.= '<select name="atversions">';
+    $menu.= '<option value="0">'._AT("all").'</option>';
+    foreach($sort_versions as $version){
+        if($version == VERSION){
+            $menu .= '<option value="'.$version.'" selected="selected">'.$version.'</option>';
+        }else{
+            $menu .= '<option value="'.$version.'" >'.$version.'</option>';
+        }
+    }
+    $menu .='</select>';
+    $menu .='<input type="submit"  value="'. _AT('filter').'"/></form>';
+    return $menu;
+}
+
+$savant->assign('atversions', select_atversion());
 $savant->assign('enable_upload', $enable_upload);
 $savant->assign('enable_remote_installation', $enable_remote_installtion);
 $savant->assign('keys', $keys);
