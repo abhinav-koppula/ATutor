@@ -216,17 +216,16 @@
         <table class="data" summary="" id="custom_duration">
             <thead>
                 <tr>
-                    <th scope="col"></th>
                     <th scope="col"><?php echo _AT('type'); ?></th>
                     <th scope="col"><?php echo _AT('name'); ?></th>
                     <th scope="col"><?php echo _AT('custom_duration'); ?></th>
+                    <th scope="col"></th>
                 </tr>   
             </thead>
             <tfoot>
                 <tr>
                     <td colspan="4">
-                        <input type="button" name="add" value="<?php echo _AT('add'); ?>" id="add_custom_duration_row" /> 
-                        <input type="button" name="delete" value="<?php echo _AT('delete'); ?>" id="delete_custom_duration_row" />
+                        <input type="button" name="add" value="<?php echo _AT('add'); ?>" id="add_custom_duration_row" />
                     </td>
                 </tr>
             </tfoot>

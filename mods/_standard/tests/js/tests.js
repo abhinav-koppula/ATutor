@@ -93,12 +93,8 @@ ATutor.mods.tests.create_test = ATutor.mods.tests.create_test || {};
         $('#custom_duration_options_'+ id).append(ATutor.mods.tests.create_test.get_options(val))
     }
     
-    ATutor.mods.tests.create_test.select_row = function(ele, id) {
-        if(ele.checked) {
-            $('#custom_duration_row_'+id).addClass('selected');
-        } else {
-            $('#custom_duration_row_'+id).removeClass('selected');
-        }
+    ATutor.mods.tests.create_test.delete_row = function(id) {
+        $('#custom_duration_row_'+id).remove();
     }
     
     ATutor.mods.tests.create_test.add_custom_duration_row = function(id, type, type_id, hours, mins, secs) {
@@ -128,7 +124,6 @@ ATutor.mods.tests.create_test = ATutor.mods.tests.create_test || {};
         
         var data="";
         data+="<tr id='custom_duration_row_"+id+"' >";
-        data+="<td><input type='checkbox' name='custom_duration_checkbox_"+id+"' id='custom_duration_checkbox_"+id+"' onclick='javascript:ATutor.mods.tests.create_test.select_row(this, "+id+");' /><label for='' ></label></td>"
         data+="<td>\
                 <select name='custom_duration_type_"+id+"' id='custom_duration_type_"+id+"' onchange='javascript:ATutor.mods.tests.create_test.change_options(this, "+id+");' >\
                     <option value='-1'"+ type_selected_none +">select type</option>\
@@ -136,23 +131,24 @@ ATutor.mods.tests.create_test = ATutor.mods.tests.create_test || {};
                     <option value='student'"+ type_selected_student +">Student</option>\
                 </select>\
                </td>";
-        data+="<td>";
-   
-            
-        data+="<div class='ui-widget'>\
+        data+="<td>\
+                <div class='ui-widget'>\
                 <select name='custom_duration_options_"+id+"' id='custom_duration_options_"+id+"' class='combobox' >\
                 <option value='-1'>select group/student</option>"+ATutor.mods.tests.create_test.get_options(type)+"\
-               </select></div>";
-        data+="</td>";
-        data+="<td>";
-        data+="<input type='text' name='custom_duration_hours_"+id+"' id='custom_duration_hours_"+id+"' size='2' value='"+ hours +"' />\
+                </select></div>\
+               </td>";
+        data+="<td>\
+                <input type='text' name='custom_duration_hours_"+id+"' id='custom_duration_hours_"+id+"' size='2' value='"+ hours +"' />\
                 <label for='custom_duration_hours_"+id+"' ><?php echo _AT('hours'); ?></label>\
                 <input type='text' name='custom_duration_minutes_"+id+"' id='custom_duration_minutes_"+id+"' size='2' value='"+ mins +"' /> \
                 <label for='custom_duration_minutes_"+id+"'><?php echo _AT('in_minutes'); ?></label> \
                 <input type='text' name='custom_duration_seconds_"+id+"' id='custom_duration_seconds_"+id+"' size='2' value='"+ secs +"' /> \
                 <label for='custom_duration_seconds_"+id+"' ><?php echo _AT('seconds'); ?></label>\
-                </td>\
-                </tr>";
+               </td>";
+        data+="<td>\
+                <span class='ui-icon ui-icon-trash' onclick='javascript:ATutor.mods.tests.create_test.delete_row("+id+");' ></span>\
+               </td>"
+        data+="</tr>";
         $('#custom_duration tbody').append(data);
         $('#custom_duration_options_'+id+' option[value="'+type_id+'"]').attr('selected', 'selected');
         $(".combobox" ).combobox();

@@ -247,14 +247,13 @@ $savant->display('create_test.tmpl.php');
     }
     
     $(document).ready(function(){
-        $('#delete_custom_duration_row').click(function(){
-            $('#custom_duration').find('.selected').remove();
-        });
         $('#add_custom_duration_row').click(function(){ 
             ATutor.mods.tests.create_test.add_custom_duration_row(ATutor.mods.tests.create_test.custom_duration_row_id++);
         });
         
-        ATutor.mods.tests.create_test.add_custom_duration_row(ATutor.mods.tests.create_test.custom_duration_row_id++);
+        <?php if(!$tid) { ?>
+            ATutor.mods.tests.create_test.add_custom_duration_row(ATutor.mods.tests.create_test.custom_duration_row_id++);
+        <?php } ?>
     });
 </script>
 <?php require (AT_INCLUDE_PATH.'footer.inc.php'); ?>
