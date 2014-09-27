@@ -11,8 +11,10 @@
 /* * ****************************************************************** */
 // $Id$                                         Author: Abhinav Koppula */
 
-define('AT_INCLUDE_PATH' , '../../include/');
-require_once (AT_INCLUDE_PATH. 'unit_tests/classes/TestDBHelper.class.php');
+if (!defined('AT_INCLUDE_PATH')) {
+    define('AT_INCLUDE_PATH', '../include/');
+}
+require_once ('classes/TestDBHelper.class.php');
 require_once (AT_INCLUDE_PATH. '../mods/_standard/tests/lib/test_db_helper_functions.inc.php');
 
 class CreateTestDb extends PHPUnit_Framework_TestCase {
@@ -27,7 +29,7 @@ class CreateTestDb extends PHPUnit_Framework_TestCase {
         $this->db_helper = new DBHelper();
         $this->db_helper->setUp();
         
-        $path = AT_INCLUDE_PATH ."/unit_tests/data/create_test_db/";
+        $path = AT_INCLUDE_PATH ."../unit_tests/modules/test/data/create_test_db/";
         $input_string = file_get_contents($path."dummy_post_array.json");
         CreateTestDb::$dummy_post_array = json_decode($input_string,true);
     }
@@ -158,7 +160,7 @@ class CreateTestDb extends PHPUnit_Framework_TestCase {
     }
     
     public static function provider_helper($test_name) {
-        $path = AT_INCLUDE_PATH ."/unit_tests/data/create_test_db/";
+        $path = AT_INCLUDE_PATH ."../unit_tests/modules/test/data/create_test_db/";
         $test_cases_string = file_get_contents($path.$test_name.".json");
         $test_cases = json_decode($test_cases_string, TRUE);
         

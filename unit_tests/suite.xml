@@ -1,0 +1,9 @@
+<phpunit>
+  <testsuites>
+    <testsuite name="TestsModule">
+      <file>modules/test/create_test.php</file>
+      <file>modules/test/create_test_db.php</file>
+      <file>modules/test/custom_duration_functions_test.php</file>
+    </testsuite>
+  </testsuites>
+</phpunit>

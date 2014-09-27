@@ -13,7 +13,7 @@
 
 require_once (AT_INCLUDE_PATH. 'lib/mysql_connect.inc.php');
 require_once (AT_INCLUDE_PATH. 'config.inc.php');
-require_once (AT_INCLUDE_PATH. 'unit_tests/include/config.tests.inc.php');
+require_once (AT_INCLUDE_PATH. '../unit_tests/include/config.tests.inc.php');
 class DBHelper {
     
     public function setUp() {

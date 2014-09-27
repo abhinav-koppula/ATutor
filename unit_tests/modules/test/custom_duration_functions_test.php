@@ -11,8 +11,10 @@
 /* * ****************************************************************** */
 // $Id$                                         Author: Abhinav Koppula */
 
-define('AT_INCLUDE_PATH' , '../../include/');
-require_once (AT_INCLUDE_PATH. 'unit_tests/classes/TestDBHelper.class.php');
+if (!defined('AT_INCLUDE_PATH')) {
+    define('AT_INCLUDE_PATH', '../include/');
+}
+require_once ('classes/TestDBHelper.class.php');
 require_once (AT_INCLUDE_PATH. '../mods/_standard/tests/lib/test_custom_duration_functions.inc.php');
 
 class CustomDurationFunctionsTest extends PHPUnit_Framework_TestCase {

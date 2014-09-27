@@ -11,7 +11,9 @@
 /* * ****************************************************************** */
 // $Id$                                         Author: Abhinav Koppula */
 
-define('AT_INCLUDE_PATH' , '../../include/');
+if (!defined('AT_INCLUDE_PATH')) {
+    define('AT_INCLUDE_PATH', '../include/');
+}
 require_once (AT_INCLUDE_PATH. '../mods/_standard/tests/lib/test_helper_functions.inc.php');
 
 class CreateTest extends PHPUnit_Framework_TestCase {
@@ -21,7 +23,7 @@ class CreateTest extends PHPUnit_Framework_TestCase {
     //Dummy post array is used in all tests except the functional test(test_check_missing_fields)
     public static $dummy_post_array = array();
     protected function setUp() {
-        $path = AT_INCLUDE_PATH ."/unit_tests/data/create_test/";
+        $path = AT_INCLUDE_PATH ."../unit_tests/modules/test/data/create_test/";
         $input_string = file_get_contents($path."dummy_post_array.json");
         CreateTest::$dummy_post_array = json_decode($input_string,true);
         $this->post_array = CreateTest::$dummy_post_array;
@@ -134,7 +136,7 @@ class CreateTest extends PHPUnit_Framework_TestCase {
     }
     
     public static function provider_helper($test_name) {
-        $path = AT_INCLUDE_PATH ."/unit_tests/data/create_test/";
+        $path = AT_INCLUDE_PATH ."../unit_tests/modules/test/data/create_test/";
         $test_cases_string = file_get_contents($path.$test_name.".json");
         $test_cases = json_decode($test_cases_string, TRUE);
         
