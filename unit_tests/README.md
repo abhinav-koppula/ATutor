@@ -14,5 +14,4 @@ Instructions to run unit tests in ATutor
 
 
 Tools used in the Testing Framework -- present in lib folder
-PHPUnit 4.1.1
-Selenium 
+1. PHPUnit 4.1.1
