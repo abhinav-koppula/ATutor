@@ -108,15 +108,6 @@ class CreateTest extends PHPUnit_Framework_TestCase {
         $this->assertEquals($expected, $actual);
     }
     
-    public function test_check_duplicate_custom_duration() {
-        $custom_group_array = [1,2,3];
-        $custom_student_array = [2,4,5];
-        
-        $expected = 'duplicate_custom_duration';
-        $actual = check_duplicate_custom_duration($custom_group_array, $custom_student_array);
-        $this->assertEquals($expected, $actual);
-    }
-    
     public function test_check_percentage_score() {
         $this->post_array['pass_score'] = 1;
         $this->post_array['passpercent'] = 0;

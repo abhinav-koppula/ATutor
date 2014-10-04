@@ -56,7 +56,6 @@
          "title",
          "timed_test_duration_zero",
          "test_custom_duration_negative",
-         "duplicate_custom_duration",
          "percentage_score"
       ]
    },

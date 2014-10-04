@@ -270,4 +270,49 @@ function edit_test_for_groups($post_array, $tid) {
     insert_test_for_groups($post_array, $tid);
 }
 
+function check_duplicate_custom_duration($post_array) {
+    $custom_group_array = array();
+    $custom_student_array = array();
+    
+    foreach($post_array as $key => $value) {
+        if(substr($key, 0, strlen($key)-1) == "custom_duration_type_") {
+            $id = substr($key, -1);
+            $type = $post_array["custom_duration_type_".$id];
+            $type_id = $post_array["custom_duration_options_".$id];
+            
+            if($type == 'group') {
+                $custom_group_students_array = array();
+                $sql = "SELECT member_id FROM %sgroups_members WHERE group_id = %d";
+                $member_rows = queryDB($sql, array(TABLE_PREFIX, $type_id));
+                foreach($member_rows as $member_row) {
+                    array_push($custom_group_students_array, $member_row['member_id']);
+                }
+                $map = array($type_id => $custom_group_students_array);
+                array_push($custom_group_array, $map);
+            } else if($type == 'student') {
+                array_push($custom_student_array, $type_id);
+            }
+        }
+    }
+    
+    $duplicate_fields = array();
+    foreach($custom_group_array as $group_members_map) {
+        foreach($group_members_map as $group_id => $group_members) {
+            $common_students = array_intersect($group_members, $custom_student_array);
+        
+            if(count($common_students) > 0) {
+                foreach($common_students as $student) {   
+                    $sql = "SELECT title FROM %sgroups WHERE group_id = %d";
+                    $grows = queryDB($sql, array(TABLE_PREFIX, $group_id));
+                    $sql = "SELECT first_name, last_name FROM %smembers WHERE member_id = %d";
+                    $srows = queryDB($sql, array(TABLE_PREFIX, $student));
+                
+                    $duplicate_message = $srows[0]['first_name'].' '.$srows[0]['last_name'].' in '.$grows[0]['title'];
+                    array_push($duplicate_fields, $duplicate_message);
+                }
+            }
+        }
+    }
+    return $duplicate_fields;
+}
 ?>

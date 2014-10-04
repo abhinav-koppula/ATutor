@@ -34,6 +34,10 @@ class CreateTestDb extends PHPUnit_Framework_TestCase {
         CreateTestDb::$dummy_post_array = json_decode($input_string,true);
     }
     
+    public function tearDown() {
+        $this->db_helper->truncate_all();
+    }
+    
     /**
     * @param $post_array
     * @param $expected_row
@@ -50,7 +54,6 @@ class CreateTestDb extends PHPUnit_Framework_TestCase {
         $actual_row = queryDB($sql, array(TABLE_PREFIX, $insert_id));
         
         $this->assertEquals($expected_row, $actual_row[0]);
-        $this->db_helper->truncate($tables);
     }
     
     /**
@@ -72,7 +75,6 @@ class CreateTestDb extends PHPUnit_Framework_TestCase {
         $actual_row = queryDB($sql, array(TABLE_PREFIX, $tid));
         
         $this->assertEquals($expected_row, $actual_row[0]);
-        $this->db_helper->truncate($tables);
     }
     
     /**
@@ -90,7 +92,6 @@ class CreateTestDb extends PHPUnit_Framework_TestCase {
         $actual_row = queryDB($sql, array(TABLE_PREFIX, $tid));
         
         $this->assertEquals($expected_row, $actual_row);
-        $this->db_helper->truncate($tables);
     }
     
     /**
@@ -112,7 +113,6 @@ class CreateTestDb extends PHPUnit_Framework_TestCase {
         $sql = "SELECT * FROM %stests WHERE test_id=%d";
         $actual_row = queryDB($sql, array(TABLE_PREFIX, $tid));
         $this->assertEquals($expected_row, $actual_row[0]);
-        $this->db_helper->truncate($tables);
     }
     
     /**
@@ -137,7 +137,6 @@ class CreateTestDb extends PHPUnit_Framework_TestCase {
         //Unsetting 'id' as edit would do a delete followed by insert thus making id irrelevant
         unset($actual_row[0]['id']); unset($expected_row['id']);
         $this->assertEquals($expected_row, $actual_row[0]);
-        $this->db_helper->truncate($tables);
     }
     
     /**
@@ -156,7 +155,36 @@ class CreateTestDb extends PHPUnit_Framework_TestCase {
         $actual_row = queryDB($sql, array(TABLE_PREFIX, $tid));
         
         $this->assertEquals($expected_row, $actual_row);
-        $this->db_helper->truncate($tables);
+    }
+    
+    /**
+    * @param $post_array
+    * @param $expected_duplicate_array
+    *
+    * @dataProvider check_duplicate_custom_duration_provider
+    */
+    public function test_check_duplicate_custom_duration($post_array, $expected_duplicate_array) {
+        //Setup
+        $this->post_array = $post_array;
+        $groups_table = $this->db_helper->seed_groups();
+        $first_memberid = $second_memberid = $third_memberid = $fourth_memberid = 0;
+        $members_table = $this->db_helper->seed_student('member1', 'member1@atutor.com', 'First', 'Member', $first_memberid);
+        $members_table = $this->db_helper->seed_student('member2', 'member2@atutor.com', 'Second', 'Member', $second_memberid);
+        $members_table = $this->db_helper->seed_student('member3', 'member3@atutor.com', 'Third', 'Member', $third_memberid);
+        $members_table = $this->db_helper->seed_student('member4', 'member4@atutor.com', 'Fourth', 'Member', $fourth_memberid);
+        $groups_members_table = $this->db_helper->seed_group_member_association(1, $first_memberid);
+        $groups_members_table = $this->db_helper->seed_group_member_association(1, $second_memberid);
+        $groups_members_table = $this->db_helper->seed_group_member_association(2, $third_memberid);
+        $groups_members_table = $this->db_helper->seed_group_member_association(2, $fourth_memberid);
+        $course_enrollment_table = $this->db_helper->enroll_student_into_course(1, 1);
+        $course_enrollment_table = $this->db_helper->enroll_student_into_course(2, 1);
+        $course_enrollment_table = $this->db_helper->enroll_student_into_course(3, 1);
+        $course_enrollment_table = $this->db_helper->enroll_student_into_course(4, 1);
+        $tables = array_merge($groups_table, $members_table, $groups_members_table, $course_enrollment_table);
+        
+        //Act
+        $actual_duplicate_array = check_duplicate_custom_duration($this->post_array);
+        $this->assertEquals($expected_duplicate_array['duplicate'], $actual_duplicate_array);
     }
     
     public static function provider_helper($test_name) {
@@ -196,5 +224,8 @@ class CreateTestDb extends PHPUnit_Framework_TestCase {
         return CreateTestDb::provider_helper('edit_test_for_groups');
     }
     
+    public static function check_duplicate_custom_duration_provider() {
+        return CreateTestDb::provider_helper('check_duplicate_custom_duration');
+    }
 }
 ?>

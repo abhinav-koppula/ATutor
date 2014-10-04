@@ -30,23 +30,49 @@ class DBHelper {
         }
     }
     
+    public function add_table_prefix($str) {
+        return TABLE_PREFIX.$str;
+    }
+
+    public function truncate_all() {
+        $tables_to_not_truncate = array('admins', 'config', 'grade_scales', 'grade_scales_detail', 
+                                        'language_pages', 'language_text', 'modules', 'resource_types', 
+                                        'social_groups_types', 'themes');
+        
+        $sql = "SELECT table_name FROM information_schema.tables WHERE TABLE_SCHEMA =  '%s'";
+        $tables = queryDB($sql, array(TEST_DB_NAME));
+        foreach($tables as $table) {
+            $table_name_without_prefix = substr($table['table_name'], strlen(TABLE_PREFIX));
+            if(!(in_array($table_name_without_prefix, $tables_to_not_truncate))) {
+                $sql = "TRUNCATE %s";
+                queryDB($sql, array($table['table_name']));
+            }
+        }
+    }
+    
     public function seed_groups() {
         $sql = "INSERT INTO %sgroups_types (course_id,title) 
                 VALUES(1,'Type 1'),(1,'Type 2'),(2,'Type 3')";
         queryDB($sql, array(TABLE_PREFIX));
         
         $sql = "INSERT INTO %sgroups (type_id, title, description, modules) 
-                VALUES(1,'Type 1','Description 1','_standard/file_storage|_standard/forums|_standard/social|_standard/photos'),
-                      (1,'Type 2','Description 2','_standard/file_storage|_standard/forums|_standard/social|_standard/photos'),
-                      (2,'Type 3','Description 3','_standard/file_storage|_standard/forums|_standard/social|_standard/photos'),
-                      (3,'Type 4','Description 4','_standard/file_storage|_standard/forums|_standard/social|_standard/photos')";
+                VALUES(1,'Group 1','Description 1','_standard/file_storage|_standard/forums|_standard/social|_standard/photos'),
+                      (1,'Group 2','Description 2','_standard/file_storage|_standard/forums|_standard/social|_standard/photos'),
+                      (2,'Group 3','Description 3','_standard/file_storage|_standard/forums|_standard/social|_standard/photos'),
+                      (3,'Group 4','Description 4','_standard/file_storage|_standard/forums|_standard/social|_standard/photos')";
         queryDB($sql, array(TABLE_PREFIX));
         
         $tables_affected = array('groups_types', 'groups');
         return $tables_affected;
     }
     
-    public function seed_instructor($login, $email, $first_name, $last_name) {
+    public function seed_group_member_association($group_id, $member_id) {
+        $sql = "INSERT INTO `%sgroups_members`(group_id, member_id) VALUES(%d, %d)";
+        queryDB($sql, array(TABLE_PREFIX, $group_id, $member_id));
+        return array('groups_members');
+    }
+
+        public function seed_instructor($login, $email, $first_name, $last_name) {
         $password = md5('password');
         $sql = "INSERT INTO `%smembers`(`login`, `password`, `email`, `website`, `first_name`, `second_name`, `last_name`, `dob`, `gender`, `address`, `postal`, `city`, `province`, `country`, `phone`, `status`, `preferences`, `language`, `inbox_notify`, `private_email`)
                 VALUES('$login','$password', '$email', '', '$first_name', '', '$last_name', '1992-03-16', 'm', '', '', '', '', '', '', 3, '', 'en', '', '')";
@@ -54,11 +80,12 @@ class DBHelper {
         return array('members');
     }
     
-    public function seed_student($login, $email, $first_name, $last_name) {
+    public function seed_student($login, $email, $first_name, $last_name, &$member_id) {
         $password = md5('password');
         $sql = "INSERT INTO `%smembers`(`login`, `password`, `email`, `website`, `first_name`, `second_name`, `last_name`, `dob`, `gender`, `address`, `postal`, `city`, `province`, `country`, `phone`, `status`, `preferences`, `language`, `inbox_notify`, `private_email`)
                 VALUES('$login', '$password', '$email', '', '$first_name', '', '$last_name', '1992-03-16', 'm', '', '', '', '', '', '', 2, '', 'en', '', '')";
         queryDB($sql, array(TABLE_PREFIX));
+        $member_id = at_insert_id();
         return array('members');
     }
     

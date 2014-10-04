@@ -34,6 +34,7 @@ if (isset($_POST['cancel'])) {
     exit;
 } else if (isset($_POST['submit'])) {
     $missing_fields                         = array();
+    $duplicate_custom_duration_fields       = array();
     $_POST['title']                         = trim($_POST['title']);
     $_POST['description']                   = trim($_POST['description']);
     $_POST['passfeedback']                  = trim($_POST['passfeedback']);
@@ -60,25 +61,11 @@ if (isset($_POST['cancel'])) {
     $_POST['order']                = 1;  
     $_POST['difficulty']           = 0;
 
-    $custom_group_array = array();
-    foreach($_POST as $key => $value) {
-        if(substr($key, 0, strlen($key)-1) == "custom_duration_type_") {
-            $id = substr($key, -1);
-            $type = $_POST["custom_duration_type_".$id];
-            $type_id = $_POST["custom_duration_options_".$id];
-            
-            if($type == 'group') {
-                $sql = "SELECT member_id FROM %sgroups_members WHERE group_id = %d";
-                $member_rows = queryDB($sql, array(TABLE_PREFIX, $type_id));
-                foreach($member_rows as $member_row) {
-                    array_push($custom_group_array, $member_row['member_id']);
-                }
-            }
-        }
-    }
     
-    $missing_fields = check_missing_fields($_POST, $custom_group_array);
+    $missing_fields = check_missing_fields($_POST);
     $missing_fields = array_map('_AT', $missing_fields);
+    
+    $duplicate_custom_duration_fields = check_duplicate_custom_duration($_POST);
     
     /* 
      * If test is anonymous and have submissions, then we don't permit changes.
@@ -98,7 +85,11 @@ if (isset($_POST['cancel'])) {
         $missing_fields = implode(', ', $missing_fields);
         $msg->addError(array('EMPTY_FIELDS', $missing_fields));
     }
-
+    
+    if($duplicate_custom_duration_fields) {
+        $duplicate_custom_duration_fields = implode(', ', $duplicate_custom_duration_fields);
+        $msg->addError(array('DUPLICATE_CUSTOM_DURATION_FIELDS', $duplicate_custom_duration_fields));
+    }
     $day_start    = intval($_POST['day_start']);
     $month_start  = intval($_POST['month_start']);
     $year_start   = intval($_POST['year_start']);

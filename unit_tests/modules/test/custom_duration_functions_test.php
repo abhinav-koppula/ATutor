@@ -25,6 +25,10 @@ class CustomDurationFunctionsTest extends PHPUnit_Framework_TestCase {
         $this->db_helper->setUp();
     }
     
+    public function tearDown() {
+        $this->db_helper->truncate_all();
+    }
+    
     public function test_validate_type_group() {
         /* Start setup for this test */
         $tables = $this->db_helper->seed_groups();
@@ -34,7 +38,6 @@ class CustomDurationFunctionsTest extends PHPUnit_Framework_TestCase {
         $expected = true;
         $actual = validate_type('group', 2);
         $this->assertEquals($expected, $actual);
-        $this->db_helper->truncate($tables);
     }
     
     public function test_get_all_students() {
@@ -51,14 +54,13 @@ class CustomDurationFunctionsTest extends PHPUnit_Framework_TestCase {
             unset($row['course_id']);
             $system_courses[$course] = $row;
         }
-        $table2 = $this->db_helper->seed_student('student_abhinav', 'student_abhinav@atutor.com', 'Student', 'Abhinav');
-        $student_id = at_insert_id();
-        $expected_students[] = $student_id;
-        $this->db_helper->enroll_student_into_course($student_id, $course_id);
-        $table3 = $this->db_helper->seed_student('student_student', 'student_student@atutor.com', 'Student', 'Student');
-        $student_id = at_insert_id();
-        $expected_students[] = $student_id;
-        $table4 = $this->db_helper->enroll_student_into_course($student_id, $course_id);
+        $student1 = $student2 = 0;
+        $table2 = $this->db_helper->seed_student('student_abhinav', 'student_abhinav@atutor.com', 'Student', 'Abhinav', $student1);
+        $expected_students[] = $student1;
+        $this->db_helper->enroll_student_into_course($student1, $course_id);
+        $table3 = $this->db_helper->seed_student('student_student', 'student_student@atutor.com', 'Student', 'Student', $student2);
+        $expected_students[] = $student2;
+        $table4 = $this->db_helper->enroll_student_into_course($student2, $course_id);
         $tables = array_merge($table1, $table2, $table3, $table4);
         /* End setup for this test */
         
@@ -67,7 +69,6 @@ class CustomDurationFunctionsTest extends PHPUnit_Framework_TestCase {
             $actual_students[] = $s['member_id'];
         }
         $this->assertEquals($expected_students, $actual_students);
-        $this->db_helper->truncate($tables);
     }
     
     public function test_convert_hhmmss_to_duration() {

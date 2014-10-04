@@ -38,9 +38,6 @@ $timed_test_duration = $test_row['timed_test_duration'];
 $normal_mode = $timed_test ? $test_row['timed_test_normal_mode'] : 0;
 $intermediate_mode = $timed_test ? $test_row['timed_test_intermediate_mode']: 0;
 $emergency_mode = $timed_test ? $test_row['timed_test_emergency_mode'] : 0;
-$normal_mode_seconds = intval($timed_test_duration - (($normal_mode/100) * ($timed_test_duration)));
-$intermediate_mode_seconds = intval($normal_mode_seconds - (($intermediate_mode/100) * ($timed_test_duration)));
-$emergency_mode_seconds = intval($intermediate_mode_seconds - (($emergency_mode/100) * ($timed_test_duration)));
 
 $sql = "SELECT * FROM %stests_custom_duration WHERE test_id = %d";
 $custom_duration_rows = queryDB($sql, array(TABLE_PREFIX, $tid));
@@ -62,6 +59,9 @@ foreach($custom_duration_rows as $row) {
         }
     }
 }
+$normal_mode_seconds = intval($timed_test_duration - (($normal_mode/100) * ($timed_test_duration)));
+$intermediate_mode_seconds = intval($normal_mode_seconds - (($intermediate_mode/100) * ($timed_test_duration)));
+$emergency_mode_seconds = intval($intermediate_mode_seconds - (($emergency_mode/100) * ($timed_test_duration)));
 
 if(isset($_POST['test_timer_hidden'])) {
     $timer = $_POST['test_timer_hidden'];
@@ -302,13 +302,11 @@ if (count($question_row)==0) {
 <?php if (isset($_REQUEST['cid'])) {?> <input type="hidden" name="cid" value="<?php echo $cid; ?>" /> <?php }?>
 
 <div class="input-form" style="width:95%">
-
 	<fieldset class="group_form"><legend class="group_form"><?php echo $title ?> (<?php echo _AT('question').' '. ($pos+1).'/'.$test_row['num_questions']; ?>)</legend>
         <div id ="test_timer" class="test_timer">
         </div>
-        <div id ="test_timer_aria"  class="region" role="timer" aria-live="assertive" aria-atomic="false" aria-relevant="additions" style="
-    opacity: 0;" >
-            00:00:00
+        <div id ="test_timer_aria" role="timer" aria-live="assertive" aria-atomic="false" aria-relevant="additions" style="width:1px; height:35px; opacity: 0" >
+            &nbsp;
         </div>
         <input type="hidden" name="test_timer_hidden" id="test_timer_hidden" value="0" />
         <input type="hidden" name="test_type" id="test_type" value="single_question_page" />

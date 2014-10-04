@@ -93,17 +93,20 @@ function UpdateTimer() {
 
 function changeMode() {
     var seconds = TotalSeconds;
-    var convertedObj = {hours:0, mins:0, secs:0};
     
     if(seconds > NormalMode) {
         Timer.style.color = "#008000";
     } else if(seconds == NormalMode) {
-        updateLiveRegion(seconds, convertedObj, "#test_timer_aria");
+        setTimerAttributes();
+        updateLiveRegion("#test_timer_aria");
     } else if(seconds > IntermediateMode) {
+        removeTimerAttributes();
         Timer.style.color = "#E89C0C";
     } else if(seconds == IntermediateMode) {
-        updateLiveRegion(seconds, convertedObj, "#test_timer_aria");
+        setTimerAttributes();
+        updateLiveRegion("#test_timer_aria");
     } else {
+        removeTimerAttributes();
         Timer.style.color = "#FF0000";
     }
 }
@@ -148,9 +151,20 @@ function convert_duration_to_hhmmss(duration, convertedObj) {
     convertedObj.secs = secs;
 }
 
-function updateLiveRegion(duration, convertedObj, liveRegionId) {
-    convert_duration_to_hhmmss(duration, convertedObj);
-    $(liveRegionId).text(convertedObj.hours + " hours " + convertedObj.mins + " minutes " + convertedObj.secs + " seconds remaining");
+function setTimerAttributes() {
+    Timer.setAttribute('aria-relevant', 'all');
+    Timer.setAttribute('aria-atomic', 'true');
+    Timer.setAttribute('aria-live', 'polite');
+}
+
+function removeTimerAttributes() {
+    Timer.removeAttribute('aria-relevant');
+    Timer.removeAttribute('aria-atomic');
+    Timer.removeAttribute('aria-live');
+}
+
+function updateLiveRegion(liveRegionId) {
+    $(liveRegionId).text(Timer.innerHTML);
 }
 
 TestTimeout = function(options) {
