@@ -419,7 +419,7 @@ INSERT INTO `language_text` VALUES ('en', '_module', 'bbb_admin_setup', 'BigBlue
 ('en', '_msgs', 'AT_ERROR_DISABLE_MISSING_MODULE', 'You cannot disable a missing module. To continue managing this module you must first restore its directory.', '2005-10-05 16:22:01', ''),
 ('en', '_msgs', 'AT_ERROR_DISABLE_PARTIALLY_UNINSTALLED_MODULE', 'You cannot disable a partially uninstalled module. To continue managing this module you must first restore it.', '2008-10-21 15:41:53', 'error msg'),
 ('en', '_msgs', 'AT_ERROR_DOB_INVALID', 'Date of birth has invalid format.', '2004-06-24 12:53:34', ''),
-('en', '_msgs', 'AT_ERROR_DUPLICATE_CUSTOM_DURATION_FIELDS', 'The following students are already present in the following groups:<br />\r\n%s.', '2014-29-09 15:51:52', ''),
+('en', '_msgs', 'AT_ERROR_DUPLICATE_CUSTOM_DURATION_FIELDS', 'The following students are already present in the following groups:<br />\r\n%s.', '2014-09-29 15:51:52', ''),
 ('en', '_msgs', 'AT_ERROR_EC_INVOICE_APPROVED', 'Invoice number has already been approved.', '2013-08-01 10:18:14', ''),
 ('en', '_msgs', 'AT_ERROR_EC_INVOICE_NOT_FOUND', 'Invoice number cannot be found.', '2013-08-01 10:18:14', ''),
 ('en', '_msgs', 'AT_ERROR_EC_PAYMENTS_NO_COURSE_SELECTED', 'No course was selected. ', '2013-08-01 10:18:14', ''),
