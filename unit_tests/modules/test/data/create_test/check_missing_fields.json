@@ -47,15 +47,10 @@
          "passpercent":0,
          "submit":"Save"
       },
-      "custom_group_array":[  
-         1,
-         2,
-         3
-      ],
       "expected":[  
          "title",
          "timed_test_duration_zero",
-         "test_custom_duration_negative",
+         ["test_custom_duration_negative", "Group 3"],
          "percentage_score"
       ]
    },
@@ -93,11 +88,6 @@
          "instructions":"",
          "submit":"Save"
       },
-      "custom_group_array":[  
-         1,
-         2,
-         3
-      ],
       "expected":[  
          "title"
       ]

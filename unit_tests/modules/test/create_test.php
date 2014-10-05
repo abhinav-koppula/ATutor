@@ -14,30 +14,39 @@
 if (!defined('AT_INCLUDE_PATH')) {
     define('AT_INCLUDE_PATH', '../include/');
 }
+require_once ('classes/TestDBHelper.class.php');
 require_once (AT_INCLUDE_PATH. '../mods/_standard/tests/lib/test_helper_functions.inc.php');
 
 class CreateTest extends PHPUnit_Framework_TestCase {
     
-    protected $post_array;
+    protected $post_array, $db_helper;
     
     //Dummy post array is used in all tests except the functional test(test_check_missing_fields)
     public static $dummy_post_array = array();
     protected function setUp() {
+        
+        $this->db_helper = new DBHelper();
+        $this->db_helper->setUp();
+        
         $path = AT_INCLUDE_PATH ."../unit_tests/modules/test/data/create_test/";
         $input_string = file_get_contents($path."dummy_post_array.json");
         CreateTest::$dummy_post_array = json_decode($input_string,true);
         $this->post_array = CreateTest::$dummy_post_array;
     }
     
+    public function tearDown() {
+        $this->db_helper->truncate_all();
+    }
+    
     /**
     * @param $post_array
-    * @param $custom_group_array
     * @param $expected_missing_fields
     *
     * @dataProvider check_missing_fields_provider
     */
-    public function test_check_missing_fields($post_array, $custom_group_array, $expected_missing_fields) {       
-        $actual_missing_fields = check_missing_fields($post_array, $custom_group_array);
+    public function test_check_missing_fields($post_array, $expected_missing_fields) {
+        $this->db_helper->seed_groups();
+        $actual_missing_fields = check_missing_fields($post_array);
         $this->assertEquals($expected_missing_fields, $actual_missing_fields);
     }
     
@@ -88,22 +97,23 @@ class CreateTest extends PHPUnit_Framework_TestCase {
     }
     
     public function test_check_missing_custom_timed_test_duration() {
+        $this->db_helper->seed_groups();
         $id = 0;
-        $this->post_array['custom_duration_options_'.$id] = 'group';
-        
-        $expected = 'test_custom_duration_zero';
+        $this->post_array['custom_duration_options_'.$id] = 1;
+        $expected = array('test_custom_duration_zero', 'Group 1');
         $actual = check_missing_custom_timed_test_duration($this->post_array, $id);
         $this->assertEquals($expected, $actual);
     }
     
     public function test_check_negative_custom_timed_test_duration() {
+        $this->db_helper->seed_groups();
         $id = 0;
-        $this->post_array['custom_duration_options_'.$id] = 'group';
+        $this->post_array['custom_duration_options_'.$id] = 1;
         $this->post_array['custom_duration_hours_0'] = -3;
         $this->post_array['custom_duration_minutes_0'] = -2;
         $this->post_array['custom_duration_seconds_0'] = 0;
         
-        $expected = 'test_custom_duration_negative';
+        $expected = array('test_custom_duration_negative', 'Group 1');
         $actual = check_negative_custom_timed_test_duration($this->post_array, $id);
         $this->assertEquals($expected, $actual);
     }
@@ -133,7 +143,7 @@ class CreateTest extends PHPUnit_Framework_TestCase {
         
         $return_array = array();
         foreach($test_cases as $test_case) {
-            $return_array[] = array($test_case['input'], $test_case['custom_group_array'], $test_case['expected']);
+            $return_array[] = array($test_case['input'], $test_case['expected']);
         }
         
         return $return_array;

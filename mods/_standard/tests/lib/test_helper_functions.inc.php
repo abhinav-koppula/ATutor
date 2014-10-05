@@ -76,27 +76,41 @@ function check_negative_timed_test_duration($post_array) {
 }
 
 function check_missing_custom_timed_test_duration($post_array, $id) {
-    $missing_field = '';
+    $missing_field = array();
     $type = $post_array["custom_duration_type_".$id];
     $type_id = $post_array["custom_duration_options_".$id];
     $custom_duration_hours = $post_array["custom_duration_hours_".$id];
     $custom_duration_minutes = $post_array["custom_duration_minutes_".$id];
     $custom_duration_seconds = $post_array["custom_duration_seconds_".$id];
     if($type != -1 && $type_id != -1 && ($custom_duration_hours == 0  && $custom_duration_minutes == 0 && $custom_duration_seconds == 0)) {
-        $missing_field = 'test_custom_duration_zero';
+        $missing_field[] = 'test_custom_duration_zero';
+        if($type == 'group') {
+            $sql = "SELECT title AS name FROM %sgroups WHERE group_id = %d";
+        } else {
+            $sql = "SELECT CONCAT_WS(' ', first_name, last_name) AS name FROM %smembers WHERE member_id = %d";
+        }
+        $row = queryDB($sql, array(TABLE_PREFIX, $type_id));
+        $missing_field[] = $row[0]['name'];
     }
     return $missing_field;
 }
 
 function check_negative_custom_timed_test_duration($post_array, $id) {
-    $missing_field = '';
+    $missing_field = array();
     $type = $post_array["custom_duration_type_".$id];
     $type_id = $post_array["custom_duration_options_".$id];
     $custom_duration_hours = $post_array["custom_duration_hours_".$id];
     $custom_duration_minutes = $post_array["custom_duration_minutes_".$id];
     $custom_duration_seconds = $post_array["custom_duration_seconds_".$id];
     if($type != -1 && $type_id != -1 && ($custom_duration_hours < 0  || $custom_duration_minutes < 0 || $custom_duration_seconds < 0)) {
-        $missing_field = 'test_custom_duration_negative';
+        $missing_field[] = 'test_custom_duration_negative';
+        if($type == 'group') {
+            $sql = "SELECT title AS name FROM %sgroups WHERE group_id = %d";
+        } else {
+            $sql = "SELECT CONCAT_WS(' ', first_name, last_name) AS name FROM %smembers WHERE member_id = %d";
+        }
+        $row = queryDB($sql, array(TABLE_PREFIX, $type_id));
+        $missing_field[] = $row[0]['name'];
     }
     return $missing_field;
 }
