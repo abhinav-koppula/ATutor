@@ -237,7 +237,22 @@ $savant->display('create_test.tmpl.php');
         return options;
     }
     
-    $(document).ready(function(){
+    $(document).ready(function(){       
+        fluid.tooltip('#timed_test_normal_mode', {
+            content : function() {
+                return "<?php echo _AT('test_normal_mode_tooltip'); ?>";
+            }
+        });
+        fluid.tooltip('#timed_test_intermediate_mode', {
+            content : function() {
+                return "<?php echo _AT('test_intermediate_mode_tooltip'); ?>";
+            }
+        });
+        fluid.tooltip('#timed_test_emergency_mode', {
+            content : function() {
+                return "<?php echo _AT('test_emergency_mode_tooltip'); ?>";
+            }
+        });
         $('#add_custom_duration_row').click(function(){ 
             ATutor.mods.tests.create_test.add_custom_duration_row(ATutor.mods.tests.create_test.custom_duration_row_id++);
         });

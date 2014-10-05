@@ -184,11 +184,11 @@
     <div class="row">
         <?php echo _AT('timed_test_modes'); ?><br/>
         <input type="text" name="timed_test_normal_mode" id="timed_test_normal_mode" size="2" value="<?php echo $_POST['timed_test_normal_mode'] ? $_POST['timed_test_normal_mode'] : 60; ?>" <?php echo $disabled . $n; ?> /> 
-        <label for="timed_test_normal_mode"><?php echo _AT('timed_test_normal_mode'); ?></label>
+        <label for="timed_test_normal_mode">% - <?php echo _AT('timed_test_normal_mode'); ?></label>
         <input type="text" name="timed_test_intermediate_mode" id="timed_test_intermediate_mode" size="2" value="<?php echo $_POST['timed_test_intermediate_mode'] ? $_POST['timed_test_intermediate_mode'] : 30; ?>" <?php echo $disabled . $n; ?> /> 
-        <label for="timed_test_intermediate_mode"><?php echo _AT('timed_test_intermediate_mode'); ?></label>
+        <label for="timed_test_intermediate_mode">% - <?php echo _AT('timed_test_intermediate_mode'); ?></label>
         <input type="text" name="timed_test_emergency_mode" id="timed_test_emergency_mode" size="2" value="<?php echo $_POST['timed_test_emergency_mode'] ? $_POST['timed_test_emergency_mode'] : 10; ?>" <?php echo $disabled . $n; ?> /> 
-        <label for="timed_test_emergency_mode"><?php echo _AT('timed_test_emergency_mode'); ?></label>
+        <label for="timed_test_emergency_mode">% - <?php echo _AT('timed_test_emergency_mode'); ?></label>
     </div>
     
     <div class="row">
