@@ -75,7 +75,7 @@ class CustomDurationFunctionsTest extends PHPUnit_Framework_TestCase {
         $hours = 1;
         $mins = 30;
         $secs = 45;
-        $expected = (5445);
+        $expected = (5440);
         $actual = convert_hhmmss_to_duration($hours, $mins, $secs);
         $this->assertEquals($expected, $actual);
     }
