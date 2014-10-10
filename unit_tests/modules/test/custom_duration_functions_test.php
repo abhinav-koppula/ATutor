@@ -12,7 +12,7 @@
 // $Id$                                         Author: Abhinav Koppula */
 
 if (!defined('AT_INCLUDE_PATH')) {
-    define('AT_INCLUDE_PATH', '../include/');
+    define('AT_INCLUDE_PATH', '../../../../include/');
 }
 require_once ('classes/TestDBHelper.class.php');
 require_once (AT_INCLUDE_PATH. '../mods/_standard/tests/lib/test_custom_duration_functions.inc.php');
@@ -75,7 +75,7 @@ class CustomDurationFunctionsTest extends PHPUnit_Framework_TestCase {
         $hours = 1;
         $mins = 30;
         $secs = 45;
-        $expected = (5440);
+        $expected = (5445);
         $actual = convert_hhmmss_to_duration($hours, $mins, $secs);
         $this->assertEquals($expected, $actual);
     }

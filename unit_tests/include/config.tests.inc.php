@@ -26,5 +26,7 @@ define('TEST_DB_PORT',                      '3306');
 
 /* the database name                                                    */
 define('TEST_DB_NAME',                      'atutor_test');
-
+global $addslashes, $stripslashes;
+$addslashes   = 'my_add_null_slashes';
+$stripslashes = 'stripslashes';
 ?>

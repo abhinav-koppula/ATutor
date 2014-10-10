@@ -12,7 +12,7 @@
 // $Id$                                         Author: Abhinav Koppula */
 
 if (!defined('AT_INCLUDE_PATH')) {
-    define('AT_INCLUDE_PATH', '../include/');
+    define('AT_INCLUDE_PATH', '../../../../include/');
 }
 require_once ('classes/TestDBHelper.class.php');
 require_once (AT_INCLUDE_PATH. '../mods/_standard/tests/lib/test_db_helper_functions.inc.php');

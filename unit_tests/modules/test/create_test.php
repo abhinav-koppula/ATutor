@@ -12,7 +12,7 @@
 // $Id$                                         Author: Abhinav Koppula */
 
 if (!defined('AT_INCLUDE_PATH')) {
-    define('AT_INCLUDE_PATH', '../include/');
+    define('AT_INCLUDE_PATH', '../../../../include/');
 }
 require_once ('classes/TestDBHelper.class.php');
 require_once (AT_INCLUDE_PATH. '../mods/_standard/tests/lib/test_helper_functions.inc.php');
@@ -23,6 +23,7 @@ class CreateTest extends PHPUnit_Framework_TestCase {
     
     //Dummy post array is used in all tests except the functional test(test_check_missing_fields)
     public static $dummy_post_array = array();
+    
     protected function setUp() {
         
         $this->db_helper = new DBHelper();

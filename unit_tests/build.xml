@@ -1,8 +1,0 @@
-<?xml version="1.0"?>
-
-<project name="ATutor" basedir="." default="test">
-  <target name="test">
-    <exec command="phpunit --configuration suite.xml --log-junit report.xml" />
-    <phpunitreport infile="report.xml" styledir="styles" format="noframes" todir="reports" />
-  </target>
-</project>
