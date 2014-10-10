@@ -75,7 +75,7 @@ class DBHelper {
         public function seed_instructor($login, $email, $first_name, $last_name) {
         $password = md5('password');
         $sql = "INSERT INTO `%smembers`(`login`, `password`, `email`, `website`, `first_name`, `second_name`, `last_name`, `dob`, `gender`, `address`, `postal`, `city`, `province`, `country`, `phone`, `status`, `preferences`, `language`, `inbox_notify`, `private_email`)
-                VALUES('$login','$password', '$email', '', '$first_name', '', '$last_name', '1992-03-16', 'm', '', '', '', '', '', '', 3, '', 'en', '', '')";
+                VALUES('$login','$password', '$email', '', '$first_name', '', '$last_name', '1992-03-16', 'm', '', '', '', '', '', '', 3, '', 'en', 0, 0)";
         queryDB($sql, array(TABLE_PREFIX));
         return array('members');
     }
@@ -83,7 +83,7 @@ class DBHelper {
     public function seed_student($login, $email, $first_name, $last_name, &$member_id) {
         $password = md5('password');
         $sql = "INSERT INTO `%smembers`(`login`, `password`, `email`, `website`, `first_name`, `second_name`, `last_name`, `dob`, `gender`, `address`, `postal`, `city`, `province`, `country`, `phone`, `status`, `preferences`, `language`, `inbox_notify`, `private_email`)
-                VALUES('$login', '$password', '$email', '', '$first_name', '', '$last_name', '1992-03-16', 'm', '', '', '', '', '', '', 2, '', 'en', '', '')";
+                VALUES('$login', '$password', '$email', '', '$first_name', '', '$last_name', '1992-03-16', 'm', '', '', '', '', '', '', 2, '', 'en', 0, 0)";
         queryDB($sql, array(TABLE_PREFIX));
         $member_id = at_insert_id();
         return array('members');
